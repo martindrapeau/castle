@@ -1,0 +1,58 @@
+<!doctype html>
+<html style="touch-action: none;">
+    <head>
+        <title>Castle - Backbone Game Engine</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <link href="../apple_touch_icon.png" rel="apple-touch-icon" />
+
+        <meta name="viewport" content="width=960, user-scalable=no"/>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+        <script src="js/3rd/hammer.js" type="text/javascript"></script>
+        <script src="js/3rd/underscore.js" type="text/javascript"></script>
+        <script src="js/3rd/backbone.native.js" type="text/javascript"></script>
+        <script src="js/3rd/backbone.js" type="text/javascript"></script>
+
+        <script src="js/backbone-game-engine/adjust-viewport.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/input.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/shapes.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/core.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/character.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/hero.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/world.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/camera.js" type="text/javascript"></script>
+        <script src="js/backbone-game-engine/editor.js" type="text/javascript"></script>
+
+        <script src="js/src/hero1.js" type="text/javascript"></script>
+        <script src="js/src/tiles.js" type="text/javascript"></script>
+        <script src="js/src/main.js" type="text/javascript"></script>
+
+        <style>
+            body {
+                margin: 0;
+                background-color: #000;
+            }
+            canvas {
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <img id="hero1" src="img/hero1.png" style="display:none;" />
+        <img id="tiles" src="img/tiles.png" style="display:none;" />
+        <img id="icons" src="img/icons.png" style="display:none;" />
+
+        <canvas id="foreground" width="960" height="700">
+            Your browser does not support canvas element.
+        </canvas>
+    </body>
+
+</html>
