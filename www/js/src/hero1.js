@@ -17,6 +17,7 @@
       fallVelocity = 600,
       idleDelay = 2500,
       walkDelay = 75,
+      koDelay = 100,
       runDelay = 50;
 
   // Backbone.Hero implements the Mario character in Super Mario Bros.
@@ -33,7 +34,8 @@
       acceleration: 0,
       yVelocity: 0,
       yAcceleration: 0,
-      collision: true
+      collision: true,
+      dead: false
     }),
     animations: {
       "idle-left": {
@@ -145,17 +147,33 @@
         scaleY: 1
       },
       "ko-left": {
-        sequences: [70, 71, 72, 73],
-        delay: walkDelay,
-        velocity: 0,
-        scaleX: 1,
+        sequences: [70, 71, 72],
+        delay: koDelay,
+        velocity: -walkVelocity,
+        yVelocity: fallVelocity,
+        yAcceleration: fallAcceleration,
+        scaleX: -1,
         scaleY: 1
       },
       "ko-right": {
-        sequences: [70, 71, 72, 73],
-        delay: walkDelay,
+        sequences: [70, 71, 72],
+        delay: koDelay,
+        velocity: walkVelocity,
+        yVelocity: fallVelocity,
+        yAcceleration: fallAcceleration,
+        scaleX: 1,
+        scaleY: 1
+      },
+      "dead-left": {
+        sequences: [73],
         velocity: 0,
         scaleX: -1,
+        scaleY: 1
+      },
+      "dead-right": {
+        sequences: [73],
+        velocity: 0,
+        scaleX: 1,
         scaleY: 1
       }
     },
@@ -201,11 +219,13 @@
       return this;
     },
     knockout: function(sprite, dir) {
+      var cur = this.getStateInfo();
       this.set({
-        state: "ko-" + dir,
-        velocity: 0,
-        yVelocity: 0,
-        collision: false
+        state: "ko-" + cur.dir,
+        velocity: this.animations["ko-" + cur.dir].velocity,
+        yVelocity: -this.animations["ko-" + cur.dir].yVelocity/2,
+        nextState: "dead-" + cur.dir,
+        dead: true
       });
       return this;
     },
@@ -226,7 +246,7 @@
           velocity = this.get("velocity"),
           attrs = {};
 
-      if (cur.mov == "ko") return this;
+      if (this.get("dead")) return this;
 
       if (dirPressed) {
         // Pressed. Intent to move in that direction
@@ -286,7 +306,7 @@
           cur = this.getStateInfo(),
           attrs = {};
 
-      if (cur.mov == "ko") return this;
+      if (this.get("dead")) return this;
 
       if (this.input && this.input.buttonAPressed() && cur.mov != "jump") {
         // Set new state (keep old as next)
@@ -304,12 +324,12 @@
         var heroSmall = cur.mov == "crouch",
           heroWidth = this.get("width"),
           tileHeight = this.get("height"),
-          heroHeight = heroSmall ? tileHeight/2 : tileHeight,
+          heroHeight = heroSmall ? tileHeight*0.5 : tileHeight*0.8,
           heroBottomY = Math.round(this.get("y") - 4) + tileHeight,
           heroTopY = heroBottomY - heroHeight,
           heroLeftX = this.get("x"),
-          topLeftTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth/4, heroTopY, "tile", this, true) : null,
-          topRightTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*3/4, heroTopY, "tile", this, true) : null;
+          topLeftTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "tile", this, true) : null,
+          topRightTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "tile", this, true) : null;
         if (topLeftTile || topRightTile) attrs.yVelocity = -2*60;
 
         // Keep the horizontal velocity
@@ -330,7 +350,8 @@
       if (!this.world) return true;
 
       // Velocity and state
-      var input = this.input,
+      var dead = this.get("dead"),
+          input = this.input,
           velocity = this.get("velocity") || 0,
           yVelocity = this.get("yVelocity") || 0,
           yAcceleration = null,
@@ -444,202 +465,203 @@
       function updateHeroTopBottom() {
         heroBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight;
         heroTopY = heroBottomY - heroHeight;
-        obstacleCheckTopY = heroTopY + heroHeight/4;
-        obstacleCheckBottomY = heroTopY + heroHeight*3/4;
+        obstacleCheckTopY = heroTopY + heroHeight*0.25;
+        obstacleCheckBottomY = heroTopY + heroHeight*0.75;
       }
       updateHeroTopBottom();
 
-      var bottomLeftTile = cur.mov != "ko" ? this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "tile", this, true) : null,
-          bottomRightTile = cur.mov != "ko" ? this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "tile", this, true) : null,
+      var bottomLeftTile = this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "tile", this, true),
+          bottomRightTile = this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "tile", this, true),
           bottomWorld = this.world.height() + heroHeight,
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld,
-            bottomLeftTile ? bottomLeftTile.get("y") : null,
-            bottomRightTile ? bottomRightTile.get("y") : null
+            bottomLeftTile ? (bottomLeftTile.get("y") + (bottomLeftTile.get("paddingTop") || 0)) : null,
+            bottomRightTile ? (bottomRightTile.get("y") + (bottomRightTile.get("paddingTop") || 0)) : null
           ]);
 
-      if (cur.mov == "ko") {
-        if (heroBottomY >= bottomWorld) {
+
+      if ((cur.mov == "jump" || dead) && yVelocity > 0) {
+        // Falling...
+        attrs.sequenceIndex = 1;
+
+        if (dead && heroBottomY >= bottomWorld) {
           this.world.remove(this);
           return false;
         }
-      } else {
 
-        if (cur.mov == "jump" && yVelocity > 0) {
-          // Falling...
-          attrs.sequenceIndex = 1;
-
-          function land(bottomY) {
-            attrs.yVelocity = yVelocity = 0;
-            attrs.y = y = bottomY - tileHeight;
-            updateHeroTopBottom();
-            attrs.state = nextState;
-            if (nex.move == "walk" || nex.move == "run")
-              attrs.nextState = (input && input.buttonBPressed() ? "run-" : "walk-") + nex.dir;
-            if (nex.mov == "skid")
-              attrs.nextState = (input && input.buttonBPressed() ? "run-" : "walk-") + nex.opo;
-            else if(nex.mov == "release")
-              attrs.nextState = "idle-" + nex.dir;
+        function land(bottomY) {
+          attrs.yVelocity = yVelocity = 0;
+          attrs.y = y = bottomY - tileHeight;
+          updateHeroTopBottom();
+          attrs.state = nextState;
+          if (nex.move == "walk" || nex.move == "run")
+            attrs.nextState = (input && input.buttonBPressed() ? "run-" : "walk-") + nex.dir;
+          else if (nex.mov == "skid")
+            attrs.nextState = (input && input.buttonBPressed() ? "run-" : "walk-") + nex.opo;
+          else if(nex.mov == "release")
+            attrs.nextState = "idle-" + nex.dir;
+          else if (nex.mov == "dead") {
+            attrs.velocity = velocity = 0;
           }
+        }
 
-          if (heroBottomY >= bottomY) {
-            // Stop falling if obstacle below
-            if (heroBottomY >= bottomWorld) {
-              this.world.remove(this);
-              return false;
-            }
-            if (bottomLeftTile || bottomRightTile) {
-              reaction = this.getHitReaction(bottomLeftTile || bottomRightTile, "bottom", bottomLeftTile ? "left": "right");
-              if (reaction == "ko") {
-                return this.knockout(bottomLeftTile || bottomRightTile, bottomLeftTile ? "left": "right");
-              }
-            }
-            land(bottomY);
-          } else {
-            // Enemie below?
-            var bottomLeftCharacter = heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "character", this, true) : null,
-                bottomRightCharacter = heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "character", this, true) : null,
-                characterBottomY = _.minNotNull([
-                    bottomY,
-                    bottomLeftCharacter ? bottomLeftCharacter.get("y") : null,
-                    bottomRightCharacter ? bottomRightCharacter.get("y") : null
-                ]);
-            if (characterBottomY != bottomY) {
-              reaction = this.getHitReaction(bottomLeftCharacter || bottomRightCharacter, "bottom", bottomLeftCharacter ? "left": "right");
-              if (reaction == "block") {
-                land(characterBottomY);
-              } else if (reaction == "bounce") {
-                attrs.yVelocity = yVelocity = animation.yStartVelocity*1/4;
-                attrs.y = y = characterBottomY - tileHeight;
-                updateHeroTopBottom();
-              } else if (reaction == "ko") {
-                return this.knockout(bottomLeftCharacter || bottomRightCharacter, bottomLeftCharacter ? "left": "right");
-              }
-
-              if (bottomLeftCharacter)
-                bottomLeftCharacter.trigger("hit", this, "top", "right");
-              if (bottomRightCharacter && bottomLeftCharacter != bottomRightCharacter)
-                bottomRightCharacter.trigger("hit", this, "top", "left");
+        if (heroBottomY >= bottomY) {
+          // Stop falling if obstacle below
+          if (heroBottomY >= bottomWorld) {
+            this.world.remove(this);
+            return false;
+          }
+          if (bottomLeftTile || bottomRightTile) {
+            reaction = this.getHitReaction(bottomLeftTile || bottomRightTile, "bottom", bottomLeftTile ? "left": "right");
+            if (reaction == "ko") {
+              return this.knockout(bottomLeftTile || bottomRightTile, bottomLeftTile ? "left": "right");
             }
           }
-
-        } else if (cur.mov == "jump" && yVelocity < 0) {
-          attrs.sequenceIndex = 0;
-
-          // Stop jumping if obstacle above
-          var topLeftTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "tile", this, true) : null,
-              topRightTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "tile", this, true) : null,
-              topY = _.maxNotNull([
-                -400,
-                topLeftTile ? (topLeftTile.get("y") + topLeftTile.get("height")) : null,
-                topRightTile ? (topRightTile.get("y") + topRightTile.get("height")) : null,
+          land(bottomY);
+        } else {
+          // Enemie below?
+          var bottomLeftCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "character", this, true) : null,
+              bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "character", this, true) : null,
+              characterBottomY = _.minNotNull([
+                  bottomY,
+                  bottomLeftCharacter ? bottomLeftCharacter.get("y") : null,
+                  bottomRightCharacter ? bottomRightCharacter.get("y") : null
               ]);
-          if (heroTopY < topY) {
-            attrs.yVelocity = yVelocity = 0;
-            attrs.y = y = topY + heroHeight - tileHeight;
-            updateHeroTopBottom();
-            if (cur.dir == "left") {
-              if (topLeftTile) topLeftTile.trigger("hit", this);
-              else if (topRightTile) topRightTile.trigger("hit", this);
-            } else {
-              if (topRightTile) topRightTile.trigger("hit", this);
-              else if (topLeftTile) topLeftTile.trigger("hit", this);
+          if (characterBottomY != bottomY) {
+            reaction = this.getHitReaction(bottomLeftCharacter || bottomRightCharacter, "bottom", bottomLeftCharacter ? "left": "right");
+            if (reaction == "block") {
+              land(characterBottomY);
+            } else if (reaction == "bounce") {
+              attrs.yVelocity = yVelocity = animation.yStartVelocity*1/4;
+              attrs.y = y = characterBottomY - tileHeight;
+              updateHeroTopBottom();
+            } else if (reaction == "ko") {
+              return this.knockout(bottomLeftCharacter || bottomRightCharacter, bottomLeftCharacter ? "left": "right");
             }
+
+            if (bottomLeftCharacter)
+              bottomLeftCharacter.trigger("hit", this, "top", "right");
+            if (bottomRightCharacter && bottomLeftCharacter != bottomRightCharacter)
+              bottomRightCharacter.trigger("hit", this, "top", "left");
+          }
+        }
+
+      } else if ((cur.mov == "jump" || dead) && yVelocity < 0) {
+        attrs.sequenceIndex = 0;
+
+        // Stop jumping if obstacle above
+        var topLeftTile = !dead && heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroTopY, "tile", this, true) : null,
+            topRightTile = !dead && heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.60, heroTopY, "tile", this, true) : null,
+            topY = _.maxNotNull([
+              -400,
+              topLeftTile ? (topLeftTile.get("y") + topLeftTile.get("height")) : null,
+              topRightTile ? (topRightTile.get("y") + topRightTile.get("height")) : null,
+            ]);
+        if (heroTopY < topY) {
+          attrs.yVelocity = yVelocity = 0;
+          attrs.y = y = topY + heroHeight - tileHeight;
+          updateHeroTopBottom();
+          if (cur.dir == "left") {
+            if (topLeftTile) topLeftTile.trigger("hit", this);
+            else if (topRightTile) topRightTile.trigger("hit", this);
           } else {
-            // Enemie above?
-            var topLeftCharacter = this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "character", this, true),
-                topRightCharacter = this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "character", this, true),
-                characterTopY = _.maxNotNull([
-                    topY,
-                    topLeftCharacter ? (topLeftCharacter.get("y") + topLeftCharacter.get("height")) : null,
-                    topRightCharacter ? (topRightCharacter.get("y") + topRightCharacter.get("height")) : null
-                ]);
-            if (characterTopY != topY) {
-              reaction = this.getHitReaction(topLeftCharacter || topRightCharacter, "top", topLeftCharacter ? "left": "right");
-              if (reaction == "block") {
-                attrs.yVelocity = yVelocity = 0;
-                attrs.y = y = characterTopY + heroHeight - tileHeight;
-                updateHeroTopBottom();
-              }
-
-              if (topLeftCharacter) topLeftCharacter.trigger("hit", this, "bottom", "left");
-              if (topRightCharacter) topRightCharacter.trigger("hit", this, "bottom", "right");
-            }
+            if (topRightTile) topRightTile.trigger("hit", this);
+            else if (topLeftTile) topLeftTile.trigger("hit", this);
           }
-        } else if (cur.mov != "jump" && heroBottomY < bottomY) {
-          // Start falling if no obstacle below
-          attrs.nextState = state;
-          attrs.state = "jump-" + cur.dir;
+        } else {
+          // Enemie above?
+          var topLeftCharacter = !dead ? this.world.findAt(heroLeftX + heroWidth*0.40, heroTopY, "character", this, true) : null,
+              topRightCharacter = !dead ? this.world.findAt(heroLeftX + heroWidth*0.60, heroTopY, "character", this, true) : null,
+              characterTopY = _.maxNotNull([
+                  topY,
+                  topLeftCharacter ? (topLeftCharacter.get("y") + topLeftCharacter.get("height")) : null,
+                  topRightCharacter ? (topRightCharacter.get("y") + topRightCharacter.get("height")) : null
+              ]);
+          if (characterTopY != topY) {
+            reaction = this.getHitReaction(topLeftCharacter || topRightCharacter, "top", topLeftCharacter ? "left": "right");
+            if (reaction == "block") {
+              attrs.yVelocity = yVelocity = 0;
+              attrs.y = y = characterTopY + heroHeight - tileHeight;
+              updateHeroTopBottom();
+            }
+
+            if (topLeftCharacter) topLeftCharacter.trigger("hit", this, "bottom", "left");
+            if (topRightCharacter) topRightCharacter.trigger("hit", this, "bottom", "right");
+          }
         }
+      } else if (cur.mov != "jump" && heroBottomY < bottomY && !dead) {
+        // Start falling if no obstacle below
+        attrs.nextState = state;
+        attrs.state = "jump-" + cur.dir;
+      }
 
-        if (velocity <= 0) {
-          // Stop if obstacle left
-          var leftTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroLeftX, obstacleCheckTopY, "tile", this, true) : null,
-              leftBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroLeftX, obstacleCheckBottomY, "tile", this, true) : null,
-              leftBottomCharacter = this.world.findAt(heroLeftX + heroWidth/4, obstacleCheckBottomY, "character", this, true),
-              leftX = _.maxNotNull([
-                0,
-                leftTopTile ? (leftTopTile.get("x") + leftTopTile.get("width")) : null,
-                leftBottomTile ? (leftBottomTile.get("x") + leftBottomTile.get("width")) : null
-              ]) - heroWidth*0.25;
+      if (velocity <= 0) {
+        // Stop if obstacle left
+        var leftTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.25, obstacleCheckTopY, "tile", this, true) : null,
+            leftBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.25, obstacleCheckBottomY, "tile", this, true) : null,
+            leftBottomCharacter = this.world.findAt(heroLeftX + heroWidth*0.25, obstacleCheckBottomY, "character", this, true),
+            leftX = _.maxNotNull([
+              0,
+              leftTopTile ? (leftTopTile.get("x") + leftTopTile.get("width")) : null,
+              leftBottomTile ? (leftBottomTile.get("x") + leftBottomTile.get("width")) : null
+            ]) - heroWidth*0.25;
 
+        if (heroLeftX <= leftX) {
+          // Hit a tile or end of the world
+          attrs.velocity = velocity = 0;
+          attrs.x = x = leftX;
+
+        } else if (leftBottomCharacter) {
+          // Check for character hit
+          leftX = leftBottomCharacter.get("x") + leftBottomCharacter.get("width");
           if (heroLeftX <= leftX) {
-            // Hit a tile or end of the world
-            attrs.velocity = velocity = 0;
-            attrs.x = x = leftX;
-
-          } else if (leftBottomCharacter) {
-            // Check for character hit
-            leftX = leftBottomCharacter.get("x") + leftBottomCharacter.get("width");
-            if (heroLeftX <= leftX) {
-              var reaction = this.getHitReaction(leftBottomCharacter, "left");
-              if (reaction == "block") {
-                attrs.velocity = velocity = 0;
-                attrs.x = x = leftX;
-              } else if (reaction == "ko") {
-                return this.knockout(rightBottomCharacter, "right");
-              }
-              this.hit(leftBottomCharacter, "left");
-              leftBottomCharacter.trigger("hit", this, "right");
+            var reaction = this.getHitReaction(leftBottomCharacter, "left");
+            if (reaction == "block") {
+              attrs.velocity = velocity = 0;
+              attrs.x = x = leftX;
+            } else if (reaction == "ko") {
+              return this.knockout(rightBottomCharacter, "right");
             }
+            this.hit(leftBottomCharacter, "left");
+            leftBottomCharacter.trigger("hit", this, "right");
           }
-
         }
 
-        if (velocity >= 0) {
-          // Stop if obstacle to the right
-          var rightTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroLeftX + heroWidth, obstacleCheckTopY, "tile", this, true) : null,
-              rightBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth, obstacleCheckBottomY, "tile", this, true) : null,
-              rightBottomCharacter = this.world.findAt(heroLeftX + heroWidth*3/4, obstacleCheckBottomY, "character", this, true),
-              rightX = _.minNotNull([
-                this.world.width(),
-                rightTopTile ? rightTopTile.get("x") : null,
-                rightBottomTile ? rightBottomTile.get("x") : null
-              ]) + heroWidth*0.25;
+      }
 
+      if (velocity >= 0) {
+        // Stop if obstacle to the right
+        var rightTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.75, obstacleCheckTopY, "tile", this, true) : null,
+            rightBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.75, obstacleCheckBottomY, "tile", this, true) : null,
+            rightBottomCharacter = this.world.findAt(heroLeftX + heroWidth*0.75, obstacleCheckBottomY, "character", this, true),
+            rightX = _.minNotNull([
+              this.world.width(),
+              rightTopTile ? rightTopTile.get("x") : null,
+              rightBottomTile ? rightBottomTile.get("x") : null
+            ]) + heroWidth*0.25;
+
+        if (heroLeftX + heroWidth >= rightX) {
+          // Hit a tile or end of the world
+          attrs.velocity = velocity = 0;
+          attrs.x = x = rightX - heroWidth;
+
+        } else if (rightBottomCharacter) {
+          // Check for character hit
+          rightX = rightBottomCharacter.get("x");
           if (heroLeftX + heroWidth >= rightX) {
-            // Hit a tile or end of the world
-            attrs.velocity = velocity = 0;
-            attrs.x = x = rightX - heroWidth;
-
-          } else if (rightBottomCharacter) {
-            // Check for character hit
-            rightX = rightBottomCharacter.get("x");
-            if (heroLeftX + heroWidth >= rightX) {
-              var reaction = this.getHitReaction(rightBottomCharacter, "right");
-              if (reaction == "block") {
-                attrs.velocity = velocity = 0;
-                attrs.x = x = rightX - heroWidth;
-              } else if (reaction == "ko") {
-                return this.knockout(rightBottomCharacter, "left");
-              }
-              this.hit(rightBottomCharacter, "right");
-              rightBottomCharacter.trigger("hit", this, "left");
+            var reaction = this.getHitReaction(rightBottomCharacter, "right");
+            if (reaction == "block") {
+              attrs.velocity = velocity = 0;
+              attrs.x = x = rightX - heroWidth;
+            } else if (reaction == "ko") {
+              return this.knockout(rightBottomCharacter, "left");
             }
+            this.hit(rightBottomCharacter, "right");
+            rightBottomCharacter.trigger("hit", this, "left");
           }
-
         }
+
       }
 
       if (velocity) attrs.x = x = x + Math.round(velocity * (dt/1000));
@@ -661,6 +683,7 @@
     //   - ko: Knock-out and die
     getHitReaction: function(sprite, dir, dir2) {
       if (sprite.isBlocking && !sprite.isBlocking(this)) return null;
+      if (this.get("dead")) return "block";
       var name = sprite.get("name");
       if (dir == "bottom" && name == "spikes") return "ko";
       if (dir == "bottom") return "bounce";

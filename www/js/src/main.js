@@ -60,7 +60,9 @@ $(window).on("load", function() {
       });
 
       // Camera
-      this.camera = new Backbone.Camera();
+      this.camera = new Backbone.Camera({
+        bottom: 228
+      });
 
       // Our world
       // Reserve bottom of canvas for input and editor
