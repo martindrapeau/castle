@@ -57,6 +57,18 @@
   extendSprite("Tile", "block1", {collision: true}, {idle: {sequences: [12]}});
   extendSprite("Tile", "block2", {collision: true}, {idle: {sequences: [13]}});
 
-  extendSprite("Tile", "spikes", {collision: true}, {idle: {sequences: [16]}});
+  extendSprite("Tile", "spikes", {collision: true, paddingTop: 25}, {idle: {sequences: [16]}});
+
+  extendSprite("Tile", "pillar1", {collision: true}, {idle: {sequences: [20]}});
+  extendSprite("Tile", "pillar2", {collision: true}, {idle: {sequences: [21]}});
+  extendSprite("Tile", "pillar3", {collision: true}, {idle: {sequences: [22]}});
+
+  extendSprite("Tile", "grass1", {collision: true}, {idle: {sequences: [24]}});
+  extendSprite("Tile", "grass2", {collision: true}, {idle: {sequences: [25]}});
+  extendSprite("Tile", "grass3", {collision: true}, {idle: {sequences: [26]}});
+
+  extendSprite("Tile", "ground1", {collision: true}, {idle: {sequences: [28]}});
+  extendSprite("Tile", "ground2", {collision: true}, {idle: {sequences: [29]}});
+  extendSprite("Tile", "ground3", {collision: true}, {idle: {sequences: [30]}});
 
 }).call(this);

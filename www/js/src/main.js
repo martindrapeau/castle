@@ -16,8 +16,11 @@ $(window).on("load", function() {
   var tileWidth = 64,
       tileHeight = 64,
       spriteNames = [
-        "brick-top1", "brick-top2", "brick-top3", "brick1", "brick2", "brick3", "hero1",
-        "brick-bottom1", "brick-bottom2", "brick-bottom3", "spikes", "block1", "block2"
+        "brick-top1", "brick-top2", "brick-top3", "brick1", "brick2", "brick3",
+        "brick-bottom1", "brick-bottom2", "brick-bottom3", "spikes", "hero1",
+        "block1", "block2",
+        "pillar1", "pillar2", "pillar3", "grass1", "grass2", "grass3",
+        "ground1", "ground2", "ground3"
       ];
 
   Backbone.Controller = Backbone.Model.extend({
@@ -33,10 +36,10 @@ $(window).on("load", function() {
         img: "#hero1",
         x: 0,
         y: 0,
-        tileWidth: 100,
-        tileHeight: 100,
+        tileWidth: 128,
+        tileHeight: 128,
         tileColumns: 14,
-        tileRows: 5
+        tileRows: 6
       }, {
         id: "tiles",
         img: "#tiles",
@@ -45,7 +48,7 @@ $(window).on("load", function() {
         tileWidth: tileWidth,
         tileHeight: tileHeight,
         tileColumns: 4,
-        tileRows: 5
+        tileRows: 11
       }]).attachToSpriteClasses();
 
       // Create the debug panel
@@ -62,10 +65,12 @@ $(window).on("load", function() {
       // Our world
       // Reserve bottom of canvas for input and editor
       this.world = new Backbone.World(
-        _.extend({viewportBottom: 156}, window._world, {
+        _.extend({viewportBottom: 156}, {
           tileWidth: tileWidth,
-          tileHeight: tileHeight
-        }), {
+          tileHeight: tileHeight,
+          width: 15,
+          height: 9
+        }, window._world), {
         input: this.input,
         camera: this.camera
       });
@@ -97,6 +102,10 @@ $(window).on("load", function() {
 
       // The sprite picker and editor
       this.editor = new Backbone.WorldEditor({
+        x: canvas.width - ((tileWidth+2)*11 + 128 + 4),
+        y: canvas.height - ((tileHeight+2)*2 + 4),
+        width: (tileWidth+2)*11 + 128 + 4,
+        height: (tileHeight+2)*2 + 4,
         spriteNames: spriteNames,
         tileWidth: tileWidth,
         tileHeight: tileHeight

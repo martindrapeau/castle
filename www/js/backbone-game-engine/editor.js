@@ -14,9 +14,9 @@
   Backbone.WorldEditor = Backbone.Model.extend({
     defaults: {
       x: 136,
-      y: 690-(34*4+4),
-      width: 34*24+4,
-      height: 34*4+4,
+      y: 550,
+      width: 820,
+      height: 140,
       tileWidth: 32,
       tileHeight: 32,
       padding: 1,
@@ -52,11 +52,6 @@
           engine = this.engine;
       if (!this.hammertime) this.hammertime = Hammer(document);
       this.onDetach();
-
-      this.set({
-        width: engine.canvas.width - 140,
-        y: engine.canvas.height - 10 - (34*4+4)
-      });
 
       // Handle tap on touch device, or click with mouse
       this.hammertime.on("tap", this.onTap);
