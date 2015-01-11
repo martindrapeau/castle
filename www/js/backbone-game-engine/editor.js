@@ -23,15 +23,25 @@
       backgroundColor: "#333",
       selectColor: "#f00",
       selected: undefined,
-      spriteNames: []
+      spriteNames: [],
+      page: 0
     },
     initialize: function(attributes, options) {
       options || (options = {});
 
       if (!attributes || !attributes.spriteNames) throw "Missing attribute spriteNames";
-      this.sprites = new Backbone.SpriteCollection(_.map(attributes.spriteNames, function(name) {
-        return {name: name};
-      }));
+
+      var defs = [];
+      if (attributes.spriteNames.length && typeof attributes.spriteNames[0] == "object") {
+        for (var page = 0; page < attributes.spriteNames.length; page ++)
+          for (var s = 0; s < attributes.spriteNames[page].length; s++)
+            defs.push({name: attributes.spriteNames[page][s], page: page});
+      } else {
+        defs = _.map(attributes.spriteNames, function(name) {
+          return {name: name, page: 0};
+        });
+      }
+      this.sprites = new Backbone.SpriteCollection(defs);
 
       this.world = options.world;
       if (!this.world && !_.isFunction(this.world.add))
@@ -89,18 +99,24 @@
     },
 
     update: function(dt) {
-      var sp = this.toJSON();
-          x = sp.x + sp.tileWidth + 4*sp.padding;
-          y = sp.y + 2*sp.padding;
+      var sp = this.toJSON(),
+          x = sp.x + sp.tileWidth + 4*sp.padding,
+          y = sp.y + 2*sp.padding,
+          page = 0;
 
       this.sprites.each(function(sprite) {
         if (sprite.attributes.type == "tile" || sprite.attributes.type == "character") {
+          if (sprite.attributes.page > page) {
+            page = sprite.attributes.page;
+            x = sp.x + sp.tileWidth + 4*sp.padding;
+            y = sp.y + 2*sp.padding;
+          }
           sprite.set({x: x, y: y});
           sprite.update(dt);
           x += sprite.attributes.width + 2*sp.padding;
           if (x >= sp.x + sp.width - 2) {
-            y += sp.tileHeight + 2*sp.padding;
             x = sp.x + 2*sp.padding;
+            y += sp.tileHeight + 2*sp.padding;
           }
         }
       });
@@ -112,7 +128,7 @@
       // Fill background
       drawRect(context, sp.x, sp.y, sp.width, sp.height, sp.backgroundColor);
 
-      // Draw selected sprite
+      // Highlight selected sprite
       var st = this.sprites.findWhere({name: sp.selected}),
           sx = st ? st.get("x") - 2 : sp.x,
           sy = st ? st.get("y") - 2 : sp.y,
@@ -122,7 +138,7 @@
 
       // Draw sprites
       this.sprites.each(function(sprite) {
-        if (sprite.attributes.type == "tile" || sprite.attributes.type == "character")
+        if (sprite.attributes.page == sp.page && (sprite.attributes.type == "tile" || sprite.attributes.type == "character"))
           sprite.draw(context);
       });
 

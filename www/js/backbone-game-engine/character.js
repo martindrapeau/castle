@@ -121,18 +121,38 @@
     hit: function(sprite, dir, dir2) {
       return this;
     },
+    startNewAnimation: function(state, done) {
+      this.lastSequenceChangeTime = _.now();
+      this.set({
+        state: state,
+        sequenceIndex: 0
+      });
+      this.whenAnimationEnds = done;
+      return this;
+    },
     updateSequenceIndex: function(dt) {
       var sequenceIndex = this.get("sequenceIndex"),
           animation = this.getAnimation(),
           delay = animation.delay || 0,
-          now = _.now();
+          now = _.now(),
+          triggerAnimationEnd = false;
 
-      if (!animation.sequences || sequenceIndex >= animation.sequences.length) {
+      if (!animation.sequences) {
         sequenceIndex = 0;
         this.lastSequenceChangeTime = now;
+      } else if (sequenceIndex >= animation.sequences.length) {
+        sequenceIndex = 0;
+        this.lastSequenceChangeTime = now;
+        triggerAnimationEnd = true;
       } else if (delay && now > this.lastSequenceChangeTime + delay) {
         sequenceIndex = sequenceIndex < animation.sequences.length-1 ? sequenceIndex + 1 : 0;
         this.lastSequenceChangeTime = now;
+        if (sequenceIndex == 0) triggerAnimationEnd = true;
+      }
+
+      if (triggerAnimationEnd && typeof this.whenAnimationEnds == "function") {
+        this.whenAnimationEnds();
+        this.whenAnimationEnds = null;
       }
 
       return sequenceIndex;
@@ -314,12 +334,19 @@
         mov: state
       };
 
-      return {
-        state: state,
-        mov: pieces[0], // idle, walk, ...
-        dir: pieces[1], // right or left
-        opo: pieces[1] == "right" ? "left" : "right" // oposite direction
-      };
+      var stateInfo = {};
+      stateInfo.mov = pieces[0];
+      stateInfo.mov2 = pieces.length == 3 ? pieces[1] : null;
+      stateInfo.dir = pieces.length == 3 ? pieces[2] : pieces[1];
+      stateInfo.opo = stateInfo.dir == "right" ? "left" : "right";
+      return stateInfo;
+    },
+    buildState: function(piece1, piece2, piece3) {
+      var state = "";
+      if (piece1) state += piece1;
+      if (piece2) state += (state.length ? "-" : "") + piece2;
+      if (piece3) state += (state.length ? "-" : "") + piece3;
+      return state;
     },
     // Returns a reaction when the character hits another sprite.
     // Return value may be:

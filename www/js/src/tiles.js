@@ -71,4 +71,15 @@
   extendSprite("Tile", "ground2", {collision: true}, {idle: {sequences: [29]}});
   extendSprite("Tile", "ground3", {collision: true}, {idle: {sequences: [30]}});
 
+  extendSprite("Tile", "ground4", {collision: true}, {idle: {sequences: [32]}});
+  extendSprite("Tile", "ground5", {collision: true}, {idle: {sequences: [33]}});
+  extendSprite("Tile", "ground6", {collision: true}, {idle: {sequences: [34]}});
+
+  extendSprite("Tile", "grass4", {collision: true}, {idle: {sequences: [36]}});
+  extendSprite("Tile", "grass5", {collision: true}, {idle: {sequences: [37]}});
+  extendSprite("Tile", "grass6", {collision: true}, {idle: {sequences: [38]}});
+
+  extendSprite("Tile", "water1", {collision: true}, {idle: {sequences: [40]}});
+  extendSprite("Tile", "water2", {collision: true}, {idle: {sequences: [41]}});
+
 }).call(this);

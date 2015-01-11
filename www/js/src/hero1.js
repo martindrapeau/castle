@@ -18,9 +18,167 @@
       idleDelay = 2500,
       walkDelay = 75,
       koDelay = 100,
-      runDelay = 50;
+      runDelay = 50,
+      attackDelay = 50,
+      attackSequences = [84, 85, 86, 87, 88, 89],
+      jumpAttackSequences = [98, 99, 100, 101, 102, 103],
+      skidAttackSequences = [112, 113, 114, 115, 116],
+      walkSequences = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
+      runSequences = [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41];
 
-  // Backbone.Hero implements the Mario character in Super Mario Bros.
+  var animations = {
+    "idle-left": {
+      sequences: [0, 1],
+      delay: idleDelay,
+      velocity: 0,
+      acceleration: 0,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "idle-right": {
+      sequences: [0, 1],
+      delay: idleDelay,
+      velocity: 0,
+      acceleration: 0,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "walk-left": {
+      sequences: walkSequences,
+      delay: walkDelay,
+      velocity: -walkVelocity,
+      minVelocity: -walkMinVelocity,
+      acceleration: walkAcceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "walk-right": {
+      sequences: walkSequences,
+      delay: walkDelay,
+      velocity: walkVelocity,
+      minVelocity: walkMinVelocity,
+      acceleration: walkAcceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "run-left": {
+      sequences: runSequences,
+      delay: runDelay,
+      velocity: -runVelocity,
+      minVelocity: -runMinVelocity,
+      acceleration: runAcceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "run-right": {
+      sequences: runSequences,
+      delay: runDelay,
+      velocity: runVelocity,
+      minVelocity: runMinVelocity,
+      acceleration: runAcceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "release-left": {
+      sequences: walkSequences,
+      delay: walkDelay,
+      velocity: 0,
+      acceleration: releaseDeceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "release-right": {
+      sequences: walkSequences,
+      delay: walkDelay,
+      velocity: 0,
+      acceleration: releaseDeceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "skid-left": {
+      sequences: [42],
+      velocity: 0,
+      acceleration: skidDeceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "skid-right": {
+      sequences: [42],
+      velocity: 0,
+      acceleration: skidDeceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "jump-left": {
+      sequences: [56, 57],
+      delay: 1000,
+      velocity: -walkVelocity,
+      acceleration: airTurnaroundDeceleration,
+      yStartVelocity: -jumpVelocity,
+      yEndVelocity: fallVelocity,
+      yAscentAcceleration: jumpDeceleration,
+      yHoldAscentAcceleration: jumpHoldDeceleration,
+      yDescentAcceleration: fallAcceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "jump-right": {
+      sequences: [56, 57],
+      delay: 1000,
+      velocity: walkVelocity,
+      acceleration: airTurnaroundDeceleration,
+      yStartVelocity: -jumpVelocity,
+      yEndVelocity: fallVelocity,
+      yAscentAcceleration: jumpDeceleration,
+      yHoldAscentAcceleration: jumpHoldDeceleration,
+      yDescentAcceleration: fallAcceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "ko-left": {
+      sequences: [70, 71, 72],
+      delay: koDelay,
+      velocity: -walkVelocity,
+      yVelocity: fallVelocity,
+      yAcceleration: fallAcceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "ko-right": {
+      sequences: [70, 71, 72],
+      delay: koDelay,
+      velocity: walkVelocity,
+      yVelocity: fallVelocity,
+      yAcceleration: fallAcceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "dead-left": {
+      sequences: [73],
+      velocity: 0,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "dead-right": {
+      sequences: [73],
+      velocity: 0,
+      scaleX: 1,
+      scaleY: 1
+    }
+  };
+  animations["idle-attack-left"] = _.extend({}, animations["idle-left"], {sequences: attackSequences, delay: attackDelay});
+  animations["idle-attack-right"] = _.extend({}, animations["idle-right"], {sequences: attackSequences, delay: attackDelay});
+  animations["walk-attack-left"] = _.extend({}, animations["walk-left"], {sequences: attackSequences, delay: attackDelay});
+  animations["walk-attack-right"] = _.extend({}, animations["walk-right"], {sequences: attackSequences, delay: attackDelay});
+  animations["run-attack-left"] = _.extend({}, animations["run-left"], {sequences: attackSequences, delay: attackDelay});
+  animations["run-attack-right"] = _.extend({}, animations["run-right"], {sequences: attackSequences, delay: attackDelay});
+  animations["release-attack-left"] = _.extend({}, animations["release-left"], {sequences: attackSequences, delay: attackDelay});
+  animations["release-attack-right"] = _.extend({}, animations["release-right"], {sequences: attackSequences, delay: attackDelay});
+  animations["jump-attack-left"] = _.extend({}, animations["jump-left"], {sequences: jumpAttackSequences, delay: attackDelay});
+  animations["jump-attack-right"] = _.extend({}, animations["jump-right"], {sequences: jumpAttackSequences, delay: attackDelay});
+  animations["skid-attack-left"] = _.extend({}, animations["skid-left"], {sequences: skidAttackSequences, delay: attackDelay});
+  animations["skid-attack-right"] = _.extend({}, animations["skid-right"], {sequences: skidAttackSequences, delay: attackDelay});
+
   Backbone.Hero1 = Backbone.Character.extend({
     defaults: _.extend({}, Backbone.Character.prototype.defaults, {
       name: "hero1",
@@ -35,148 +193,10 @@
       yVelocity: 0,
       yAcceleration: 0,
       collision: true,
-      dead: false
+      dead: false,
+      buttonBMode: "attack" // run or attack
     }),
-    animations: {
-      "idle-left": {
-        sequences: [0, 1],
-        delay: idleDelay,
-        velocity: 0,
-        acceleration: 0,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "idle-right": {
-        sequences: [0, 1],
-        delay: idleDelay,
-        velocity: 0,
-        acceleration: 0,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "walk-left": {
-        sequences: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
-        delay: walkDelay,
-        velocity: -walkVelocity,
-        minVelocity: -walkMinVelocity,
-        acceleration: walkAcceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "walk-right": {
-        sequences: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
-        delay: walkDelay,
-        velocity: walkVelocity,
-        minVelocity: walkMinVelocity,
-        acceleration: walkAcceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "run-left": {
-        sequences: [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41],
-        delay: runDelay,
-        velocity: -runVelocity,
-        minVelocity: -runMinVelocity,
-        acceleration: runAcceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "run-right": {
-        sequences: [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41],
-        delay: runDelay,
-        velocity: runVelocity,
-        minVelocity: runMinVelocity,
-        acceleration: runAcceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "release-left": {
-        sequences: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
-        delay: walkDelay,
-        velocity: 0,
-        acceleration: releaseDeceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "release-right": {
-        sequences: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
-        delay: walkDelay,
-        velocity: 0,
-        acceleration: releaseDeceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "skid-left": {
-        sequences: [42],
-        velocity: 0,
-        acceleration: skidDeceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "skid-right": {
-        sequences: [42],
-        velocity: 0,
-        acceleration: skidDeceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "jump-left": {
-        sequences: [56, 57],
-        delay: 1000,
-        velocity: -walkVelocity,
-        acceleration: airTurnaroundDeceleration,
-        yStartVelocity: -jumpVelocity,
-        yEndVelocity: fallVelocity,
-        yAscentAcceleration: jumpDeceleration,
-        yHoldAscentAcceleration: jumpHoldDeceleration,
-        yDescentAcceleration: fallAcceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "jump-right": {
-        sequences: [56, 57],
-        delay: 1000,
-        velocity: walkVelocity,
-        acceleration: airTurnaroundDeceleration,
-        yStartVelocity: -jumpVelocity,
-        yEndVelocity: fallVelocity,
-        yAscentAcceleration: jumpDeceleration,
-        yHoldAscentAcceleration: jumpHoldDeceleration,
-        yDescentAcceleration: fallAcceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "ko-left": {
-        sequences: [70, 71, 72],
-        delay: koDelay,
-        velocity: -walkVelocity,
-        yVelocity: fallVelocity,
-        yAcceleration: fallAcceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "ko-right": {
-        sequences: [70, 71, 72],
-        delay: koDelay,
-        velocity: walkVelocity,
-        yVelocity: fallVelocity,
-        yAcceleration: fallAcceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "dead-left": {
-        sequences: [73],
-        velocity: 0,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "dead-right": {
-        sequences: [73],
-        velocity: 0,
-        scaleX: 1,
-        scaleY: 1
-      }
-    },
+    animations: animations,
     saveAttributes: _.union(
       Backbone.Character.prototype.saveAttributes,
       ["nextState", "velocity", "acceleration", "yVelocity", "yAcceleration"]
@@ -221,10 +241,10 @@
     knockout: function(sprite, dir) {
       var cur = this.getStateInfo();
       this.set({
-        state: "ko-" + cur.dir,
-        velocity: this.animations["ko-" + cur.dir].velocity,
-        yVelocity: -this.animations["ko-" + cur.dir].yVelocity/2,
-        nextState: "dead-" + cur.dir,
+        state: this.buildState("ko", cur.dir),
+        velocity: this.animations[this.buildState("ko", cur.dir)].velocity,
+        yVelocity: -this.animations[this.buildState("ko", cur.dir)].yVelocity/2,
+        nextState: this.buildState("dead", cur.mov2, cur.dir),
         dead: true
       });
       return this;
@@ -242,7 +262,7 @@
           opoIntent = dirIntent == "right" ? "left" : "right",
           dirPressed = this.input ? this.input[dirIntent+"Pressed"]() : false,
           opoPressed = this.input ? this.input[opoIntent+"Pressed"]() : false,
-          buttonBPressed = this.input ? this.input.buttonBPressed() : false,
+          run = this.get("buttonBMode") == "run" && this.input ? this.input.buttonBPressed() : false,
           velocity = this.get("velocity"),
           attrs = {};
 
@@ -253,19 +273,19 @@
         if (cur.mov == "jump") {
             // Update next step
             if (dirIntent != cur.dir && velocity)
-              attrs.nextState = "skid-" + opoIntent;
+              attrs.nextState = this.buildState("skid", opoIntent);
             else
-              attrs.nextState = (buttonBPressed ? "run-" : "walk-") + dirIntent;
+              attrs.nextState = this.buildState(run ? "run" : "walk", dirIntent);
           } else if (cur.dir == dirIntent || cur.mov == "idle") {
             // Start walking or running
-            attrs.state = (buttonBPressed ? "run-" : "walk-") + dirIntent;
+            attrs.state = this.buildState(run ? "run" : "walk", dirIntent);
             var animation = this.getAnimation(attrs.state);
             if (animation.minVelocity && Math.abs(velocity) < Math.abs(animation.minVelocity))
               attrs.velocity = animation.minVelocity;
           } else if (cur.dir == opoIntent) {
             // Skid trying to stop before turning
-            attrs.state = "skid-" + opoIntent;
-            attrs.nextState = (buttonBPressed ? "run-" : "walk-") + dirIntent;
+            attrs.state = this.buildState("skid", opoIntent);
+            attrs.nextState = this.buildState(run ? "run" : "walk", dirIntent);
           }
         } else if (opoPressed) {
         // Depressed but opposite direction still pressed. Intent = turnaround.
@@ -274,10 +294,10 @@
       } else {
         // Depressed. Intent = stop to idle
         if (cur.mov == "jump") {
-          attrs.nextState = "release-" + dirIntent;
+          attrs.nextState = this.buildState("release", dirIntent);
         } else {
-          attrs.state = "release-" + dirIntent;
-          attrs.nextState = "idle-" + dirIntent;
+          attrs.state = this.buildState("release", dirIntent);
+          attrs.nextState = this.buildState("idle", dirIntent);
         }
       }
 
@@ -285,19 +305,31 @@
 
       return this;
     },
-    // Run or walk
+    // Run or attack
     buttonBToggled: function() {
-      var state = this.get("state"),
-          pressed = this.input ? this.input.buttonBPressed() : false,
-          attrs = {};
+      var mode = this.get("buttonBMode"),
+          cur = this.getStateInfo(),
+          pressed = this.input ? this.input.buttonBPressed() : false;
 
-      // Speed up or slow down
-      if (pressed && state == "walk-right") attrs.state = "run-right";
-      else if (pressed && state == "walk-left") attrs.state = "run-left";
-      else if (!pressed && state == "run-right") attrs.state = "walk-right";
-      else if (!pressed && state == "run-left") attrs.state = "walk-left";
-      if (!_.isEmpty(attrs)) this.set(attrs);
+      if (mode == "run") {
+        if (pressed && cur.mov == "walk")
+          this.set("state",  this.buildState("run", cur.mov2, cur.dir));
+        else if (!pressed && cur.mov == "run")
+          this.set("state",  this.buildState("walk", cur.mov2, cur.dir));
 
+      } else if (mode == "attack") {
+        if (pressed && cur.mov2 != "attack")
+          this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), this.endAttack);
+        else if (!pressed && cur.mov2 == "attack")
+          this.endAttack();
+      }
+
+      return this;
+    },
+    endAttack: function() {
+      var cur = this.getStateInfo();
+      this.whenAnimationEnds = null;
+      this.set("state", this.buildState(cur.mov, cur.dir));
       return this;
     },
     // Jump
@@ -310,7 +342,7 @@
 
       if (this.input && this.input.buttonAPressed() && cur.mov != "jump") {
         // Set new state (keep old as next)
-        attrs.state = "jump-" + cur.dir;
+        attrs.state = this.buildState("jump", cur.dir);
         attrs.nextState = state;
 
         // Determine vertical velocity as a factor of horizontal velocity
@@ -350,7 +382,9 @@
       if (!this.world) return true;
 
       // Velocity and state
-      var dead = this.get("dead"),
+      var hero = this,
+          mode = this.get("buttonBMode"),
+          dead = this.get("dead"),
           input = this.input,
           velocity = this.get("velocity") || 0,
           yVelocity = this.get("yVelocity") || 0,
@@ -483,7 +517,7 @@
 
       if ((cur.mov == "jump" || dead) && yVelocity > 0) {
         // Falling...
-        attrs.sequenceIndex = 1;
+        if (cur.mov2 == null) attrs.sequenceIndex = 1;
 
         if (dead && heroBottomY >= bottomWorld) {
           this.world.remove(this);
@@ -496,11 +530,11 @@
           updateHeroTopBottom();
           attrs.state = nextState;
           if (nex.move == "walk" || nex.move == "run")
-            attrs.nextState = (input && input.buttonBPressed() ? "run-" : "walk-") + nex.dir;
+            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", nex.dir);
           else if (nex.mov == "skid")
-            attrs.nextState = (input && input.buttonBPressed() ? "run-" : "walk-") + nex.opo;
+            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", nex.opo);
           else if(nex.mov == "release")
-            attrs.nextState = "idle-" + nex.dir;
+            attrs.nextState = hero.buildState("idle", nex.dir);
           else if (nex.mov == "dead") {
             attrs.velocity = velocity = 0;
           }
@@ -548,7 +582,7 @@
         }
 
       } else if ((cur.mov == "jump" || dead) && yVelocity < 0) {
-        attrs.sequenceIndex = 0;
+        if (cur.mov2 == null) attrs.sequenceIndex = 0;
 
         // Stop jumping if obstacle above
         var topLeftTile = !dead && heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroTopY, "tile", this, true) : null,
@@ -593,7 +627,7 @@
       } else if (cur.mov != "jump" && heroBottomY < bottomY && !dead) {
         // Start falling if no obstacle below
         attrs.nextState = state;
-        attrs.state = "jump-" + cur.dir;
+        attrs.state = this.buildState("jump", cur.mov2, cur.dir);
       }
 
       if (velocity <= 0) {
@@ -671,7 +705,7 @@
       if (!_.isEmpty(attrs)) this.set(attrs);
 
       if (this.debugPanel)
-        this.debugPanel.set({x: x, y: y});
+        this.debugPanel.set({state: this.attributes.state, nextState: this.attributes.nextState});
 
       return true;
     },
