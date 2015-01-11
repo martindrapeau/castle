@@ -24,7 +24,8 @@
       selectColor: "#f00",
       selected: undefined,
       spriteNames: [],
-      page: 0
+      page: 0,
+      pages: 1
     },
     initialize: function(attributes, options) {
       options || (options = {});
@@ -33,9 +34,10 @@
 
       var defs = [];
       if (attributes.spriteNames.length && typeof attributes.spriteNames[0] == "object") {
-        for (var page = 0; page < attributes.spriteNames.length; page ++)
+        for (var page = 0; page < attributes.spriteNames.length; page++)
           for (var s = 0; s < attributes.spriteNames[page].length; s++)
             defs.push({name: attributes.spriteNames[page][s], page: page});
+        this.set("pages", attributes.spriteNames.length);
       } else {
         defs = _.map(attributes.spriteNames, function(name) {
           return {name: name, page: 0};
@@ -47,6 +49,12 @@
       if (!this.world && !_.isFunction(this.world.add))
         throw "Missing or invalid world option.";
 
+      this.changePageButton = new Backbone.Button({
+        x: 68, y: 646, width: 32, height: 50, borderRadius: 2,
+        img: "#icons", imgX: 394, imgY: 0, imgWidth: 22, imgHeight: 32, imgMargin: 10
+      });
+      this.changePageButton.on("tap", this.changePage, this);
+
       this.debugPanel = options.debugPanel;
 
       _.bindAll(this,
@@ -56,6 +64,11 @@
 
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
+
+      var editor = this;
+      this.on("change:page", function() {
+        editor.set("selected", undefined);
+      });
     },
     onAttach: function() {
       var world = this.world,
@@ -80,6 +93,11 @@
           sprite.trigger("attach", engine);
         }
       });
+
+      if (this.get("pages") > 1) {
+        this.changePageButton.engine = engine;
+        this.changePageButton.trigger("attach");
+      }
     },
     onDetach: function() {
       this.hammertime
@@ -96,6 +114,13 @@
           sprite.trigger("detach");
         }
       });
+
+      this.changePageButton.trigger("detach");
+    },
+    changePage: function() {
+      var page = this.get("page") + 1;
+      if (page >= this.get("pages")) page = 0;
+      this.set("page", page);
     },
 
     update: function(dt) {
@@ -120,6 +145,11 @@
           }
         }
       });
+      this.changePageButton.set({
+        x: sp.x + sp.width - this.changePageButton.get("width"),
+        y: sp.y + sp.height - this.changePageButton.get("height")
+      });
+      this.changePageButton.update(dt);
       return true;
     },
     draw: function(context) {
@@ -142,6 +172,7 @@
           sprite.draw(context);
       });
 
+      this.changePageButton.draw(context);
     },
 
     getSelectedSprite: function() {
@@ -162,7 +193,7 @@
         editor.set({selected: null});
         this.sprites.each(function(sprite) {
           var s = sprite.toJSON();
-          if (x >= s.x && y >= s.y && x <= s.x + s.width && y <= s.y + s.height) {
+          if (s.page == sp.page && x >= s.x && y >= s.y && x <= s.x + s.width && y <= s.y + s.height) {
             editor.set({selected: s.name});
             return false;
           }

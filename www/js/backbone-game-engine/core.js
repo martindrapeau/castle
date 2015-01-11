@@ -385,7 +385,7 @@
       this.hammertime.on("tap", this.onTap);
     },
     onDetach: function() {
-      this.hammertime.off("tap", this.onTap);
+      if (this.hammertime) this.hammertime.off("tap", this.onTap);
     },
     update: function(dt) {
       return true;
