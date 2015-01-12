@@ -510,8 +510,8 @@
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld,
-            bottomLeftTile ? (bottomLeftTile.get("y") + (bottomLeftTile.get("paddingTop") || 0)) : null,
-            bottomRightTile ? (bottomRightTile.get("y") + (bottomRightTile.get("paddingTop") || 0)) : null
+            bottomLeftTile ? (bottomLeftTile.getTop(true)) : null,
+            bottomRightTile ? (bottomRightTile.getTop(true)) : null
           ]);
 
 
@@ -559,8 +559,8 @@
               bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "character", this, true) : null,
               characterBottomY = _.minNotNull([
                   bottomY,
-                  bottomLeftCharacter ? bottomLeftCharacter.get("y") : null,
-                  bottomRightCharacter ? bottomRightCharacter.get("y") : null
+                  bottomLeftCharacter ? bottomLeftCharacter.getTop(true) : null,
+                  bottomRightCharacter ? bottomRightCharacter.getTop(true) : null
               ]);
           if (characterBottomY != bottomY) {
             reaction = this.getHitReaction(bottomLeftCharacter || bottomRightCharacter, "bottom", bottomLeftCharacter ? "left": "right");
@@ -589,8 +589,8 @@
             topRightTile = !dead && heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.60, heroTopY, "tile", this, true) : null,
             topY = _.maxNotNull([
               -400,
-              topLeftTile ? (topLeftTile.get("y") + topLeftTile.get("height")) : null,
-              topRightTile ? (topRightTile.get("y") + topRightTile.get("height")) : null,
+              topLeftTile ? (topLeftTile.getBottom(true)) : null,
+              topRightTile ? (topRightTile.getBottom(true)) : null,
             ]);
         if (heroTopY < topY) {
           attrs.yVelocity = yVelocity = 0;
@@ -609,8 +609,8 @@
               topRightCharacter = !dead ? this.world.findAt(heroLeftX + heroWidth*0.60, heroTopY, "character", this, true) : null,
               characterTopY = _.maxNotNull([
                   topY,
-                  topLeftCharacter ? (topLeftCharacter.get("y") + topLeftCharacter.get("height")) : null,
-                  topRightCharacter ? (topRightCharacter.get("y") + topRightCharacter.get("height")) : null
+                  topLeftCharacter ? topLeftCharacter.getBottom(true) : null,
+                  topRightCharacter ? topRightCharacter.getBottom(true) : null
               ]);
           if (characterTopY != topY) {
             reaction = this.getHitReaction(topLeftCharacter || topRightCharacter, "top", topLeftCharacter ? "left": "right");
@@ -637,8 +637,8 @@
             leftBottomCharacter = this.world.findAt(heroLeftX + heroWidth*0.25, obstacleCheckBottomY, "character", this, true),
             leftX = _.maxNotNull([
               0,
-              leftTopTile ? (leftTopTile.get("x") + leftTopTile.get("width")) : null,
-              leftBottomTile ? (leftBottomTile.get("x") + leftBottomTile.get("width")) : null
+              leftTopTile ? leftTopTile.getRight(true) : null,
+              leftBottomTile ? leftBottomTile.getRight(true) : null
             ]) - heroWidth*0.25;
 
         if (heroLeftX <= leftX) {
@@ -671,8 +671,8 @@
             rightBottomCharacter = this.world.findAt(heroLeftX + heroWidth*0.75, obstacleCheckBottomY, "character", this, true),
             rightX = _.minNotNull([
               this.world.width(),
-              rightTopTile ? rightTopTile.get("x") : null,
-              rightBottomTile ? rightBottomTile.get("x") : null
+              rightTopTile ? rightTopTile.getLeft(true) : null,
+              rightBottomTile ? rightBottomTile.getLeft(true) : null
             ]) + heroWidth*0.25;
 
         if (heroLeftX + heroWidth >= rightX) {

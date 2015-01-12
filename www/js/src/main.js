@@ -15,14 +15,7 @@ $(window).on("load", function() {
 
   var tileWidth = 64,
       tileHeight = 64,
-      spriteNames = [[
-        "brick-top1", "brick-top2", "brick-top3", "brick1", "brick2", "brick3",
-        "brick-bottom1", "brick-bottom2", "brick-bottom3", "spikes", "hero1",
-        "block1", "block2", "pillar1", "pillar2", "pillar3"
-      ], [
-        "grass1", "grass2", "grass3", "ground1", "ground2", "ground3",
-        "ground4", "ground5", "ground6", "grass4", "grass5", "grass6", "water1", "water2"
-      ]];
+      spriteNames = [["hero1"], Backbone.BlueCastleTileNames, Backbone.ForestTileNames, Backbone.GraveyardTileNames];
 
   Backbone.Controller = Backbone.Model.extend({
     initialize: function(attributes, options) {
@@ -49,7 +42,7 @@ $(window).on("load", function() {
         tileWidth: tileWidth,
         tileHeight: tileHeight,
         tileColumns: 4,
-        tileRows: 11
+        tileRows: 25
       }]).attachToSpriteClasses();
 
       // Create the debug panel

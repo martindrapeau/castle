@@ -51,6 +51,18 @@
     toSave: function() {
       return _.pick(this.toJSON(), this.saveAttributes);
     },
+    getLeft: function(withPadding) {
+      return this.attributes.x + (withPadding && this.attributes.paddingLeft ? this.attributes.paddingLeft : 0);
+    },
+    getRight: function(withPadding) {
+      return this.attributes.x + this.attributes.width - (withPadding && this.attributes.paddingRight ? this.attributes.paddingRight : 0);
+    },
+    getTop: function(withPadding) {
+      return this.attributes.y + (withPadding && this.attributes.paddingTop ? this.attributes.paddingTop : 0);
+    },
+    getBottom: function(withPadding) {
+      return this.attributes.y + this.attributes.height - (withPadding && this.attributes.paddingBottom ? this.attributes.paddingBottom : 0);
+    },
     update: function(dt) {
       // Fetch animation and change sequence if need be
       var animation = this.getAnimation(),
