@@ -82,6 +82,7 @@
 
   extendSprite("Tile", "bc-barrel", {collision: true}, {idle: {sequences: [76]}});
   extendSprite("Tile", "bc-crate", {collision: true}, {idle: {sequences: [77]}});
+  extendSprite("Tile", "bc-chest", {collision: true}, {idle: {sequences: [78]}});
 
   extendSprite("Tile", "bc-table1", {collision: true}, {idle: {sequences: [80]}});
   extendSprite("Tile", "bc-table2", {collision: true}, {idle: {sequences: [81]}});

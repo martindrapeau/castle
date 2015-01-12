@@ -15,7 +15,12 @@ $(window).on("load", function() {
 
   var tileWidth = 64,
       tileHeight = 64,
-      spriteNames = [["hero1"], Backbone.BlueCastleTileNames, Backbone.ForestTileNames, Backbone.GraveyardTileNames];
+      spriteNames = [
+        ["hero1"],
+        Backbone.BlueCastleTileNames,
+        Backbone.ForestTileNames,
+        Backbone.GraveyardTileNames
+      ];
 
   Backbone.Controller = Backbone.Model.extend({
     initialize: function(attributes, options) {
@@ -43,6 +48,15 @@ $(window).on("load", function() {
         tileHeight: tileHeight,
         tileColumns: 4,
         tileRows: 25
+      }, {
+        id: "enemies",
+        img: "#enemies",
+        x: 0,
+        y: 0,
+        tileWidth: 128,
+        tileHeight: 128,
+        tileColumns: 12,
+        tileRows: 10
       }]).attachToSpriteClasses();
 
       // Create the debug panel

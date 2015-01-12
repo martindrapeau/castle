@@ -187,6 +187,10 @@
       spriteSheet: "hero1",
       width: 128,
       height: 128,
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: 24,
+      paddingBottom: 4,
       state: "idle-right",
       velocity: 0,
       acceleration: 0,
@@ -353,15 +357,14 @@
             ratio = Math.abs((Math.abs(velocity) > walkVelocity ? velocity : walkVelocity) / runVelocity);
         attrs.yVelocity = Math.round(jumpAnimation.yStartVelocity * (ratio + (1-ratio)/2));
 
-        var heroSmall = cur.mov == "crouch",
-          heroWidth = this.get("width"),
-          tileHeight = this.get("height"),
-          heroHeight = heroSmall ? tileHeight*0.5 : tileHeight*0.8,
-          heroBottomY = Math.round(this.get("y") - 4) + tileHeight,
-          heroTopY = heroBottomY - heroHeight,
-          heroLeftX = this.get("x"),
-          topLeftTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "tile", this, true) : null,
-          topRightTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "tile", this, true) : null;
+        var heroWidth = this.get("width"),
+            tileHeight = this.get("height"),
+            heroHeight = tileHeight - this.get("paddingTop") - this.get("paddingBottom"),
+            heroBottomY = Math.round(this.get("y") - 4) + tileHeight - this.get("paddingBottom"),
+            heroTopY = heroBottomY - heroHeight,
+            heroLeftX = this.get("x"),
+            topLeftTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroTopY, "tile", this, true) : null,
+            topRightTile = heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroTopY, "tile", this, true) : null;
         if (topLeftTile || topRightTile) attrs.yVelocity = -2*60;
 
         // Keep the horizontal velocity
@@ -488,16 +491,16 @@
       }
 
       // Collision detection
-      var heroSmall = cur.mov == "crouch",
-          heroWidth = this.get("width"),
+      var heroWidth = this.get("width"),
           tileHeight = this.get("height"),
-          heroHeight = heroSmall ? tileHeight*0.5 : tileHeight*0.8,
+          paddingBottom = this.get("paddingBottom"),
+          heroHeight = tileHeight - this.get("paddingTop") - paddingBottom,
           heroLeftX = Math.round(x + velocity * (dt/1000)),
           reaction = null;
 
       var heroBottomY, heroTopY, obstacleCheckTopY, obstacleCheckBottomY;
       function updateHeroTopBottom() {
-        heroBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight;
+        heroBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom;
         heroTopY = heroBottomY - heroHeight;
         obstacleCheckTopY = heroTopY + heroHeight*0.25;
         obstacleCheckBottomY = heroTopY + heroHeight*0.75;
@@ -526,7 +529,7 @@
 
         function land(bottomY) {
           attrs.yVelocity = yVelocity = 0;
-          attrs.y = y = bottomY - tileHeight;
+          attrs.y = y = bottomY - tileHeight + paddingBottom;
           updateHeroTopBottom();
           attrs.state = nextState;
           if (nex.move == "walk" || nex.move == "run")
