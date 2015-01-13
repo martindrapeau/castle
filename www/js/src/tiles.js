@@ -25,28 +25,24 @@
     }
   });
 
-  Backbone.BlueCastleTileNames = [];
-  Backbone.ForestTileNames = [];
-  Backbone.GraveyardTileNames = [];
+  Backbone.HouseTile = Backbone.Sprite.extend({
+    defaults: _.extend({},
+      Backbone.Tile.prototype.defaults,
+      {spriteSheet: "houses", collision: false}
+    ),
+    initialize: Backbone.Tile.prototype.initialize
+  })
+
+  Backbone.TilePages = {};
 
   function extendSprite(cls, name, attributes, animations) {
     var prefix = name.split("-")[0];
-    switch (prefix) {
-      case "bc":
-        Backbone.BlueCastleTileNames.push(name);
-        break;
-      case "f":
-        Backbone.ForestTileNames.push(name);
-        break;
-      case "g":
-        Backbone.GraveyardTileNames.push(name);
-        break;
-    }
+    if (!Backbone.TilePages[prefix]) Backbone.TilePages[prefix] = [];
+    Backbone.TilePages[prefix].push(name);
 
     var newCls = _.classify(name);
     Backbone[newCls] = Backbone[cls].extend({
-      defaults: _.extend(
-        _.deepClone(Backbone[cls].prototype.defaults),
+      defaults: _.extend({}, Backbone[cls].prototype.defaults,
         {name: name},
         attributes || {}
       ),
@@ -119,6 +115,9 @@
   extendSprite("Tile", "f-sign1", {collision: false}, {idle: {sequences: [96]}});
   extendSprite("Tile", "f-sign2", {collision: false}, {idle: {sequences: [97]}});
 
+  extendSprite("Tile", "f-fence1", {collision: false}, {idle: {sequences: [100]}});
+  extendSprite("Tile", "f-fence2", {collision: false}, {idle: {sequences: [101]}});
+
   extendSprite("Tile", "g-grass1", {collision: true}, {idle: {sequences: [44]}});
   extendSprite("Tile", "g-grass2", {collision: true}, {idle: {sequences: [45]}});
   extendSprite("Tile", "g-grass3", {collision: true}, {idle: {sequences: [46]}});
@@ -147,5 +146,15 @@
   extendSprite("Tile", "g-tombstone1", {collision: true, paddingTop: 4}, {idle: {sequences: [72]}});
   extendSprite("Tile", "g-tombstone2", {collision: true}, {idle: {sequences: [73]}});
   extendSprite("Tile", "g-tombstone3", {collision: true, paddingTop: 24}, {idle: {sequences: [74]}});
+
+
+  // House 1
+  var page = 1, index = 0;
+  for (var c = 0; c < 9; c++)
+    for (var r = 0; r < 8; r++) {
+      extendSprite("HouseTile", "h" + page + "-" + index, null, {idle: {sequences: [index]}});
+      index += 1;
+      if (index % 25 == 0) page += 1;
+    }
 
 }).call(this);
