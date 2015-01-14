@@ -707,8 +707,8 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
-      if (this.debugPanel)
-        this.debugPanel.set({state: this.attributes.state, nextState: this.attributes.nextState});
+      /*if (this.debugPanel)
+        this.debugPanel.set({state: this.attributes.state, nextState: this.attributes.nextState});*/
 
       return true;
     },

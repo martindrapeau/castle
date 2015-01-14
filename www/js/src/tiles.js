@@ -28,7 +28,12 @@
   Backbone.HouseTile = Backbone.Sprite.extend({
     defaults: _.extend({},
       Backbone.Tile.prototype.defaults,
-      {spriteSheet: "houses", collision: false}
+      {
+        spriteSheet: "houses",
+        width: 432,
+        height: 384,
+        collision: false
+      }
     ),
     initialize: Backbone.Tile.prototype.initialize
   })
@@ -149,12 +154,15 @@
 
 
   // House 1
-  var page = 1, index = 0;
+  extendSprite("HouseTile", "h-1", {collision: false}, {idle: {sequences: [0]}});
+  extendSprite("HouseTile", "h-2", {collision: false}, {idle: {sequences: [1]}});
+  extendSprite("HouseTile", "h-3", {collision: false}, {idle: {sequences: [2]}});
+  /*var page = 1, index = 0;
   for (var c = 0; c < 9; c++)
     for (var r = 0; r < 8; r++) {
       extendSprite("HouseTile", "h" + page + "-" + index, null, {idle: {sequences: [index]}});
       index += 1;
       if (index % 25 == 0) page += 1;
-    }
+    }*/
 
 }).call(this);

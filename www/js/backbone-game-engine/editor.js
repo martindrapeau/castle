@@ -98,6 +98,8 @@
         this.changePageButton.engine = engine;
         this.changePageButton.trigger("attach");
       }
+
+      this.positionSprites();
     },
     onDetach: function() {
       this.hammertime
@@ -122,33 +124,40 @@
       if (page >= this.get("pages")) page = 0;
       this.set("page", page);
     },
-
-    update: function(dt) {
+    positionSprites: function() {
       var sp = this.toJSON(),
           x = sp.x + sp.tileWidth + 4*sp.padding,
           y = sp.y + 2*sp.padding,
-          page = 0;
+          page = 0,
+          maxHeight = this.attributes.height - 4;
 
       this.sprites.each(function(sprite) {
-        if (sprite.attributes.type == "tile" || sprite.attributes.type == "character") {
-          if (sprite.attributes.page > page) {
-            page = sprite.attributes.page;
-            x = sp.x + sp.tileWidth + 4*sp.padding;
-            y = sp.y + 2*sp.padding;
-          }
-          sprite.set({x: x, y: y});
-          sprite.update(dt);
-          x += sprite.attributes.width + 2*sp.padding;
-          if (x >= sp.x + sp.width - 2) {
-            x = sp.x + 2*sp.padding;
-            y += sp.tileHeight + 2*sp.padding;
-          }
+        if (sprite.attributes.page > page) {
+          page = sprite.attributes.page;
+          x = sp.x + sp.tileWidth + 4*sp.padding;
+          y = sp.y + 2*sp.padding;
+        }
+
+        sprite.set({x: x, y: y});
+        x += sprite.attributes.width + 2*sp.padding;
+
+        if (x >= sp.x + sp.width - 2) {
+          x = sp.x + 2*sp.padding;
+          y += sp.tileHeight + 2*sp.padding;
         }
       });
+
       this.changePageButton.set({
         x: sp.x + sp.width - this.changePageButton.get("width"),
         y: sp.y + sp.height - this.changePageButton.get("height")
       });
+
+      return this;
+    },
+
+    update: function(dt) {
+      for (var i = 0; i < this.sprites.models.length; i++)
+        this.sprites.models[i].update(dt);
       this.changePageButton.update(dt);
       return true;
     },

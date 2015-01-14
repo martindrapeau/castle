@@ -62,10 +62,10 @@ $(window).on("load", function() {
         img: "#houses",
         x: 0,
         y: 0,
-        tileWidth: 64,
-        tileHeight: 64,
-        tileColumns: 9,
-        tileRows: 16
+        tileWidth: 432,
+        tileHeight: 384,
+        tileColumns: 1,
+        tileRows: 3
       }]).attachToSpriteClasses();
 
       // Create the debug panel
@@ -91,7 +91,8 @@ $(window).on("load", function() {
           height: 9
         }, window._world), {
         input: this.input,
-        camera: this.camera
+        camera: this.camera,
+        debugPanel: this.debugPanel
       });
 
       // Message
