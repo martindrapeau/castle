@@ -108,8 +108,9 @@
   extendSprite("Tile", "f-grass5", {collision: true}, {idle: {sequences: [37]}});
   extendSprite("Tile", "f-grass6", {collision: true}, {idle: {sequences: [38]}});
 
-  extendSprite("Tile", "f-water1", {collision: true}, {idle: {sequences: [40]}});
-  extendSprite("Tile", "f-water2", {collision: true}, {idle: {sequences: [41]}});
+  extendSprite("Tile", "f-ground7", {collision: true}, {idle: {sequences: [40]}});
+  extendSprite("Tile", "f-ground8", {collision: true}, {idle: {sequences: [41]}});
+  extendSprite("Tile", "f-water", {collision: false}, {idle: {sequences: [42]}});
 
   extendSprite("Tile", "f-stump1", {collision: true, paddingTop: 20, paddingLeft: 32}, {idle: {sequences: [88]}});
   extendSprite("Tile", "f-stump2", {collision: true, paddingTop: 20, paddingRight: 32}, {idle: {sequences: [89]}});
@@ -122,6 +123,7 @@
 
   extendSprite("Tile", "f-fence1", {collision: false}, {idle: {sequences: [100]}});
   extendSprite("Tile", "f-fence2", {collision: false}, {idle: {sequences: [101]}});
+  extendSprite("Tile", "f-hay", {collision: true}, {idle: {sequences: [102]}});
 
   extendSprite("Tile", "g-grass1", {collision: true}, {idle: {sequences: [44]}});
   extendSprite("Tile", "g-grass2", {collision: true}, {idle: {sequences: [45]}});

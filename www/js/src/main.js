@@ -69,7 +69,7 @@ $(window).on("load", function() {
       }]).attachToSpriteClasses();
 
       // Create the debug panel
-      this.debugPanel = new Backbone.DebugPanel();
+      this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
 
       // User input (turn off touchpad to start)
       this.input = new Backbone.Input({
@@ -88,7 +88,8 @@ $(window).on("load", function() {
           tileWidth: tileWidth,
           tileHeight: tileHeight,
           width: 15,
-          height: 9
+          height: 9,
+          backgroundImage: "#background"
         }, window._world), {
         input: this.input,
         camera: this.camera,

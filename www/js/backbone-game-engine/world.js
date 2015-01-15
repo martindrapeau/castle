@@ -46,6 +46,9 @@
       this.setupSpriteLayers();
       this.spawnSprites();
 
+      this.on("change:backgroundImage", this.spawnBackgroundImage);
+      this.spawnBackgroundImage();
+
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
@@ -94,7 +97,9 @@
           staticSprites = this.staticSprites = new Backbone.Collection(),
           dynamicSprites = this.dynamicSprites = new Backbone.Collection();
       staticSprites.lookup = {};
+      staticSprites.maxSpriteWidth = staticSprites.maxSpriteHeight = 0;
       dynamicSprites.lookup = {};
+      dynamicSprites.maxSpriteWidth = dynamicSprites.maxSpriteHeight = 0;
 
       function add(sprite, collection) {
         collection.add(sprite);
@@ -102,6 +107,8 @@
         collection.lookup[index] || (collection.lookup[index] = []);
         collection.lookup[index].push(sprite);
         sprite.set("lookupIndex", index);
+        collection.maxSpriteWidth = Math.max(collection.maxSpriteWidth, sprite.attributes.width);
+        collection.maxSpriteHeight = Math.max(collection.maxSpriteHeight, sprite.attributes.width);
       }
 
       function update(sprite, collection) {
@@ -115,6 +122,8 @@
         collection.lookup[newIndex] || (collection.lookup[newIndex] = []);
         collection.lookup[newIndex].push(sprite);
         sprite.set("lookupIndex", newIndex);
+        collection.maxSpriteWidth = Math.max(collection.maxSpriteWidth, sprite.attributes.width);
+        collection.maxSpriteHeight = Math.max(collection.maxSpriteHeight, sprite.attributes.width);
       }
 
       function remove(sprite, collection) {
@@ -184,6 +193,20 @@
       return this;
     },
 
+    spawnBackgroundImage: function() {
+      this.backgroundImage = undefined;
+      var id = this.get("backgroundImage");
+      if (!id) return;
+
+      id = id.replace("#", "");
+      var img = document.getElementById(id);
+
+      if (!img)
+        throw "Invalid img #" + id + " for world backgroundImage. Cannot find element by id.";
+
+      this.backgroundImage = img;
+      return this;
+    },
     spawnSprites: function() {
       var world = this,
           w = this.toShallowJSON(),
@@ -366,9 +389,9 @@
     drawStaticSprites: function(context) {
       var start =_.now(),
           sprite, index, count = 0,
-          tileX1 = this.getWorldCol(-this.attributes.x + this.attributes.viewportLeft),
+          tileX1 = this.getWorldCol(-this.attributes.x + this.attributes.viewportLeft - this.staticSprites.maxSpriteWidth),
           tileX2 = this.getWorldCol(-this.attributes.x + context.canvas.width - this.attributes.viewportRight),
-          tileY1 = this.getWorldRow(-this.attributes.y + this.attributes.viewportTop),
+          tileY1 = this.getWorldRow(-this.attributes.y + this.attributes.viewportTop - this.staticSprites.maxSpriteHeight),
           tileY2 = this.getWorldRow(-this.attributes.y + context.canvas.height - this.attributes.viewportBottom);
       this.spriteOptions.offsetX = this.attributes.x;
       this.spriteOptions.offsetY = this.attributes.y;
@@ -381,21 +404,13 @@
 
       if (this.backgroundImage) {
         var img = this.backgroundImage,
-            ix = -this.attributes.x/2,
-            iy = -this.attributes.y/2,
             width = context.canvas.width < img.width ? context.canvas.width : img.width,
-            height = context.canvas.height < img.height ? context.canvas.height : img.height,
-            flipAxis = 0;
-        context.save();
-        context.translate(flipAxis, 0);
-        context.scale(2, 2);
-        context.translate(-flipAxis, 0);
+            height = context.canvas.height < img.height ? context.canvas.height : img.height;
         context.drawImage(
           img,
-          ix, iy, width, height,
-          0, 40, width, height
+          0, 0, width, height,
+          0, 0, width, height
         );
-        context.restore();
       }
 
       for (var col = tileX1; col <= tileX2; col++)

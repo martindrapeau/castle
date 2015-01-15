@@ -488,7 +488,7 @@
     },
     draw: function(context) {
       var text = JSON.stringify(this.toJSON());
-      context.fillStyle = this.get("color");
+      context.fillStyle = this.color;
       context.font = "12px arial";
       context.textAlign = "left";
       context.textBaseline = "middle";
