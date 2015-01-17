@@ -1,26 +1,10 @@
 $(window).on("load", function() {
-
-  /**
-   *
-   * Backbone Game Engine - An elementary HTML5 canvas game engine using Backbone.
-   *
-   * Copyright (c) 2014 Martin Drapeau
-   * https://github.com/martindrapeau/backbone-game-engine
-   *
-   */
-
   
   var canvas = document.getElementById("foreground"),
-      context = canvas.getContext("2d");
-
-  var tileWidth = 64,
+      context = canvas.getContext("2d"),
+      tileWidth = 64,
       tileHeight = 64,
-      spriteNames = [
-        ["hero1"]
-      ];
-  _.each(Backbone.TilePages, function(names) {
-    spriteNames.push(names);
-  });
+      spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
   Backbone.Controller = Backbone.Model.extend({
     initialize: function(attributes, options) {
@@ -66,6 +50,15 @@ $(window).on("load", function() {
         tileHeight: 384,
         tileColumns: 1,
         tileRows: 3
+      }, {
+        id: "artifacts",
+        img: "#artifacts",
+        x: 0,
+        y: 0,
+        tileWidth: tileWidth,
+        tileHeight: tileHeight,
+        tileColumns: 5,
+        tileRows: 5
       }]).attachToSpriteClasses();
 
       // Create the debug panel

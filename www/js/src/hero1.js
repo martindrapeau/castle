@@ -209,6 +209,8 @@
       options || (options = {});
       Backbone.Character.prototype.initialize.apply(this, arguments);
 
+      _.bindAll(this, "midAttack");
+
       this.input = options.input;
       this.world = options.world;
 
@@ -234,9 +236,8 @@
         var name = sprite.get("name"),
             cur = sprite.getStateInfo ? sprite.getStateInfo() : null;
 
+        if (name == "a-coin") return this;
         if (cur == null) return this;
-        if (cur.mov == "squished" || cur.mov == "wake") return this;
-        if (dir == "top" && name != "spike") return this;
 
         return this.knockout(sprite, "left");
       }
@@ -322,11 +323,26 @@
           this.set("state",  this.buildState("walk", cur.mov2, cur.dir));
 
       } else if (mode == "attack") {
-        if (pressed && cur.mov2 != "attack")
+        if (pressed && cur.mov2 != "attack") {
           this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), this.endAttack);
+          this.world.setTimeout(this.midAttack, 200);
+        }
         else if (!pressed && cur.mov2 == "attack")
           this.endAttack();
       }
+
+      return this;
+    },
+    midAttack: function() {
+      var cur = this.getStateInfo();
+      if (cur.mov2 != "attack") return this;
+
+      var x = this.get("x") + this.get("width") * (cur.dir == "left" ? -0.2 : 1.2),
+          y = this.get("y") + this.get("paddingTop") + (this.get("height") - this.get("paddingTop") - this.get("paddingBottom"))/2,
+          sprites = this.world.filterAt(x, y, null, this, true);
+
+      for (var s = 0; s < sprites.length; s++)
+        sprites[s].trigger("attack", this, cur.dir == "left" ? "right" : "left");
 
       return this;
     },
@@ -509,14 +525,33 @@
 
       var bottomLeftTile = this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "tile", this, true),
           bottomRightTile = this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "tile", this, true),
+          bottomLeftCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "character", this, true) : null,
+          bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "character", this, true) : null,
           bottomWorld = this.world.height() + heroHeight,
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld,
             bottomLeftTile ? (bottomLeftTile.getTop(true)) : null,
-            bottomRightTile ? (bottomRightTile.getTop(true)) : null
+            bottomRightTile ? (bottomRightTile.getTop(true)) : null,
+            bottomLeftCharacter ? bottomLeftCharacter.getTop(true) : null,
+            bottomRightCharacter ? bottomRightCharacter.getTop(true) : null
           ]);
 
+      if (bottomLeftCharacter || bottomRightCharacter) {
+        reaction = this.getHitReaction(bottomLeftCharacter || bottomRightCharacter, "bottom", bottomLeftCharacter ? "left": "right");
+        if (reaction == "bounce") {
+          attrs.yVelocity = yVelocity = animation.yStartVelocity*1/4;
+          attrs.y = y = characterBottomY - tileHeight;
+          updateHeroTopBottom();
+        } else if (reaction == "ko") {
+          return this.knockout(bottomLeftCharacter || bottomRightCharacter, bottomLeftCharacter ? "left": "right");
+        }
+
+        if (bottomLeftCharacter)
+          bottomLeftCharacter.trigger("hit", this, "top", "right");
+        if (bottomRightCharacter && bottomLeftCharacter != bottomRightCharacter)
+          bottomRightCharacter.trigger("hit", this, "top", "left");
+      }
 
       if ((cur.mov == "jump" || dead) && yVelocity > 0) {
         // Falling...
@@ -556,32 +591,6 @@
             }
           }
           land(bottomY);
-        } else {
-          // Enemie below?
-          var bottomLeftCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.4, heroBottomY, "character", this, true) : null,
-              bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.6, heroBottomY, "character", this, true) : null,
-              characterBottomY = _.minNotNull([
-                  bottomY,
-                  bottomLeftCharacter ? bottomLeftCharacter.getTop(true) : null,
-                  bottomRightCharacter ? bottomRightCharacter.getTop(true) : null
-              ]);
-          if (characterBottomY != bottomY) {
-            reaction = this.getHitReaction(bottomLeftCharacter || bottomRightCharacter, "bottom", bottomLeftCharacter ? "left": "right");
-            if (reaction == "block") {
-              land(characterBottomY);
-            } else if (reaction == "bounce") {
-              attrs.yVelocity = yVelocity = animation.yStartVelocity*1/4;
-              attrs.y = y = characterBottomY - tileHeight;
-              updateHeroTopBottom();
-            } else if (reaction == "ko") {
-              return this.knockout(bottomLeftCharacter || bottomRightCharacter, bottomLeftCharacter ? "left": "right");
-            }
-
-            if (bottomLeftCharacter)
-              bottomLeftCharacter.trigger("hit", this, "top", "right");
-            if (bottomRightCharacter && bottomLeftCharacter != bottomRightCharacter)
-              bottomRightCharacter.trigger("hit", this, "top", "left");
-          }
         }
 
       } else if ((cur.mov == "jump" || dead) && yVelocity < 0) {
@@ -651,7 +660,7 @@
 
         } else if (leftBottomCharacter) {
           // Check for character hit
-          leftX = leftBottomCharacter.get("x") + leftBottomCharacter.get("width");
+          leftX = leftBottomCharacter.get("x") + leftBottomCharacter.get("width") - heroWidth*0.25;
           if (heroLeftX <= leftX) {
             var reaction = this.getHitReaction(leftBottomCharacter, "left");
             if (reaction == "block") {
@@ -685,7 +694,7 @@
 
         } else if (rightBottomCharacter) {
           // Check for character hit
-          rightX = rightBottomCharacter.get("x");
+          rightX = rightBottomCharacter.get("x") + heroWidth*0.25;
           if (heroLeftX + heroWidth >= rightX) {
             var reaction = this.getHitReaction(rightBottomCharacter, "right");
             if (reaction == "block") {
@@ -720,7 +729,7 @@
     //   - ko: Knock-out and die
     getHitReaction: function(sprite, dir, dir2) {
       if (sprite.isBlocking && !sprite.isBlocking(this)) return null;
-      if (this.get("dead")) return "block";
+      if (this.get("dead") || sprite.get("isTile")) return "block";
       var name = sprite.get("name");
       if (dir == "bottom" && name == "spikes") return "ko";
       if (dir == "bottom") return "bounce";

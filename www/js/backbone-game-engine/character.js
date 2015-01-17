@@ -174,7 +174,7 @@
 
       attrs.sequenceIndex = this.updateSequenceIndex();
 
-      if (velocity != animation.velocity) velocity = animation.velocity;
+      if (velocity != animation.velocity) velocity = animation.velocity || 0;
 
       if (cur.mov == "fall" || cur.mov == "ko") {
         if (yVelocity < animation.yVelocity)
