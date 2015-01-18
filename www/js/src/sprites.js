@@ -264,6 +264,7 @@
       Backbone.Object.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "endAttack");
       this.on("attack", this.attack, this);
+      this.explosion = new Backbone.Explosion();
     },
     isBlocking: function(sprite) {
       return true;
@@ -274,10 +275,11 @@
 
       this.set({state: "bounce", sequenceIndex: 0});
       this.world.setTimeout(this.endAttack, 200);
-      this.world.add(new Backbone.Explosion({
+      this.explosion.set({
         x: this.get("x"),
         y: this.get("y")
-      }));
+      });
+      this.world.add(this.explosion);
     },
     endAttack: function() {
       this.set({
@@ -290,7 +292,8 @@
             artifact = this.get("artifact");
         this.world.remove(this);
         if (artifact) this.world.add(new Backbone[_.classify(artifact)]({x: x, y: y}));
-        this.world.add(new Backbone.Explosion({x: x, y: y}));
+        this.explosion.set({x: x, y: y});
+        this.world.add(this.explosion);
       }
     }
   });
