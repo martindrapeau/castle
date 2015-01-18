@@ -1,7 +1,7 @@
 (function() {
   Backbone.pagedSprites = {a: []};
 
-  function extendSprite(Cls, name, defaults, animations) {
+  window.extendSprite = function(Cls, name, defaults, animations) {
     var prefix = name.split("-")[0];
     if (!Backbone.pagedSprites[prefix]) Backbone.pagedSprites[prefix] = [];
     Backbone.pagedSprites[prefix].push(name);
@@ -116,11 +116,11 @@
   buildArtifact("a-coin", [5, 6, 7, 8]);
   buildArtifact("a-death", [10]);
   buildArtifact("a-health", [11]);
-  buildArtifact("a-key", [22]);
+  buildArtifact("a-key", [17]);
 
 
   // Regular tiles
-  var Tile = Backbone.Sprite.extend({
+  var Tile = Backbone.Tile = Backbone.Sprite.extend({
     defaults: {
       type: "tile",
       width: 64,
@@ -228,22 +228,26 @@
   extendSprite(Tile, "g-tombstone3", {collision: true, paddingTop: 24}, {idle: {sequences: [74]}});
 
 
-  // Houses
-  var HouseTile = Backbone.Sprite.extend({
-    defaults: _.extend({},
-      Tile.prototype.defaults,
-      {
-        spriteSheet: "houses",
-        width: 432,
-        height: 384,
-        collision: false
+  // Doors
+  var DoorTile = Tile.extend({
+    defaults: _.extend({}, Tile.prototype.defaults, {
+      spriteSheet: "doors",
+      width: 192,
+      height: 192,
+      collision: false,
+      static: false
+    }),
+    animations: {
+      idle: {
+        sequences: [0]
+      },
+      open: {
+        sequences: [1, 2, 3, 4],
+        delay: 100
       }
-    ),
-    initialize: Tile.prototype.initialize
+    }
   });
-  extendSprite(HouseTile, "h-1", {collision: false}, {idle: {sequences: [0]}});
-  extendSprite(HouseTile, "h-2", {collision: false}, {idle: {sequences: [1]}});
-  extendSprite(HouseTile, "h-3", {collision: false}, {idle: {sequences: [2]}});
+  extendSprite(DoorTile, "d-1");
 
 
   // Breakable tiles
@@ -252,7 +256,7 @@
       spriteSheet: "tiles",
       width: 64,
       height: 64,
-      isTile: true,
+      isBreakableTile: true,
       health: 3,
       artifact: null
     }),
@@ -308,9 +312,13 @@
     });
   }
 
-  buildBreakableTile("a-barrel", 76);
-  buildBreakableTile("a-crate", 77, {artifact: "a-coin"});
+  buildBreakableTile("a-crate", 77);
+  buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
+  buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
   buildBreakableTile("a-hay", 102);
+  buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
+  buildBreakableTile("a-barrel", 76);
+  buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
 
 
   // Characters

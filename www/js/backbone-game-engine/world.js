@@ -9,6 +9,12 @@
    *
    */
 
+  var ZCollection = Backbone.Collection.extend({
+    comparator: function(model) {
+      return -model.attributes.zIndex;
+    }
+  });
+
   // Backbone.World is Backbone model which contains a collection of sprites.
   Backbone.World = Backbone.Model.extend({
     defaults: {
@@ -42,7 +48,7 @@
         "setTimeout", "clearTimeout"
       );
 
-      this.sprites = new Backbone.Collection();
+      this.sprites = new ZCollection();
       this.setupSpriteLayers();
       this.spawnSprites();
 
@@ -94,8 +100,8 @@
     // Maintain shadow collections to quickly access the two types.
     setupSpriteLayers: function() {
       var world = this,
-          staticSprites = this.staticSprites = new Backbone.Collection(),
-          dynamicSprites = this.dynamicSprites = new Backbone.Collection();
+          staticSprites = this.staticSprites = new ZCollection(),
+          dynamicSprites = this.dynamicSprites = new ZCollection();
       staticSprites.lookup = {};
       staticSprites.maxSpriteWidth = staticSprites.maxSpriteHeight = 0;
       dynamicSprites.lookup = {};
@@ -453,6 +459,7 @@
         this.attributes.viewportLeft, this.attributes.viewportTop, this.viewport.width, this.viewport.height,
         this.attributes.viewportLeft, this.attributes.viewportTop, this.viewport.width, this.viewport.height);
 
+      var secondPass = [];
       for (var col = tileX1; col <= tileX2; col++)
         for (var row = tileY1; row <= tileY2; row++) {
           index = col * this.attributes.height + row;
@@ -460,11 +467,17 @@
             for (var s = 0; s < this.dynamicSprites.lookup[index].length; s++) {
               sprite = this.dynamicSprites.lookup[index][s];
               if (sprite._draw) {
-                sprite.draw.call(sprite, context, this.spriteOptions);
-                count++;
+                if (!sprite.attributes.zIndex) {
+                  sprite.draw.call(sprite, context, this.spriteOptions);
+                  count++;
+                }  else {
+                  secondPass.push(sprite);
+                }
               }
             }
         }
+      for (var s = 0; s < secondPass.length; s++)
+        secondPass[s].draw.call(secondPass[s], context, this.spriteOptions);
 
       context.restore();
 

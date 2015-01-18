@@ -35,6 +35,7 @@
       hero: true,
       width: 32,
       height: 64,
+      zIndex: 1,
       spriteSheet: undefined,
       state: "idle-right",
       powerUp: "small", // small or big

@@ -31,6 +31,7 @@
 
       // Animations
       sequenceIndex: 0,
+      zIndex: 0,
 
       static: false,
       collision: false
@@ -154,6 +155,8 @@
   // frames used for animation.
   Backbone.SpriteSheet = Backbone.Model.extend({
     defaults: {
+      x: 0,
+      y: 0,
       img: undefined, // Element id to find image in DOM
       tileWidth: undefined,
       tileHeight: undefined,
@@ -174,8 +177,8 @@
       for (var row = 0; row < sheet.tileRows; row++) {
         for (var col = 0; col < sheet.tileColumns; col++)
           this.frames.push({
-            x: col * sheet.tileWidth,
-            y: row * sheet.tileHeight,
+            x: sheet.x + col * sheet.tileWidth,
+            y: sheet.y + row * sheet.tileHeight,
             width: sheet.tileWidth,
             height: sheet.tileHeight
           });
@@ -209,9 +212,10 @@
     attachToSpriteClasses: function() {
       var spriteSheets = this;
       _.each(Backbone, function(cls) {
+        //if (cls == Backbone["H1"]) debugger;
         if (_.isFunction(cls) && cls.prototype instanceof Backbone.Sprite &&
             cls.prototype.defaults && cls.prototype.defaults.spriteSheet &&
-            !cls.prototype.spriteSheet) {
+            (!cls.prototype.spriteSheet || cls.prototype.spriteSheet.attributes.name != cls.prototype.defaults.spriteSheet)) {
           var spriteSheet = spriteSheets.get(cls.prototype.defaults.spriteSheet);
           if (spriteSheet) cls.prototype.spriteSheet = spriteSheet;
         }

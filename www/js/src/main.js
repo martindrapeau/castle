@@ -48,7 +48,7 @@ $(window).on("load", function() {
         y: 0,
         tileWidth: 432,
         tileHeight: 384,
-        tileColumns: 1,
+        tileColumns: 2,
         tileRows: 3
       }, {
         id: "artifacts",
@@ -59,6 +59,24 @@ $(window).on("load", function() {
         tileHeight: tileHeight,
         tileColumns: 5,
         tileRows: 5
+      }, {
+        id: "doors",
+        img: "#doors",
+        x: 0,
+        y: 0,
+        tileWidth: 192,
+        tileHeight: 192,
+        tileColumns: 5,
+        tileRows: 1
+      }, {
+        id: "house-door",
+        img: "#doors",
+        x: 0,
+        y: 192,
+        tileWidth: 96,
+        tileHeight: 144,
+        tileColumns: 5,
+        tileRows: 1
       }]).attachToSpriteClasses();
 
       // Create the debug panel

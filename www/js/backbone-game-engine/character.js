@@ -20,6 +20,7 @@
       type: "character",
       width: 32,
       height: 32,
+      zIndex: 1,
       spriteSheet: undefined,
       state: "idle-right",
       velocity: 0,
