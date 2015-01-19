@@ -45,7 +45,7 @@
       _.bindAll(this,
         "save", "getWorldIndex", "getWorldCol", "getWorldRow", "cloneAtPosition",
         "findAt", "filterAt", "spawnSprites", "height", "width", "add", "remove",
-        "setTimeout", "clearTimeout"
+        "setTimeout", "clearTimeout", "onTap", "onKey"
       );
 
       this.sprites = new ZCollection();
@@ -75,8 +75,13 @@
         sprite.engine = engine;
         sprite.trigger("attach", engine);
       });
+      if (!this.hammertime) this.hammertime = Hammer(document);
+      this.hammertime.on("tap", this.onTap);
+      $(document).on("keyup.world", this.onKey);
     },
     onDetach: function() {
+      $(document).off("keyup.world", this.onKey);
+      if (this.hammertime) this.hammertime.off("tap", this.onTap);
       this.sprites.each(function(sprite) {
         sprite.engine = undefined;
         sprite.trigger("detach");
@@ -92,6 +97,16 @@
       this.spriteOptions.viewportBottom = this.attributes.viewportBottom;
       this.backgroundCanvas.width = this.engine.canvas.width;
       this.backgroundCanvas.height = this.engine.canvas.height;
+    },
+    onTap: function(e) {
+      if (this.attributes.state != "play") return;
+      var x = e.gesture.center.clientX - this.engine.canvas.offsetLeft + this.engine.canvas.scrollLeft - this.attributes.x,
+          y = e.gesture.center.clientY - this.engine.canvas.offsetTop + this.engine.canvas.scrollTop - this.attributes.y;
+      this.trigger("tap", _.extend(e, {x: x, y: y}));
+    },
+    onKey: function(e) {
+      if (this.attributes.state != "play") return;
+      this.trigger("key", e);
     },
 
     // Split static sprites (background tiles) from dynamic ones (animated or moving).
@@ -476,8 +491,11 @@
               }
             }
         }
-      for (var s = 0; s < secondPass.length; s++)
-        secondPass[s].draw.call(secondPass[s], context, this.spriteOptions);
+      for (var s = 0; s < secondPass.length; s++) {
+        sprite = secondPass[s];
+        if (sprite._draw)
+          sprite.draw.call(sprite, context, this.spriteOptions);
+      }
 
       context.restore();
 

@@ -233,10 +233,10 @@
     },
     hit: function(sprite, dir, dir2) {
       if (sprite.get("type") == "character") {
-        var name = sprite.get("name"),
-            cur = sprite.getStateInfo ? sprite.getStateInfo() : null;
 
-        if (name == "a-coin") return this;
+        if (sprite.get("isArtifact")) return this;
+
+        var cur = sprite.getStateInfo ? sprite.getStateInfo() : null;
         if (cur == null) return this;
 
         return this.knockout(sprite, "left");
@@ -729,12 +729,14 @@
     //   - ko: Knock-out and die
     getHitReaction: function(sprite, dir, dir2) {
       if (sprite.isBlocking && !sprite.isBlocking(this)) return null;
-      if (this.get("dead") || sprite.get("isBreakableTile")) return "block";
+      if (this.get("dead") || sprite.get("isBreakableTile") || sprite.get("isBarrier")) return "block";
       var name = sprite.get("name");
       if (dir == "bottom" && name == "bc-spikes") return "ko";
       if (dir == "bottom") return "bounce";
       return "block";
     }
   });
+
+  Backbone.pagedSprites.a.push("hero1");
 
 }).call(this);

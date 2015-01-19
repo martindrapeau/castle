@@ -1,5 +1,37 @@
 (function() {
 
+  // Invisible barrier - never drawn but detect in collision detection
+  // Useful for creating invisible barriers to prevent characters
+  // from passing through
+  Backbone.Barrier = Backbone.Sprite.extend({
+    defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
+      name: "barrier",
+      type: "character",
+      state: "idle",
+      collision: true,
+      static: false,
+      width: 64,
+      height: 64,
+      isBarrier: true
+    }),
+    isBlocking: function(sprite) {
+      return true;
+    },
+    update: function(dt) {
+      return false;
+    }
+  });
+  Backbone.Barrier2x1 = Backbone.Barrier.extend({
+    defaults: _.extend({}, Backbone.Barrier.prototype.defaults, {
+      width: 128
+    })
+  });
+  Backbone.Barrier1x2 = Backbone.Barrier.extend({
+    defaults: _.extend({}, Backbone.Barrier.prototype.defaults, {
+      height: 128
+    })
+  });
+
 	// Sprite which respects gravity
   Backbone.Object = Backbone.Sprite.extend({
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {

@@ -130,9 +130,9 @@
       if (y === undefined) {
         var o = x;
         return !(
-          sx1 > o.x + o.width ||
+          sx1 > o.x + (o.width || 0) ||
           sx2 < o.x ||
-          sy1 > o.y + o.height ||
+          sy1 > o.y + (o.height || 0) ||
           sy2 < o.y
         );
       }
