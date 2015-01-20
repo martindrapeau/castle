@@ -60,6 +60,15 @@ $(window).on("load", function() {
         tileColumns: 5,
         tileRows: 5
       }, {
+        id: "health-indicator",
+        img: "#artifacts",
+        x: 0,
+        y: 256,
+        tileWidth: 200,
+        tileHeight: 30,
+        tileColumns: 1,
+        tileRows: 2
+      }, {
         id: "doors",
         img: "#doors",
         x: 0,
@@ -104,7 +113,14 @@ $(window).on("load", function() {
         }, window._world), {
         input: this.input,
         camera: this.camera,
-        debugPanel: this.debugPanel
+        //debugPanel: this.debugPanel
+      });
+
+      this.display = new Backbone.Display({
+        x: 100,
+        y: 0
+      }, {
+        world: this.world
       });
 
       // Message

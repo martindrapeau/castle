@@ -234,9 +234,9 @@
   createHouse("h-2", 2, {
     doorX: 264
   }, [
-    {name: "a-crate-coin", x: 128, y: 320},
+    {name: "a-crate-coin", x: 192, y: 320},
     {name: "barrier1x2", x: 20, y: 256},
-    {name: "barrier2x1", x: 0, y: 150},
+    {name: "barrier2x1", x: 0, y: 128},
     {name: "barrier2x1", x: 128, y: 128},
     {name: "barrier2x1", x: 256, y: 128},
     {name: "barrier1x2", x: 410, y: 256}

@@ -214,6 +214,11 @@
       this.input = options.input;
       this.world = options.world;
 
+      this.assets = {
+        health: 5,
+        coin: 1
+      };
+
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
@@ -234,7 +239,20 @@
     hit: function(sprite, dir, dir2) {
       if (sprite.get("type") == "character") {
 
-        if (sprite.get("isArtifact")) return this;
+        if (sprite.get("isArtifact")) {
+          switch (sprite.get("name")) {
+            case "a-coin":
+              this.assets.coin += 1;
+              break;
+            case "a-health":
+              this.assets.health += 1;
+              break;
+            case "a-death":
+              return this.knockout(sprite, dir == "left" ? "right" : "left");
+              break;
+          }
+          return this;
+        }
 
         var cur = sprite.getStateInfo ? sprite.getStateInfo() : null;
         if (cur == null) return this;
@@ -244,12 +262,15 @@
       return this;
     },
     knockout: function(sprite, dir) {
-      var cur = this.getStateInfo();
+      dir || (dir = cur.dir);
+      var cur = this.getStateInfo(),
+          state = this.buildState("ko", dir);
+
       this.set({
-        state: this.buildState("ko", cur.dir),
-        velocity: this.animations[this.buildState("ko", cur.dir)].velocity,
-        yVelocity: -this.animations[this.buildState("ko", cur.dir)].yVelocity/2,
-        nextState: this.buildState("dead", cur.mov2, cur.dir),
+        state: state,
+        velocity: this.animations[state].velocity,
+        yVelocity: -this.animations[state].yVelocity/2,
+        nextState: this.buildState("dead", cur.mov2, dir),
         dead: true
       });
       return this;
