@@ -1,7 +1,7 @@
 (function() {
 
   // Doors
-  var DoorTile = Backbone.Tile.extend({
+  /*var DoorTile = Backbone.Tile.extend({
     defaults: _.extend({}, Backbone.Tile.prototype.defaults, {
       spriteSheet: "doors",
       width: 192,
@@ -19,18 +19,18 @@
       }
     }
   });
-  extendSprite(DoorTile, "d-1");
+  extendSprite(DoorTile, "d-1");*/
 
-  // House door - disappears after opened (animated)
-  Backbone.HouseDoor = Backbone.Sprite.extend({
+  // A door is ephemeral - disapears from the world after animated
+  var Door = Backbone.Sprite.extend({
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
-      name: "house-door",
-      spriteSheet: "house-door",
+      spriteSheet: "doors",
       collision: false,
       static: false,
-      width: 94,
+      width: 100,
       height: 144,
-      state: "open"
+      state: "open",
+      persist: false
     }),
     animations: {
       open: {
@@ -68,10 +68,46 @@
     }
   });
 
+  function createDoor(name, sequences, defaults) {
+    var cls = _.classify(name),
+        reverse = sequences.slice().reverse();
+
+    Backbone[cls] = Door.extend({
+      defaults: _.extend({},
+        Door.prototype.defaults,
+        {name: name},
+        defaults || {}
+      ),
+      animations: {
+        open: {
+          sequences: sequences,
+          delay: 100
+        },
+        close: {
+          sequences: reverse,
+          delay: 100
+        },
+        "open-close": {
+          sequences: sequences.concat(reverse),
+          delay: 100
+        },
+        "close-open": {
+          sequences: reverse.concat(sequences),
+          delay: 100
+        }
+      }
+    });
+  }
+
+  createDoor("house-door", [6, 7, 8, 9, 10]);
+  createDoor("wall-door", [0, 1, 2, 3, 4, 5]);
+
+
   // Houses
-  var HouseTile = Backbone.Tile.extend({
+  var House = Backbone.Tile.extend({
     defaults: _.extend({}, Backbone.Tile.prototype.defaults, {
       spriteSheet: "houses",
+      door: "house-door",
       width: 432,
       height: 384,
       collision: false,
@@ -88,7 +124,6 @@
       close1: {sequences: [0], delay: 0},
       close2: {sequences: [0], delay: 0}
     },
-    assets: [],
     initialize: function(attributes, options) {
       Backbone.Tile.prototype.initialize.apply(this, arguments);
       if (!this.world) return;
@@ -96,27 +131,47 @@
       _.bindAll(this, "open", "close", "onStep", "tryOpenClose");
 
       var house = this,
-          x = this.get("x"),
-          y = this.get("y");
+          world = this.world,
+          x = house.get("x"),
+          y = house.get("y"),
+          doorCls = _.classify(this.get("door"));
 
-      this.door = new Backbone.HouseDoor({
-          x: x + this.get("doorX"),
-          y: y + this.get("doorY")
+      house.door = new Backbone[doorCls]({
+          x: x + house.get("doorX"),
+          y: y + house.get("doorY"),
+          persist: false
       });
 
-      this.sprites = [];
-      _.each(this.assets, function(def) {
-        house.sprites.push(new Backbone[_.classify(def.name)]({
+      house.insideSprites = [];
+      _.each(house.insideAssets, function(def) {
+        house.insideSprites.push(new Backbone[_.classify(def.name)]({
           x: x + def.x,
-          y: y + def.y
+          y: y + def.y,
+          persist: false
         }));
       });
 
-      this.listenTo(this.world, "tap", function(e) {
+      house.outsideSprites = [];
+      _.each(house.outsideAssets, function(def) {
+        house.outsideSprites.push(new Backbone[_.classify(def.name)]({
+          x: x + def.x,
+          y: y + def.y,
+          persist: false
+        }));
+      });
+
+      house.listenTo(world, "tap", function(e) {
         if (house.overlaps(e)) house.tryOpenClose();
       });
-      this.listenTo(this.world, "key", function(e) {
+      house.listenTo(world, "key", function(e) {
         if (e.keyCode == 38) house.tryOpenClose();
+      });
+      this.on("attach", function() {
+        _.each(house.outsideSprites, world.add);
+      });
+      this.on("remove  detach", function() {
+        _.each(house.insideSprites, world.remove);
+        _.each(house.outsideSprites, world.remove);
       });
     },
     tryOpenClose: function() {
@@ -167,6 +222,7 @@
 
         case "open2":
           world.remove(character);
+          _.each(this.outsideSprites, world.remove);
           this.set("state", "open3");
           world.setTimeout(this.onStep, 500);
           break;
@@ -174,12 +230,12 @@
         case "open3":
           this.set("state", "inside");
           world.add(character);
-          _.each(this.sprites, world.add);
+          _.each(this.insideSprites, world.add);
           this.listenTo(world.sprites, "remove", function(sprite) {
-            house.sprites = _.without(house.sprites, sprite);
+            house.insideSprites = _.without(house.insideSprites, sprite);
           });
           this.listenTo(world.sprites, "add", function(sprite) {
-            house.sprites.push(sprite);
+            house.insideSprites.push(sprite);
           });
           this.character = undefined;
           world.requestBackgroundRedraw = true;
@@ -188,7 +244,7 @@
         case "close1":
           this.stopListening(world.sprites);
           world.remove(character);
-          _.each(this.sprites, world.remove);
+          _.each(this.insideSprites, world.remove);
           this.door.set({state: "open-close"});
           world.add(this.door);
           this.set("state", "close2");
@@ -199,6 +255,7 @@
         case "close2":
           character.set("y", character.get("y") - 16);
           world.add(character);
+          _.each(house.outsideSprites, world.add);
           this.character = undefined;
           this.set("state", "idle");
           break;
@@ -206,10 +263,10 @@
     }
   });
   
-  function createHouse(name, tileIndex, defaults, assets) {
+  function createHouse(name, tileIndex, defaults, insideAssets, outsideAssets) {
     var outside = {sequences: [tileIndex], delay: 0},
         inside = {sequences: [tileIndex+1], delay: 0};
-    var Cls = extendSprite(HouseTile, name, defaults, {
+    var Cls = extendSprite(House, name, defaults, {
       idle: outside,
       open1:  outside,
       open2:  outside,
@@ -218,7 +275,9 @@
       close1: outside,
       close2: outside
     });
-    Cls.prototype.assets = assets;
+    Cls.prototype.insideAssets = insideAssets || [];
+    Cls.prototype.outsideAssets = outsideAssets || [];
+    return Cls;
   }
 
   createHouse("h-1", 0, null, [
@@ -252,5 +311,34 @@
     {name: "barrier", x: 320, y: 150},
     {name: "barrier1x2", x: 390, y: 256}
   ]);
+
+  var Wall = createHouse("h-wall", 0, {
+    spriteSheet: "wall",
+    door: "wall-door",
+    width: 320,
+    height: 192,
+    doorX: 10,
+    doorY: 48,
+    outDoorX: 215
+  }, [
+    {name: "barrier-1x2", x: -54, y: 64},
+    {name: "barrier-2x1", x: 0, y: 0},
+    {name: "barrier-2x1", x: 128, y: 0},
+    {name: "barrier", x: 256, y: 0},
+    {name: "barrier-1x2", x: 310, y: 64}
+  ], [
+    {name: "barrier-2x1", x: 0, y: 0},
+    {name: "barrier-2x1", x: 128, y: 0},
+    {name: "barrier", x: 256, y: 0},
+    {name: "barrier-2x1", x: 94, y: 64},
+    {name: "barrier-2x1", x: 94, y: 128}
+  ]);
+  Wall.prototype.onStep = function() {
+    House.prototype.onStep.apply(this, arguments);
+
+    if (this.get("state") == "inside")
+      this.door.set("x", this.get("x") + this.get("outDoorX"));
+  };
+
 
 }).call(this);

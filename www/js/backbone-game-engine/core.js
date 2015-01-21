@@ -34,7 +34,9 @@
       zIndex: 0,
 
       static: false,
-      collision: false
+      collision: false,
+
+      persist: true
     },
     animations: {
       idle: {
@@ -50,7 +52,7 @@
       this.lastSequenceChangeTime = 0;
     },
     toSave: function() {
-      return _.pick(this.toJSON(), this.saveAttributes);
+      return this.get("persist") ? _.pick(this.toJSON(), this.saveAttributes) : null;
     },
     getLeft: function(withPadding) {
       return this.attributes.x + (withPadding && this.attributes.paddingLeft ? this.attributes.paddingLeft : 0);

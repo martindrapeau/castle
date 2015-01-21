@@ -10,7 +10,8 @@
       static: false,
       width: 64,
       height: 64,
-      state: "explode"
+      state: "explode",
+      persist: false
     }),
     animations: {
       explode: {

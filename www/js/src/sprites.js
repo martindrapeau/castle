@@ -27,7 +27,8 @@
       height: 64,
       spriteSheet: "tiles",
       state: "idle",
-      static: true
+      static: true,
+      persist: true
     },
     initialize: function(attributes, options) {
       options || (options = {});

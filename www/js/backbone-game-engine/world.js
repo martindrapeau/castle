@@ -280,9 +280,9 @@
 
     // When saving, persist the sprite collection in the model attribute sprites.
     save: function() {
-      var sprites = this.sprites.map(function(sprite) {
+      var sprites = _.compact(this.sprites.map(function(sprite) {
         return sprite.toSave.apply(sprite);
-      });
+      }));
 
       // Save a screenshot of 30x15 tiles, skipping the two top first rows
       if (this.engine && this.viewport && this.viewport.width) {
