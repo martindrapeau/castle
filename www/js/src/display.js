@@ -58,6 +58,10 @@
         x: x + 232, y: y
       });
 
+      this.key = new Backbone.AKey({
+        x: x + 384, y: y
+      });
+
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
@@ -81,12 +85,12 @@
       this.stopListening();
     },
     update: function(dt) {
-      var assets = this.hero ? this.hero.assets : empty;
+      var assets = this.getAssets();
       this.health.set("health", assets.health);
       return true;
     },
     draw: function(context) {
-      var assets = this.hero ? this.hero.assets : empty,
+      var assets = this.getAssets(),
           x = this.get("x"),
           y = this.get("y");
 
@@ -94,14 +98,20 @@
 
       this.coin.draw.apply(this.coin, arguments);
 
+      if (assets.keys)
+        this.key.draw.apply(this.key, arguments);
+
       context.fillStyle = "#E3BC70";
       context.font = "24px arcade, Verdana, Arial, Sans-Serif";
       context.textBaseline = "top";
       context.fontWeight = "normal";
       
       context.textAlign = "left";
-      context.fillText(assets.coin, this.coin.get("x") + 60, 18);
+      context.fillText(assets.coins, this.coin.get("x") + 60, 18);
 
+    },
+    getAssets: function() {
+      return _.extend({}, empty, this.hero ? _.pick(this.hero.attributes, ["health", "coins", "keys"]) : null);
     }
 	});
 

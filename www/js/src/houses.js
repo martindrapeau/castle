@@ -1,83 +1,18 @@
 (function() {
 
-  // Doors
-  /*var DoorTile = Backbone.Tile.extend({
-    defaults: _.extend({}, Backbone.Tile.prototype.defaults, {
-      spriteSheet: "doors",
-      width: 192,
-      height: 192,
-      collision: false,
-      static: false
-    }),
-    animations: {
-      idle: {
-        sequences: [0]
-      },
-      open: {
-        sequences: [1, 2, 3, 4],
-        delay: 100
-      }
-    }
-  });
-  extendSprite(DoorTile, "d-1");*/
-
   // A door is ephemeral - disapears from the world after animated
-  var Door = Backbone.Sprite.extend({
-    defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
-      spriteSheet: "doors",
-      collision: false,
-      static: false,
-      width: 100,
-      height: 144,
-      state: "open",
-      persist: false
-    }),
-    animations: {
-      open: {
-        sequences: [0, 1, 2, 3, 4],
-        delay: 100
-      },
-      close: {
-        sequences: [4, 3, 2, 1, 0],
-        delay: 100
-      },
-      "open-close": {
-        sequences: [0, 1, 2, 3, 4, 4, 3, 2, 1, 0],
-        delay: 100
-      },
-      "close-open": {
-        sequences: [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
-        delay: 100
-      }
-    },
-    initialize: function(attributes, options) {
-      options || (options = {});
-      this.world = options.world;
-      this.lastSequenceChangeTime = 0;
-      _.bindAll(this, "onEnd");
-    },
-    update: function(dt) {
-      Backbone.Sprite.prototype.update.apply(this, arguments);
-      var animation = this.getAnimation();
-      if (this.attributes.sequenceIndex == animation.sequences.length - 1)
-        this.world.setTimeout(this.onEnd, 25);
-      return true;
-    },
-    onEnd: function() {
-      this.world.remove(this);
-    }
-  });
-
-  function createDoor(name, sequences, defaults) {
+  function createDoor(name, sequences) {
     var cls = _.classify(name),
         reverse = sequences.slice().reverse();
 
-    Backbone[cls] = Door.extend({
-      defaults: _.extend({},
-        Door.prototype.defaults,
-        {name: name},
-        defaults || {}
-      ),
+    Backbone[cls] = Backbone.Ephemeral.extend({
+      defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {
+        name: name,
+        spriteSheet: "doors",
+        state: "open",
+        width: 100,
+        height: 144
+      }),
       animations: {
         open: {
           sequences: sequences,
@@ -175,11 +110,20 @@
       });
     },
     tryOpenClose: function() {
-      var character = this.world.sprites.findWhere({name: "hero1"});
+      var character = this.getHeroOverlappingCharacter("hero1");
       if (!character) return;
 
       var state = this.get("state");
       if (state != "idle" && state != "inside") return;
+
+      if (this.get("state") == "idle")
+        this.open(character);
+      else
+        this.close(character);
+    },
+    getHeroOverlappingCharacter: function(name) {
+      var character = this.world.sprites.findWhere({name: name});
+      if (!character) return null;
 
       var coords = {
         x: this.door.get("x") + this.door.get("width")*0.4,
@@ -187,11 +131,7 @@
         width: this.door.get("width")*0.2,
         height: this.door.get("height")
       };
-      if (character.overlaps(coords))
-        if (this.get("state") == "idle")
-          this.open(character);
-        else
-          this.close(character);
+      return character.overlaps(coords) ? character : null;
     },
     open: function(character) {
       this.set("state", "open1");
@@ -338,6 +278,31 @@
 
     if (this.get("state") == "inside")
       this.door.set("x", this.get("x") + this.get("outDoorX"));
+  };
+  Wall.prototype.tryOpenClose = function() {
+    var character = this.getHeroOverlappingCharacter("hero1");
+    if (!character) return;
+
+    var state = this.get("state");
+    if (state != "idle" && state != "inside") return;
+
+    if (this.get("state") == "idle") {
+      var keys = character.get("keys");
+      if (keys == 0) {
+        var callout = new Backbone.Callout({
+          x: this.door.get("x"),
+          y: this.door.get("y") - Backbone.Callout.prototype.defaults.height,
+          text: "Key ?" 
+        });
+        this.world.add(callout);
+        console.log(callout);
+      } else {
+        character.set({keys: keys-1});
+        this.open(character);
+      }
+    } else {
+      this.close(character);
+    }
   };
 
 

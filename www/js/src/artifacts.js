@@ -1,38 +1,74 @@
 (function() {
 
 	// Explosion (disappears after animation)
-  Backbone.Explosion = Backbone.Sprite.extend({
-    defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
+  Backbone.Explosion = Backbone.Ephemeral.extend({
+    defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {
       name: "explosion",
-      type: "decoration",
       spriteSheet: "artifacts",
-      collision: false,
-      static: false,
-      width: 64,
-      height: 64,
       state: "explode",
-      persist: false
+      width: 64,
+      height: 64
     }),
     animations: {
       explode: {
         sequences: [0, 1, 2, 3, 4],
         delay: 50
       }
+    }
+  });
+
+  // Shows a callout (bubble) with instructions and disappears
+  Backbone.Callout = Backbone.Ephemeral.extend({
+    defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {
+      name: "callout",
+      spriteSheet: "callout",
+      state: "callout",
+      width: 126,
+      height: 116,
+      text: "Short text"
+    }),
+    animations: {
+      callout: {
+        sequences: [
+          {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: -4},
+          {frame: 0, x: 0, y: -8},
+          {frame: 0, x: 0, y: -10},
+          {frame: 0, x: 0, y: -8},
+          {frame: 0, x: 0, y: -4},
+          {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: 4},
+          {frame: 0, x: 0, y: 8},
+          {frame: 0, x: 0, y: 10},
+          {frame: 0, x: 0, y: 8},
+          {frame: 0, x: 0, y: 4},
+          {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: -4},
+          {frame: 0, x: 0, y: -8},
+          {frame: 0, x: 0, y: -10},
+          {frame: 0, x: 0, y: -8},
+          {frame: 0, x: 0, y: -4},
+          {frame: 0, x: 0, y: 0}
+        ],
+        delay: 100
+      }
     },
-    initialize: function(attributes, options) {
-      options || (options = {});
-      this.world = options.world;
-      this.lastSequenceChangeTime = 0;
-      _.bindAll(this, "onEnd");
-    },
-    update: function(dt) {
-      Backbone.Sprite.prototype.update.apply(this, arguments);
-      if (this.attributes.sequenceIndex == 4)
-        this.world.setTimeout(this.onEnd, 25);
-      return true;
-    },
-    onEnd: function() {
-      this.world.remove(this);
+    draw: function(context) {
+      Backbone.Ephemeral.prototype.draw.apply(this, arguments);
+
+      var animation = this.getAnimation(),
+          sequence = animation.sequences[this.get("sequenceIndex")],
+          x = this.world.get("x") + this.get("x") + this.get("width")/2 + sequence.x,
+          y = this.world.get("y") + this.get("y") + this.get("height")/4 + sequence.y,
+          text = this.get("text");
+
+      context.fillStyle = "#E3BC70";
+      context.font = "24px arcade, Verdana, Arial, Sans-Serif";
+      context.textBaseline = "top";
+      context.fontWeight = "normal";
+      
+      context.textAlign = "center";
+      context.fillText(text, x, y);
     }
   });
 
@@ -175,9 +211,11 @@
   buildBreakableTile("a-crate", 77);
   buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
-  buildBreakableTile("a-hay", 102);
-  buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
+  buildBreakableTile("a-crate-death", 77, {artifact: "a-death"});
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
+  buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
+  buildBreakableTile("a-hay", 102);
+  buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
   
 }).call(this);

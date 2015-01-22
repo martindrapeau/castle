@@ -198,7 +198,10 @@
       yAcceleration: 0,
       collision: true,
       dead: false,
-      buttonBMode: "attack" // run or attack
+      buttonBMode: "attack", // run or attack
+      health: 10,
+      coins: 0,
+      keys: 0
     }),
     animations: animations,
     saveAttributes: _.union(
@@ -214,11 +217,7 @@
       this.input = options.input;
       this.world = options.world;
 
-      this.assets = {
-        health: 5,
-        coin: 1
-      };
-
+      this.on("change:health", this.checkHealth, this);
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
@@ -236,19 +235,28 @@
       if (this.input) this.stopListening(this.input);
       this.debugPanel = undefined;
     },
+    checkHealth: function(model, options) {
+      console.log("checkHealth", model, options);
+      if (this.get("health") == 0)
+        return this.knockout(null, this.get("dir") == "left" ? "right" : "left");
+      return this;
+    },
     hit: function(sprite, dir, dir2) {
       if (sprite.get("type") == "character") {
 
         if (sprite.get("isArtifact")) {
           switch (sprite.get("name")) {
             case "a-coin":
-              this.assets.coin += 1;
+              this.set("coins", this.get("coins") + 1);
               break;
             case "a-health":
-              this.assets.health += 1;
+              this.set({health: Math.min(this.get("health") + 2, 10)}, {sprite: sprite, dir: dir, dir2: dir2});
               break;
             case "a-death":
-              return this.knockout(sprite, dir == "left" ? "right" : "left");
+              this.set({health: Math.max(this.get("health") - 5, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+              break;
+            case "a-key":
+              this.set("keys", this.get("keys") + 1);
               break;
           }
           return this;

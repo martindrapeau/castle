@@ -78,6 +78,15 @@ $(window).on("load", function() {
         tileColumns: 1,
         tileRows: 2
       }, {
+        id: "callout",
+        img: "#artifacts",
+        x: 0,
+        y: 316,
+        tileWidth: 126,
+        tileHeight: 116,
+        tileColumns: 1,
+        tileRows: 1
+      }, {
         id: "doors",
         img: "#doors",
         x: 0,
