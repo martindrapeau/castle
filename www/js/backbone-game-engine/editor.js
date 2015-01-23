@@ -290,7 +290,7 @@
           });
 
       if (this.debugPanel)
-        this.debugPanel.set({sprites: nameOrIds});
+        this.debugPanel.set({sprites: nameOrIds, mx: mx, my: my});
     }
 
   });

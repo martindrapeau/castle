@@ -149,26 +149,25 @@
     }),
     initialize: function(attributes, options) {
       Backbone.Object.prototype.initialize.apply(this, arguments);
-      _.bindAll(this, "endAttack");
-      this.on("attack", this.attack, this);
+      _.bindAll(this, "endHit");
       this.explosion = new Backbone.Explosion();
     },
     isBlocking: function(sprite) {
       return true;
     },
-    attack: function(sprite, dir) {
-      if (!sprite || !sprite.get("hero")) return;
+    hit: function(sprite, dir, dir2) {
+      if (!sprite || !sprite.get("hero") || dir2 != "attack") return;
       if (this.get("state") != "idle") return;
 
       this.set({state: "bounce", sequenceIndex: 0});
-      this.world.setTimeout(this.endAttack, 200);
+      this.world.setTimeout(this.endHit, 200);
       this.explosion.set({
         x: this.get("x"),
         y: this.get("y")
       });
       this.world.add(this.explosion);
     },
-    endAttack: function() {
+    endHit: function() {
       this.set({
         state: "idle",
         health: this.get("health") - 1

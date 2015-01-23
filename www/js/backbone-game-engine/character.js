@@ -12,7 +12,80 @@
   var sequenceDelay = 300,
       walkVelocity = 50,
       fallAcceleration = 1200,
-      fallVelocity = 600;
+      fallVelocity = 600,
+      hurtDelay = 300,
+      hurtBounceVelocity = -100,
+      hurtSequences = [25];
+
+  var animations = {
+    "idle-left": {
+      sequences: [0],
+      velocity: 0,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "idle-right": {
+      sequences: [0],
+      velocity: 0,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "walk-left": {
+      sequences: [1, 0],
+      velocity: -walkVelocity,
+      scaleX: 1,
+      scaleY: 1,
+      delay: sequenceDelay
+    },
+    "walk-right": {
+      sequences: [1, 0],
+      velocity: walkVelocity,
+      scaleX: -1,
+      scaleY: 1,
+      delay: sequenceDelay
+    },
+    "fall-left": {
+      sequences: [0],
+      velocity: -walkVelocity,
+      yVelocity: fallVelocity,
+      yAcceleration: fallAcceleration,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "fall-right": {
+      sequences: [0],
+      velocity: walkVelocity,
+      yVelocity: fallVelocity,
+      yAcceleration: fallAcceleration,
+      scaleX: -1,
+      scaleY: 1
+    },
+    "ko-left": {
+      sequences: [0],
+      velocity: -walkVelocity,
+      yVelocity: fallVelocity,
+      yAcceleration: fallAcceleration,
+      scaleX: 1,
+      scaleY: -1
+    },
+    "ko-right": {
+      sequences: [0],
+      velocity: walkVelocity,
+      yVelocity: fallVelocity,
+      yAcceleration: fallAcceleration,
+      scaleX: -1,
+      scaleY: -1
+    }
+  };
+
+  var hurtAnimation = {sequences: hurtSequences, delay: hurtDelay};
+  animations["idle-hurt-left"] = _.extend({}, animations["idle-left"], hurtAnimation);
+  animations["idle-hurt-right"] = _.extend({}, animations["idle-right"], hurtAnimation);
+  animations["walk-hurt-left"] = _.extend({}, animations["walk-left"], hurtAnimation);
+  animations["walk-hurt-right"] = _.extend({}, animations["walk-right"], hurtAnimation);
+  animations["fall-hurt-left"] = _.extend({}, animations["fall-left"], hurtAnimation);
+  animations["fall-hurt-right"] = _.extend({}, animations["fall-right"], hurtAnimation);
+
 
   Backbone.Character = Backbone.Sprite.extend({
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
@@ -26,68 +99,10 @@
       velocity: 0,
       yVelocity: 0,
       collision: true,
-      floor: null
+      floor: null,
+      ceiling: null
     }),
-    animations: {
-      "idle-left": {
-        sequences: [0],
-        velocity: 0,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "idle-right": {
-        sequences: [0],
-        velocity: 0,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "walk-left": {
-        sequences: [1, 0],
-        velocity: -walkVelocity,
-        scaleX: 1,
-        scaleY: 1,
-        delay: sequenceDelay
-      },
-      "walk-right": {
-        sequences: [1, 0],
-        velocity: walkVelocity,
-        scaleX: -1,
-        scaleY: 1,
-        delay: sequenceDelay
-      },
-      "fall-left": {
-        sequences: [0],
-        velocity: -walkVelocity,
-        yVelocity: fallVelocity,
-        yAcceleration: fallAcceleration,
-        scaleX: 1,
-        scaleY: 1
-      },
-      "fall-right": {
-        sequences: [0],
-        velocity: walkVelocity,
-        yVelocity: fallVelocity,
-        yAcceleration: fallAcceleration,
-        scaleX: -1,
-        scaleY: 1
-      },
-      "ko-left": {
-        sequences: [0],
-        velocity: -walkVelocity,
-        yVelocity: fallVelocity,
-        yAcceleration: fallAcceleration,
-        scaleX: 1,
-        scaleY: -1
-      },
-      "ko-right": {
-        sequences: [0],
-        velocity: walkVelocity,
-        yVelocity: fallVelocity,
-        yAcceleration: fallAcceleration,
-        scaleX: -1,
-        scaleY: -1
-      }
-    },
+    animations: animations,
     initialize: function(attributes, options) {
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
@@ -120,6 +135,20 @@
       return this;
     },
     hit: function(sprite, dir, dir2) {
+      var cur = this.getStateInfo(),
+          spriteCur = sprite.getStateInfo();
+      if (spriteCur.mov2 == "attack")
+        this.set({
+          state: this.buildState("fall", "hurt", spriteCur.dir),
+          nextState: this.buildState(cur.mov, null, spriteCur.dir),
+          yVelocity: hurtBounceVelocity,
+          velocity: hurtBounceVelocity * (spriteCur.dir == "left" ? -1 : 1) / 2,
+          sequenceIndex: 0
+        });
+      else if (cur.dir == dir)
+        this.set({
+          state: this.buildState(cur.mov, null, cur.opo)
+        });
       return this;
     },
     startNewAnimation: function(state, done) {
@@ -188,19 +217,24 @@
 
       // Collision detection
       var collision = this.get("collision"),
-          charWidth = this.get("width"),
+          tileWidth = this.get("width"),
           tileHeight = this.get("height"),
-          charHeight = tileHeight / 2,
-          charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight,
+          paddingLeft = this.get("paddingLeft"),
+          paddingRight = this.get("paddingRight"),
+          paddingBottom = this.get("paddingBottom"),
+          paddingTop = this.get("paddingTop"),
+          charWidth = tileWidth - paddingLeft - paddingRight,
+          charHeight = tileHeight - paddingTop - paddingBottom,
+          charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
           charTopY = charBottomY - charHeight,
-          charLeftX = Math.round(x + velocity * (dt/1000)),
+          charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
           bottomTile = cur.mov != "ko" ? this.world.findAt(charLeftX + charWidth/2, charBottomY, "tile", this, true) : null,
           bottomWorld = this.world.height() + tileHeight,
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld,
-            bottomTile ? bottomTile.get("y") : null
+            bottomTile ? bottomTile.getTop(true) : null
           ]);
 
       if (yVelocity >= 0) {
@@ -217,7 +251,7 @@
 
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
-          attrs.y = y = bottomY - tileHeight;
+          attrs.y = y = bottomY - tileHeight + paddingBottom;
           if (cur.mov == "fall")
             attrs.state = "walk-" + cur.dir;
         } else if (cur.mov != "fall" && cur.mov != "ko" && charBottomY < bottomY) {
@@ -252,11 +286,12 @@
         if (velocity <= 0 && collision) {
           // Turn around if obstacle left
           var leftTile = cur.mov != "ko" ? this.world.findAt(charLeftX, charTopY, "tile", this, true) : null,
-              leftCharacter = cur.mov != "ko" ? this.world.findAt(charLeftX + charWidth/4, charTopY, "character", this, true) : null,
-              worldLeft = -charWidth,
+              leftCharacter = cur.mov != "ko" ? this.world.findAt(charLeftX, charTopY, "character", this, true) : null,
+              worldLeft = -tileWidth,
               leftX = _.maxNotNull([
                 worldLeft,
-                leftTile ? (leftTile.get("x") + leftTile.get("width")) : null
+                leftTile ? leftTile.getRight(true) : null,
+                leftCharacter ? leftCharacter.getRight(true) : null
               ]);
 
           if (charLeftX <= leftX) {
@@ -266,29 +301,21 @@
             }
             velocity = velocity * -1;
             attrs.state = cur.mov + "-" + cur.opo;
-            attrs.x = x = leftX;
-          } else if (leftCharacter) {
-            leftX = leftCharacter.get("x") + leftCharacter.get("width");
-            if (charLeftX <= leftX) {
-              var reaction = this.getHitReaction(leftCharacter, "left");
-              if (reaction == "reverse") {
-                velocity = velocity * -1;
-                attrs.state = cur.mov + "-" + cur.opo;
-                attrs.x = x = leftX;
-              }
+            attrs.x = x = leftX - paddingLeft;
+            if (leftCharacter && cur.mov2 != "hurt")
               leftCharacter.trigger("hit", this, "right");
-            }
           }
         }
 
         if (velocity >= 0 && collision) {
           // Turn around if obstacle to the right
           var rightTile = cur.mov != "ko" ? this.world.findAt(charRightX, charTopY, "tile", this, true) : null,
-              rightCharacter = cur.mov != "ko" ? this.world.findAt(charRightX - charWidth/4, charTopY, "character", this, true) : null,
+              rightCharacter = cur.mov != "ko" ? this.world.findAt(charRightX, charTopY, "character", this, true) : null,
               worldRight = this.world.width(),
               rightX = _.minNotNull([
                 worldRight,
-                rightTile ? rightTile.get("x") : null
+                rightTile ? rightTile.getLeft(true) : null,
+                rightCharacter ? rightCharacter.getLeft(true) : null,
               ]);
 
           if (charRightX >= rightX) {
@@ -298,18 +325,9 @@
             }
             velocity = velocity * -1;
             attrs.state = cur.mov + "-" + cur.opo;
-            attrs.x = x = rightX - charWidth;
-          } else if (rightCharacter) {
-            rightX = rightCharacter.get("x");
-            if (charRightX + charWidth >= rightX) {
-              var reaction = this.getHitReaction(rightCharacter, "right");
-              if (reaction == "reverse") {
-                velocity = velocity * -1;
-                attrs.state = cur.mov + "-" + cur.opo;
-                attrs.x = x = rightX - charWidth;
-              }
+            attrs.x = x = rightX - charWidth - paddingLeft;
+            if (rightCharacter && cur.mov2 != "hurt")
               rightCharacter.trigger("hit", this, "left");
-            }
           }
         }
       }

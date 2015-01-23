@@ -135,8 +135,8 @@
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld,
-            bottomTile ? bottomTile.get("y") : null,
-            bottomCharacater && bottomCharacater.isBlocking(this) ? bottomCharacater.get("y") : null
+            bottomTile ? bottomTile.getTop(true) : null,
+            bottomCharacater && bottomCharacater.isBlocking(this) ? bottomCharacater.getTop(true) : null
           ]);
 
       if (yVelocity >= 0) {

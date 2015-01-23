@@ -127,8 +127,8 @@
     overlaps: function(x, y) {
       var sx1 = this.attributes.x + (this.attributes.paddingLeft || 0),
           sy1 = this.attributes.y + (this.attributes.paddingTop || 0),
-          sx2 = sx1 + this.attributes.width - (this.attributes.paddingRight || 0),
-          sy2 = sy1 + this.attributes.height - (this.attributes.paddingBottom || 0);
+          sx2 = this.attributes.x + this.attributes.width - (this.attributes.paddingRight || 0),
+          sy2 = this.attributes.y + this.attributes.height - (this.attributes.paddingBottom || 0);
       if (y === undefined) {
         var o = x;
         return !(
