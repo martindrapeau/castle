@@ -181,6 +181,29 @@
           sprite.draw(context);
       });
 
+      // Highlight tile position (on desktop)
+      if (this.mx != undefined && this.my != undefined) {
+        var x = this.mx - this.mx % sp.tileWidth + this.world.get("x"),
+            y = this.my - this.my % sp.tileHeight + this.world.get("y");
+
+        context.save();
+        context.rect(
+          this.world.get("viewportLeft"),
+          this.world.get("viewportTop"),
+          context.canvas.width - this.world.get("viewportRight"),
+          context.canvas.height - this.world.get("viewportBottom")
+        );
+        context.clip();
+
+        context.beginPath();
+        context.strokeStyle = "#FF0000";
+        context.setLineDash([5,2]);
+        context.rect(x, y, sp.tileWidth, sp.tileHeight);
+        context.stroke();
+
+        context.restore();
+      }
+
       this.changePageButton.draw(context);
     },
 
@@ -257,12 +280,17 @@
     },
 
     onMouseMove: function(e) {
-      var mx = e.pageX,
-          my = e.pageY,
-          id = this.world.getWorldIndex({x: mx, y: my});
+      var mx = this.mx = e.pageX - this.world.get("x"),
+          my = this.my = e.pageY - this.world.get("y"),
+          id = this.world.getWorldIndex({x: mx, y: my}),
+          sprites = this.world.filterAt(mx, my),
+          nameOrIds = _.map(sprites, function(sprite) {
+            if (sprite.get("type") == "tile") return sprite.get("name")
+            return sprite.get("id");
+          });
 
       if (this.debugPanel)
-        this.debugPanel.set({mouseX: mx - this.world.get("x"), mouseY: my - this.world.get("y"), id: id});
+        this.debugPanel.set({sprites: nameOrIds});
     }
 
   });

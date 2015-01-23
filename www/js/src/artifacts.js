@@ -66,7 +66,6 @@
       context.font = "24px arcade, Verdana, Arial, Sans-Serif";
       context.textBaseline = "top";
       context.fontWeight = "normal";
-      
       context.textAlign = "center";
       context.fillText(text, x, y);
     }

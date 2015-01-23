@@ -2,7 +2,7 @@
 
   var empty = {
     health: 0,
-    coin: 0
+    coins: 0
   };
 
   Backbone.HealthIndicator = Backbone.Sprite.extend({

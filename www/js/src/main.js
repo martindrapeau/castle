@@ -95,6 +95,15 @@ $(window).on("load", function() {
         tileHeight: 144,
         tileColumns: 6,
         tileRows: 2
+      }, {
+        id: "spider",
+        img: "#spider",
+        x: 0,
+        y: 0,
+        tileWidth: 130,
+        tileHeight: 80,
+        tileColumns: 8,
+        tileRows: 5
       }]).attachToSpriteClasses();
 
       // Create the debug panel
@@ -167,7 +176,8 @@ $(window).on("load", function() {
         tileWidth: tileWidth,
         tileHeight: tileHeight
       }, {
-        world: this.world
+        world: this.world,
+        debugPanel: this.debugPanel
       });
 
       // Controls
