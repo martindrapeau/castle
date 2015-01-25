@@ -511,8 +511,8 @@
     // fast column drawing without lookup.
     getWorldIndex: function(object) {
       if (!_.isObject(object)) return null;
-      var x = object.attributes ? object.get("x") : object.x || 0,
-          y = object.attributes ? object.get("y") : object.y || 0,
+      var x = object.attributes ? (object.get("x") + object.get("width")/2) : (object.x || 0),
+          y = object.attributes ? (object.get("y") + object.get("height")/2) : (object.y || 0),
           col = Math.floor(x / this.get("tileWidth")),
           row = Math.floor(y / this.get("tileHeight"));
       return col * this.get("height") + row;
@@ -558,8 +558,8 @@
       }
 
       // Look in dynamic sprites first (lookup by index)
-      for (c = col-1; c <= col+1; c++)
-        for (r = row-1; r <= row+1; r++) {
+      for (c = col-4; c <= col+2; c++)
+        for (r = row-4; r <= row+2; r++) {
           index = c * this.attributes.height + r;
           if (this.dynamicSprites.lookup[index])
             for (s = 0; s < this.dynamicSprites.lookup[index].length; s++)

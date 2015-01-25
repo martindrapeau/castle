@@ -86,7 +86,11 @@
       isArtifact: true
     }),
     hit: function(sprite, dir, dir2) {
-      if (sprite.get("hero")) return this.knockout(sprite, "left");
+      var opo = dir == "left" ? "right" : "left";
+      if (sprite.get("hero")) {
+        sprite.trigger("hit", this, opo);
+        return this.knockout(sprite, "left");
+      }
       return this;
     },
     isBlocking: function(sprite) {

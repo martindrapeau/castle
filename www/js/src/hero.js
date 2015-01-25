@@ -217,6 +217,7 @@
       dead: false,
       buttonBMode: "attack", // run or attack
       health: 10,
+      attackDamage: 1,
       coins: 0,
       keys: 0
     }),
@@ -251,74 +252,6 @@
     onDetach: function() {
       if (this.input) this.stopListening(this.input);
       this.debugPanel = undefined;
-    },
-    onHealthChange: function(model, health, options) {
-      options || (options = {});
-      var hero = this,
-          cur = this.getStateInfo(),
-          dir = options.dir || cur.dir,
-          opo = dir == "left" ? "right" : "left";
-      
-      if (health == 0)
-        return this.knockout(null, opo);
-      else if (health < this.previous("health"))
-        this.set({
-          state: this.buildState("jump", "hurt", opo),
-          nextState: this.buildState("idle", null, opo),
-          yVelocity: hurtBounceVelocity,
-          velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
-          sequenceIndex: 0
-        });
-
-      return this;
-    },
-    hit: function(sprite, dir, dir2) {
-      var cur = this.getStateInfo();
-      if (sprite.get("type") == "character") {
-
-        if (sprite.get("isBarrier") || sprite.get("isBreakableTile")) return this;
-
-        if (sprite.get("isArtifact")) {
-          switch (sprite.get("name")) {
-            case "a-coin":
-              this.set("coins", this.get("coins") + 1);
-              break;
-            case "a-health":
-              if (cur.mov2 != "hurt")
-                this.set({health: Math.min(this.get("health") + 2, 10)}, {sprite: sprite, dir: dir, dir2: dir2});
-              break;
-            case "a-death":
-              if (cur.mov2 != "hurt")
-                this.set({health: Math.max(this.get("health") - 5, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
-              break;
-            case "a-key":
-              this.set("keys", this.get("keys") + 1);
-              break;
-          }
-          return this;
-        }
-
-        if (cur.mov2 != "hurt") {
-          var damage = sprite.get("damage") || 10;
-          this.set({health: Math.max(this.get("health") - damage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
-        }
-      }
-      return this;
-    },
-    knockout: function(sprite, dir) {
-      dir || (dir = cur.dir);
-      var cur = this.getStateInfo(),
-          state = this.buildState("ko", dir);
-
-      this.set({
-        state: state,
-        velocity: this.animations[state].velocity,
-        yVelocity: -this.animations[state].yVelocity/2,
-        nextState: this.buildState("dead", null, dir),
-        dead: true,
-        collision: false
-      });
-      return this;
     },
     toggleDirection: function(dirIntent) {
       return this.dirToggled(dirIntent);
@@ -404,11 +337,10 @@
       if (cur.mov2 != "attack") return this;
 
       var height = this.get("height") - this.get("paddingTop") - this.get("paddingBottom"),
-          x = this.get("x") + (cur.dir == "right" ? this.get("width") : 0),
-          y1 = this.get("y") + this.get("paddingTop") + height*0.25,
-          y2 = this.get("y") + this.get("paddingTop") + height*0.75;
-          sprites = _.intersection(this.world.filterAt(x, y1, null, this, true), this.world.filterAt(x, y2, null, this, true));
-      debugger;
+          x = this.get("x") + (cur.dir == "right" ? this.get("width")*1.2 : -0.2),
+          y = this.get("y") + this.get("paddingTop") + height*0.50;
+          sprites = this.world.filterAt(x, y, null, this, true);
+      
       for (var s = 0; s < sprites.length; s++)
         sprites[s].trigger("hit", this, cur.dir == "left" ? "right" : "left", "attack");
 
@@ -418,6 +350,84 @@
       var cur = this.getStateInfo();
       this.whenAnimationEnds = null;
       this.set("state", this.buildState(cur.mov, cur.dir));
+      return this;
+    },
+    onHealthChange: function(model, health, options) {
+      options || (options = {});
+      var cur = this.getStateInfo(),
+          dir = options.dir || cur.dir,
+          opo = dir == "left" ? "right" : "left";
+      
+      if (health == 0)
+        return this.knockout(null, opo);
+      else if (health < this.previous("health"))
+        this.set({
+          state: this.buildState("jump", "hurt", opo),
+          nextState: this.buildState("idle", null, dir),
+          yVelocity: hurtBounceVelocity,
+          velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
+          sequenceIndex: 0
+        });
+
+      return this;
+    },
+    hit: function(sprite, dir, dir2) {
+      var cur = this.getStateInfo();
+      if (sprite.get("type") == "character") {
+
+        if (sprite.get("isBarrier") || sprite.get("isBreakableTile")) return this;
+
+        if (sprite.get("isArtifact")) {
+          switch (sprite.get("name")) {
+            case "a-coin":
+              this.cancelUpdate = true;
+              this.set("coins", this.get("coins") + 1);
+              break;
+            case "a-health":
+              if (cur.mov2 != "hurt") {
+                this.cancelUpdate = true;
+                this.set({health: Math.min(this.get("health") + 2, 10)}, {sprite: sprite, dir: dir, dir2: dir2});
+              }
+              break;
+            case "a-death":
+              if (cur.mov2 != "hurt") {
+                this.cancelUpdate = true;
+                this.set({health: Math.max(this.get("health") - 5, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+              }
+              break;
+            case "a-key":
+              this.cancelUpdate = true;
+              this.set("keys", this.get("keys") + 1);
+              break;
+          }
+          return this;
+        }
+
+        if (cur.mov2 != "hurt") {
+          if (cur.mov2 == "attack" && cur.dir == dir) {
+            sprite.trigger("hit", this, cur.opo, "attack");
+          } else {
+            this.cancelUpdate = true;
+            var attackDamage = sprite.get("attackDamage") || 10;
+            this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+          }
+        }
+      }
+      return this;
+    },
+    knockout: function(sprite, dir) {
+      dir || (dir = cur.dir);
+      var cur = this.getStateInfo(),
+          state = this.buildState("ko", dir);
+
+      this.set({
+        state: state,
+        velocity: this.animations[state].velocity,
+        yVelocity: -this.animations[state].yVelocity/2,
+        nextState: this.buildState("dead", null, dir),
+        dead: true,
+        collision: false
+      });
       return this;
     },
     // Jump
@@ -467,6 +477,7 @@
     update: function(dt) {
       // Movements are only possible inside a world
       if (!this.world) return true;
+      this.cancelUpdate = false;
 
       // Velocity and state
       var hero = this,
@@ -644,6 +655,7 @@
             attrs.y = y = bottomY - tileHeight + paddingBottom;*/
             if (bottomLeftCharacter) bottomLeftCharacter.trigger("hit", this, "top", cur.dir);
             if (bottomRightCharacter) bottomRightCharacter.trigger("hit", this, "top", cur.dir);
+            if (this.cancelUpdate) return true;
           }
         } else if (cur.mov != "jump" && yVelocity == 0 && heroBottomY < bottomY) {
           // Start falling if no obstacle below
@@ -678,6 +690,7 @@
             // TO DO - handle reaction
             if (topLeftCharacter) topLeftCharacter.trigger("hit", this, "bottom", cur.dir);
             if (topRightCharacter) topRightCharacter.trigger("hit", this, "bottom", cur.dir);
+            if (this.cancelUpdate) return true;
           }
         }
       }
@@ -686,7 +699,7 @@
         // Stop if obstacle left
         var leftTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroLeftX, obstacleCheckTopY + heroHeight*0.25, "tile", this, true) : null,
             leftBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroLeftX, obstacleCheckBottomY - heroHeight*0.25, "tile", this, true) : null,
-            leftCharacter = this.world.findAt(heroLeftX, obstacleCheckTopY + heroHeight*0.50, "character", this, true),
+            leftCharacter = this.world.findAt(heroLeftX, obstacleCheckBottomY - heroHeight*0.25, "character", this, true),
             leftX = _.maxNotNull([
               0,
               leftTopTile ? leftTopTile.getRight(true) : null,
@@ -705,6 +718,7 @@
             var reaction = this.getHitReaction(leftCharacter, "left");
             // TO DO - handle reaction
             leftCharacter.trigger("hit", this, "right");
+            if (this.cancelUpdate) return true;
           }
         }
       }
@@ -713,7 +727,7 @@
         // Stop if obstacle to the right
         var rightTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroRightX, obstacleCheckTopY + heroHeight*0.25, "tile", this, true) : null,
             rightBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroRightX, obstacleCheckBottomY - heroHeight*0.25, "tile", this, true) : null,
-            rightCharacter = this.world.findAt(heroRightX, obstacleCheckTopY + heroHeight*0.50, "character", this, true),
+            rightCharacter = this.world.findAt(heroRightX, obstacleCheckBottomY - heroHeight*0.25, "character", this, true),
             rightX = _.minNotNull([
               this.world.width(),
               rightTopTile ? rightTopTile.getLeft(true) : null,
@@ -732,6 +746,7 @@
             var reaction = this.getHitReaction(rightCharacter, "right");
             // TO DO - handle reaction
             rightCharacter.trigger("hit", this, "left");
+            if (this.cancelUpdate) return true;
           }
         }
       }

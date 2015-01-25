@@ -9,43 +9,43 @@
    *
    */
 
-  var sequenceDelay = 300,
+  var sequenceDelay = 100,
       walkVelocity = 50,
       fallAcceleration = 1200,
-      fallVelocity = 600,
-      hurtDelay = 300,
-      hurtBounceVelocity = -100,
-      hurtSequences = [25];
+      fallVelocity = 600;
 
   var animations = {
     "idle-left": {
       sequences: [0],
+      delay: sequenceDelay,
       velocity: 0,
       scaleX: 1,
       scaleY: 1
     },
     "idle-right": {
       sequences: [0],
+      delay: sequenceDelay,
       velocity: 0,
       scaleX: -1,
       scaleY: 1
     },
     "walk-left": {
       sequences: [1, 0],
+      delay: sequenceDelay,
       velocity: -walkVelocity,
       scaleX: 1,
-      scaleY: 1,
-      delay: sequenceDelay
+      scaleY: 1
     },
     "walk-right": {
       sequences: [1, 0],
+      delay: sequenceDelay,
       velocity: walkVelocity,
       scaleX: -1,
-      scaleY: 1,
-      delay: sequenceDelay
+      scaleY: 1
     },
     "fall-left": {
       sequences: [0],
+      delay: sequenceDelay,
       velocity: -walkVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
@@ -54,6 +54,7 @@
     },
     "fall-right": {
       sequences: [0],
+      delay: sequenceDelay,
       velocity: walkVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
@@ -61,7 +62,8 @@
       scaleY: 1
     },
     "ko-left": {
-      sequences: [0],
+      sequences: [2, 3],
+      delay: sequenceDelay,
       velocity: -walkVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
@@ -69,7 +71,8 @@
       scaleY: -1
     },
     "ko-right": {
-      sequences: [0],
+      sequences: [2, 3],
+      delay: sequenceDelay,
       velocity: walkVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
@@ -78,7 +81,13 @@
     }
   };
 
-  var hurtAnimation = {sequences: hurtSequences, delay: hurtDelay};
+  var hurtBounceVelocity = -100,
+      hurtAnimation = {
+        sequences: [0],
+        delay: 300,
+        yVelocity: fallVelocity,
+        yAcceleration: fallAcceleration
+      };
   animations["idle-hurt-left"] = _.extend({}, animations["idle-left"], hurtAnimation);
   animations["idle-hurt-right"] = _.extend({}, animations["idle-right"], hurtAnimation);
   animations["walk-hurt-left"] = _.extend({}, animations["walk-left"], hurtAnimation);
@@ -99,6 +108,8 @@
       velocity: 0,
       yVelocity: 0,
       collision: true,
+      health: 2,
+      attackDamage: 1,
       floor: null,
       ceiling: null
     }),
@@ -113,12 +124,13 @@
       this.on("detach", this.onDetach, this);
 
       this.on("hit", this.hit, this);
+      this.on("change:health", this.onHealthChange, this);
     },
     onAttach: function() {
       if (!this.engine) return;
       this.onDetach();
 
-      if (this.world) this.set("state", "walk-left");
+      if (this.world) this.set("state", this.buildState("walk", null, "left"));
     },
     onDetach: function() {
     },
@@ -127,28 +139,47 @@
     },
     knockout: function(sprite, dir) {
       this.set({
-        state: "ko-" + dir,
+        state: this.buildState("ko", null, dir),
         velocity: this.animations["ko-left"].velocity,
         yVelocity: -this.animations["ko-left"].yVelocity/2,
+        sequenceIndex: 0,
         collision: false
       });
       return this;
     },
-    hit: function(sprite, dir, dir2) {
+    onHealthChange: function(model, health, options) {
+      options || (options = {});
       var cur = this.getStateInfo(),
-          spriteCur = sprite.getStateInfo();
-      if (spriteCur.mov2 == "attack")
+          dir = options.dir || cur.dir,
+          opo = dir == "left" ? "right" : "left";
+      
+      if (health == 0)
+        return this.knockout(null, opo);
+      else if (health < this.previous("health"))
         this.set({
-          state: this.buildState("fall", "hurt", spriteCur.dir),
-          nextState: this.buildState(cur.mov, null, spriteCur.dir),
+          state: this.buildState("fall", "hurt", dir),
           yVelocity: hurtBounceVelocity,
-          velocity: hurtBounceVelocity * (spriteCur.dir == "left" ? -1 : 1) / 2,
+          velocity: hurtBounceVelocity * (opo == "left" ? -1 : 1) / 2,
           sequenceIndex: 0
         });
-      else if (cur.dir == dir)
-        this.set({
-          state: this.buildState(cur.mov, null, cur.opo)
-        });
+
+      return this;
+    },
+    hit: function(sprite, dir, dir2) {
+      var cur = this.getStateInfo(),
+          opo = dir == "left" ? "right" : "left";
+
+      if (cur.mov2 == "hurt") return this;
+
+      if (dir2 == "attack") {
+        this.cancelUpdate = true;
+        var attackDamage = sprite.get("attackDamage") || 1;
+        this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+      } else if (cur.dir == dir) {
+        this.cancelUpdate = true;
+        this.set("state", this.buildState(cur.mov, null, cur.opo));
+      }
+
       return this;
     },
     startNewAnimation: function(state, done) {
@@ -190,6 +221,7 @@
     update: function(dt) {
       // Movements are only possible inside a world
       if (!this.world) return true;
+      this.cancelUpdate = false;
 
       // Velocity and state
       var self = this,
@@ -202,11 +234,16 @@
           animation = this.getAnimation(),
           attrs = {};
 
-      attrs.sequenceIndex = this.updateSequenceIndex();
+      if ((cur.mov == "ko" || cur.mov2 == "hurt") &&
+          this.get("sequenceIndex") == animation.sequences.length-1) {
+        // No sequence change - stay on last one
+      } else {
+        attrs.sequenceIndex = this.updateSequenceIndex();
+      }
 
       if (velocity != animation.velocity) velocity = animation.velocity || 0;
 
-      if (cur.mov == "fall" || cur.mov == "ko") {
+      if (cur.mov == "fall" || cur.mov == "ko" || cur.mov2 == "hurt") {
         if (yVelocity < animation.yVelocity)
           yVelocity += animation.yAcceleration * (dt/1000);
 
@@ -229,7 +266,7 @@
           charTopY = charBottomY - charHeight,
           charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
-          bottomTile = cur.mov != "ko" ? this.world.findAt(charLeftX + charWidth/2, charBottomY, "tile", this, true) : null,
+          bottomTile = this.world.findAt(charLeftX + charWidth/2, charBottomY, "tile", this, true),
           bottomWorld = this.world.height() + tileHeight,
           bottomY = _.minNotNull([
             this.get("floor"),
@@ -245,23 +282,22 @@
             return false;
           }
 
-          // Knock-out if bouncing tile below
-          var reaction = this.getHitReaction(bottomTile, "bottom");
-          if (reaction == "ko") return this.knockout(bottomTile, cur.dir);
-
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = bottomY - tileHeight + paddingBottom;
           if (cur.mov == "fall")
-            attrs.state = "walk-" + cur.dir;
+            attrs.state = this.buildState("walk", null, cur.dir);
+          else if (cur.mov == "ko") {
+            attrs.velocity = velocity = 0;
+          }
         } else if (cur.mov != "fall" && cur.mov != "ko" && charBottomY < bottomY) {
           // Start falling if no obstacle below
-          attrs.state = "fall-" + cur.dir;
+          attrs.state = this.buildState("fall", null, cur.dir);
         }
 
-      } else if (cur.mov == "fall" && yVelocity < 0) {
+      } else if (yVelocity < 0) {
         // Jumping
-        var topTile = cur.mov != "ko" ? this.world.findAt(charLeftX + charWidth/2, charTopY, "tile", this, true) : null,
+        var topTile = this.world.findAt(charLeftX + charWidth/2, charTopY, "tile", this, true),
             topY = _.maxNotNull([
               -400,
               topTile ? (topTile.get("y") + topTile.get("height")) : null
@@ -300,10 +336,12 @@
               return false;
             }
             velocity = velocity * -1;
-            attrs.state = cur.mov + "-" + cur.opo;
+            attrs.state = this.buildState(cur.mov, null, cur.opo);
             attrs.x = x = leftX - paddingLeft;
-            if (leftCharacter && cur.mov2 != "hurt")
+            if (leftCharacter && cur.mov2 != "hurt") {
               leftCharacter.trigger("hit", this, "right");
+              if (this.cancelUpdate) return true;
+            }
           }
         }
 
@@ -324,10 +362,12 @@
               return false;
             }
             velocity = velocity * -1;
-            attrs.state = cur.mov + "-" + cur.opo;
+            attrs.state = this.buildState(cur.mov, null, cur.opo);
             attrs.x = x = rightX - charWidth - paddingLeft;
-            if (rightCharacter && cur.mov2 != "hurt")
+            if (rightCharacter && cur.mov2 != "hurt") {
               rightCharacter.trigger("hit", this, "left");
+              if (this.cancelUpdate) return true;
+            }
           }
         }
       }
@@ -338,11 +378,14 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
+      if (this.engine.debugPanel)
+        this.engine.debugPanel.set({state: this.get("state")})
+
       return true;
     },
     toggleDirection: function(dirIntent) {
       var cur = this.getStateInfo();
-      this.set({state: cur.mov + "-" + dirIntent});
+      this.set({state: this.buildState(cur.mov, null, dirIntent)});
       return this;
     },
     getStateInfo: function(state) {
@@ -366,16 +409,6 @@
       if (piece2) state += (state.length ? "-" : "") + piece2;
       if (piece3) state += (state.length ? "-" : "") + piece3;
       return state;
-    },
-    // Returns a reaction when the character hits another sprite.
-    // Return value may be:
-    //   - null: No reaction
-    //   - reverse: Change direction
-    //   - ko: Knock-out and die
-    getHitReaction: function(sprite, dir, dir2) {
-      if (sprite.get("name").indexOf("pennie") != -1) return null;
-      if (dir == "left" || dir =="right") return "reverse";
-      return null;
     }
   });
 

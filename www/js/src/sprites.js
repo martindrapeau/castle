@@ -136,7 +136,7 @@
             this.get("floor"),
             bottomWorld,
             bottomTile ? bottomTile.getTop(true) : null,
-            bottomCharacater && bottomCharacater.isBlocking(this) ? bottomCharacater.getTop(true) : null
+            bottomCharacater ? bottomCharacater.getTop(true) : null
           ]);
 
       if (yVelocity >= 0) {
