@@ -216,7 +216,8 @@
       collision: true,
       dead: false,
       buttonBMode: "attack", // run or attack
-      health: 10,
+      health: 8,
+      healthMax: 8,
       attackDamage: 1,
       coins: 0,
       keys: 0
@@ -233,11 +234,6 @@
       _.bindAll(this, "midAttack");
 
       this.input = options.input;
-      this.world = options.world;
-
-      this.on("change:health", this.onHealthChange, this);
-      this.on("attach", this.onAttach, this);
-      this.on("detach", this.onDetach, this);
     },
     onAttach: function() {
       if (this.input) {
@@ -270,7 +266,7 @@
           velocity = this.get("velocity"),
           attrs = {};
 
-      if (this.get("dead")) return this;
+      if (cur.mov == "ko" || cur.mov == "dead" || cur.mov2 == "hurt") return this;
 
       if (dirPressed) {
         // Pressed. Intent to move in that direction
@@ -314,6 +310,8 @@
       var mode = this.get("buttonBMode"),
           cur = this.getStateInfo(),
           pressed = this.input ? this.input.buttonBPressed() : false;
+      
+      if (cur.mov == "ko" || cur.mov == "dead" || cur.mov2 == "hurt") return this;
 
       if (mode == "run") {
         if (pressed && cur.mov == "walk")
@@ -386,13 +384,13 @@
             case "a-health":
               if (cur.mov2 != "hurt") {
                 this.cancelUpdate = true;
-                this.set({health: Math.min(this.get("health") + 2, 10)}, {sprite: sprite, dir: dir, dir2: dir2});
+                this.set({health: Math.min(this.get("health") + 2, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
               }
               break;
             case "a-death":
               if (cur.mov2 != "hurt") {
                 this.cancelUpdate = true;
-                this.set({health: Math.max(this.get("health") - 5, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+                this.set({health: Math.max(this.get("health") - 4, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
               }
               break;
             case "a-key":

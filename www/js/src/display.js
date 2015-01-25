@@ -13,7 +13,7 @@
       height: 30,
       state: "idle",
       health: 0,
-      maxHealth: 10
+      healthMax: 10
     }),
     animations: {
       idle: {
@@ -25,7 +25,7 @@
       Backbone.Sprite.prototype.draw.apply(this, arguments);
 
       var frame = this.spriteSheet.frames[0],
-          width = Math.floor(frame.width * this.attributes.health/this.attributes.maxHealth);
+          width = Math.floor(frame.width * this.attributes.health/this.attributes.healthMax);
 
       context.drawImage(
         this.spriteSheet.img,
@@ -86,7 +86,7 @@
     },
     update: function(dt) {
       var assets = this.getAssets();
-      this.health.set("health", assets.health);
+      this.health.set({health: assets.health, healthMax: assets.healthMax});
       return true;
     },
     draw: function(context) {
@@ -111,7 +111,7 @@
 
     },
     getAssets: function() {
-      return _.extend({}, empty, this.hero ? _.pick(this.hero.attributes, ["health", "coins", "keys"]) : null);
+      return _.extend({}, empty, this.hero ? _.pick(this.hero.attributes, ["health", "healthMax", "coins", "keys"]) : null);
     }
 	});
 

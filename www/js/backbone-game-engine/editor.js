@@ -280,8 +280,8 @@
     },
 
     onMouseMove: function(e) {
-      var mx = this.mx = e.pageX - this.world.get("x"),
-          my = this.my = e.pageY - this.world.get("y"),
+      var mx = this.mx = e.pageX - this.world.get("x") - this.engine.canvas.offsetLeft + this.engine.canvas.scrollLeft,
+          my = this.my = e.pageY - this.world.get("y") - this.engine.canvas.offsetTop + this.engine.canvas.scrollTop,
           id = this.world.getWorldIndex({x: mx, y: my}),
           sprites = this.world.filterAt(mx, my),
           nameOrIds = _.map(sprites, function(sprite) {
