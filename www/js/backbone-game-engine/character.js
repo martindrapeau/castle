@@ -378,8 +378,7 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
-      if (this.engine.debugPanel)
-        this.engine.debugPanel.set({state: this.get("state")})
+      //if (this.engine.debugPanel) this.engine.debugPanel.set({state: this.get("state")})
 
       return true;
     },

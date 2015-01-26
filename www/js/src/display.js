@@ -62,6 +62,18 @@
         x: x + 384, y: y
       });
 
+      this.redPotion = new Backbone.ARedPotion({
+        x: x + 448, y: y
+      });
+
+      this.greenPotion = new Backbone.AGreenPotion({
+        x: x + 448, y: y
+      });
+
+      this.bluePotion = new Backbone.ABluePotion({
+        x: x + 448, y: y
+      });
+
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
@@ -98,8 +110,15 @@
 
       this.coin.draw.apply(this.coin, arguments);
 
-      if (assets.keys)
+      if (assets.key)
         this.key.draw.apply(this.key, arguments);
+
+      if (assets.potion == "red")
+        this.redPotion.draw.apply(this.redPotion, arguments);
+      else if (assets.potion == "green")
+        this.greenPotion.draw.apply(this.greenPotion, arguments);
+      else if (assets.potion == "blue")
+        this.bluePotion.draw.apply(this.bluePotion, arguments);
 
       context.fillStyle = "#E3BC70";
       context.font = "24px arcade, Verdana, Arial, Sans-Serif";
@@ -111,7 +130,7 @@
 
     },
     getAssets: function() {
-      return _.extend({}, empty, this.hero ? _.pick(this.hero.attributes, ["health", "healthMax", "coins", "keys"]) : null);
+      return _.extend({}, empty, this.hero ? _.pick(this.hero.attributes, ["health", "healthMax", "coins", "key", "potion"]) : null);
     }
 	});
 

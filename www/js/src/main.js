@@ -104,6 +104,15 @@ $(window).on("load", function() {
         tileHeight: 80,
         tileColumns: 8,
         tileRows: 5
+      }, {
+        id: "fly",
+        img: "#fly",
+        x: 0,
+        y: 0,
+        tileWidth: 104,
+        tileHeight: 110,
+        tileColumns: 8,
+        tileRows: 3
       }]).attachToSpriteClasses();
 
       // Create the debug panel

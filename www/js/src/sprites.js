@@ -1,5 +1,8 @@
 (function() {
-  Backbone.pagedSprites = {a: []};
+  Backbone.pagedSprites = {
+    c: [],
+    a: []
+  };
 
   window.extendSprite = function(Cls, name, defaults, animations) {
     var prefix = name.split("-")[0];

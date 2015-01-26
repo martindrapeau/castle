@@ -139,6 +139,9 @@
   buildArtifact("a-death", [10]);
   buildArtifact("a-health", [11]);
   buildArtifact("a-key", [17]);
+  buildArtifact("a-blue-potion", [13]);
+  buildArtifact("a-red-potion", [14]);
+  buildArtifact("a-green-potion", [15]);
 
 
   // Breakable tiles
@@ -213,11 +216,18 @@
   buildBreakableTile("a-crate", 77);
   buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
+  buildBreakableTile("a-crate-health", 77, {artifact: "a-health"});
+  buildBreakableTile("a-crate-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-crate-death", 77, {artifact: "a-death"});
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
+  buildBreakableTile("a-barrel-health", 76, {artifact: "a-health"});
+  buildBreakableTile("a-barrel-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
   buildBreakableTile("a-hay", 102);
   buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
+  buildBreakableTile("a-hay-health", 102, {artifact: "a-health"});
+  buildBreakableTile("a-hay-red-potion", 77, {artifact: "a-red-potion"});
+  
   
 }).call(this);

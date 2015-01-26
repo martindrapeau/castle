@@ -204,8 +204,8 @@
       spriteSheet: "hero1",
       width: 128,
       height: 128,
-      paddingLeft: 24,
-      paddingRight: 24,
+      paddingLeft: 32,
+      paddingRight: 32,
       paddingTop: 24,
       paddingBottom: 4,
       state: "idle-right",
@@ -220,7 +220,8 @@
       healthMax: 8,
       attackDamage: 1,
       coins: 0,
-      keys: 0
+      key: false,
+      potion: null
     }),
     animations: animations,
     saveAttributes: _.union(
@@ -395,7 +396,19 @@
               break;
             case "a-key":
               this.cancelUpdate = true;
-              this.set("keys", this.get("keys") + 1);
+              this.set("key", true);
+              break;
+            case "a-red-potion":
+              this.cancelUpdate = true;
+              this.set("potion", "red");
+              break;
+            case "a-blue-potion":
+              this.cancelUpdate = true;
+              this.set("potion", "blue");
+              break;
+            case "a-green-potion":
+              this.cancelUpdate = true;
+              this.set("potion", "green");
               break;
           }
           return this;
@@ -646,11 +659,6 @@
           if (bottomLeftTile) bottomLeftTile.trigger("hit", this, "top", cur.dir);
           if (bottomRightTile) bottomRightTile.trigger("hit", this, "top", cur.dir);
           if (bottomLeftCharacter || bottomRightCharacter) {
-            reaction = this.getHitReaction(bottomLeftCharacter || bottomRightCharacter, "top", bottomLeftCharacter ? "left": "right");
-            // TO DO - handle reaction
-            /* bounce stuff...
-            attrs.yVelocity = yVelocity = animation.yStartVelocity*1/4;
-            attrs.y = y = bottomY - tileHeight + paddingBottom;*/
             if (bottomLeftCharacter) bottomLeftCharacter.trigger("hit", this, "top", cur.dir);
             if (bottomRightCharacter) bottomRightCharacter.trigger("hit", this, "top", cur.dir);
             if (this.cancelUpdate) return true;
@@ -684,8 +692,6 @@
           if (topLeftTile) topLeftTile.trigger("hit", this, "bottom", cur.dir);
           if (topRightTile) topRightTile.trigger("hit", this, "bottom", cur.dir);
           if (topLeftCharacter || topRightCharacter) {
-            reaction = this.getHitReaction(topLeftCharacter || topRightCharacter, "top", topLeftCharacter ? "left": "right");
-            // TO DO - handle reaction
             if (topLeftCharacter) topLeftCharacter.trigger("hit", this, "bottom", cur.dir);
             if (topRightCharacter) topRightCharacter.trigger("hit", this, "bottom", cur.dir);
             if (this.cancelUpdate) return true;
@@ -713,8 +719,6 @@
           if (leftBottomTile) leftBottomTile.trigger("hit", this, "right");
 
           if (leftCharacter) {
-            var reaction = this.getHitReaction(leftCharacter, "left");
-            // TO DO - handle reaction
             leftCharacter.trigger("hit", this, "right");
             if (this.cancelUpdate) return true;
           }
@@ -741,8 +745,6 @@
           if (rightBottomTile) rightBottomTile.trigger("hit", this, "left");
 
           if (rightCharacter) {
-            var reaction = this.getHitReaction(rightCharacter, "right");
-            // TO DO - handle reaction
             rightCharacter.trigger("hit", this, "left");
             if (this.cancelUpdate) return true;
           }
@@ -759,23 +761,9 @@
         this.debugPanel.set({state: this.attributes.state, nextState: this.attributes.nextState});*/
 
       return true;
-    },
-    // Returns a reaction when hero hits a character or tile.
-    // Return value may be:
-    //   - null: No reaction
-    //   - block: Stop moving in that direction
-    //   - bounce: Bounce back in the opposite direction
-    //   - ko: Knock-out and die
-    getHitReaction: function(sprite, dir, dir2) {
-      if (sprite.isBlocking && !sprite.isBlocking(this)) return null;
-      if (this.get("dead") || sprite.get("isBreakableTile") || sprite.get("isBarrier")) return "block";
-      var name = sprite.get("name");
-      if (dir == "bottom" && name == "bc-spikes") return "ko";
-      if (dir == "bottom") return "bounce";
-      return "block";
     }
   });
 
-  Backbone.pagedSprites.a.push("hero1");
+  Backbone.pagedSprites.c.push("hero1");
 
 }).call(this);

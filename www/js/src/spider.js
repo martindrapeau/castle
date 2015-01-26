@@ -103,6 +103,6 @@
     animations: animations
 	});
 
-  Backbone.pagedSprites.a.push("spider");
+  Backbone.pagedSprites.c.push("spider");
 
 }).call(this);

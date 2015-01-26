@@ -21,14 +21,14 @@
 
   extendSprite(Backbone.Tile, "bc-spikes", {collision: true, paddingTop: 25}, {idle: {sequences: [16]}});
 
-  extendSprite(Backbone.Tile, "bc-chest", {collision: true}, {idle: {sequences: [78]}});
+  extendSprite(Backbone.Tile, "bc-chest", {collision: true, zIndex: 1}, {idle: {sequences: [78]}});
 
-  extendSprite(Backbone.Tile, "bc-table1", {collision: true}, {idle: {sequences: [80]}});
-  extendSprite(Backbone.Tile, "bc-table2", {collision: true}, {idle: {sequences: [81]}});
+  extendSprite(Backbone.Tile, "bc-table1", {collision: true, zIndex: 1}, {idle: {sequences: [80]}});
+  extendSprite(Backbone.Tile, "bc-table2", {collision: true, zIndex: 1}, {idle: {sequences: [81]}});
 
-  extendSprite(Backbone.Tile, "bc-vase1", {collision: true, paddingTop: 14}, {idle: {sequences: [84]}});
-  extendSprite(Backbone.Tile, "bc-vase2", {collision: true}, {idle: {sequences: [85]}});
-  extendSprite(Backbone.Tile, "bc-vase3", {collision: true, paddingTop: 23}, {idle: {sequences: [86]}});
+  extendSprite(Backbone.Tile, "bc-vase1", {collision: true, zIndex: 1, paddingTop: 14}, {idle: {sequences: [84]}});
+  extendSprite(Backbone.Tile, "bc-vase2", {collision: true, zIndex: 1}, {idle: {sequences: [85]}});
+  extendSprite(Backbone.Tile, "bc-vase3", {collision: true, zIndex: 1, paddingTop: 23}, {idle: {sequences: [86]}});
 
   extendSprite(Backbone.Tile, "f-grass1", {collision: true}, {idle: {sequences: [24]}});
   extendSprite(Backbone.Tile, "f-grass2", {collision: true}, {idle: {sequences: [25]}});
@@ -56,11 +56,11 @@
   extendSprite(Backbone.Tile, "f-bush1", {collision: false}, {idle: {sequences: [92]}});
   extendSprite(Backbone.Tile, "f-bush2", {collision: false}, {idle: {sequences: [93]}});
 
-  extendSprite(Backbone.Tile, "f-sign1", {collision: false}, {idle: {sequences: [96]}});
-  extendSprite(Backbone.Tile, "f-sign2", {collision: false}, {idle: {sequences: [97]}});
+  extendSprite(Backbone.Tile, "f-sign1", {collision: false, zIndex: 1}, {idle: {sequences: [96]}});
+  extendSprite(Backbone.Tile, "f-sign2", {collision: false, zIndex: 1}, {idle: {sequences: [97]}});
 
-  extendSprite(Backbone.Tile, "f-fence1", {collision: false}, {idle: {sequences: [100]}});
-  extendSprite(Backbone.Tile, "f-fence2", {collision: false}, {idle: {sequences: [101]}});
+  extendSprite(Backbone.Tile, "f-fence1", {collision: false, zIndex: 1}, {idle: {sequences: [100]}});
+  extendSprite(Backbone.Tile, "f-fence2", {collision: false, zIndex: 1}, {idle: {sequences: [101]}});
 
   extendSprite(Backbone.Tile, "g-grass1", {collision: true}, {idle: {sequences: [44]}});
   extendSprite(Backbone.Tile, "g-grass2", {collision: true}, {idle: {sequences: [45]}});
@@ -83,12 +83,12 @@
   extendSprite(Backbone.Tile, "g-ground8", {collision: true}, {idle: {sequences: [62]}});
   extendSprite(Backbone.Tile, "g-grass8", {collision: true}, {idle: {sequences: [64]}});
 
-  extendSprite(Backbone.Tile, "g-fence", {collision: false}, {idle: {sequences: [68]}});
-  extendSprite(Backbone.Tile, "g-chest", {collision: true, paddingTop: 13}, {idle: {sequences: [69]}});
-  extendSprite(Backbone.Tile, "g-pot", {collision: true, paddingTop: 18, paddingLeft: 10, paddingRight: 10}, {idle: {sequences: [70]}});
+  extendSprite(Backbone.Tile, "g-fence", {collision: false, zIndex: 1}, {idle: {sequences: [68]}});
+  extendSprite(Backbone.Tile, "g-chest", {collision: true, zIndex: 1, paddingTop: 13}, {idle: {sequences: [69]}});
+  extendSprite(Backbone.Tile, "g-pot", {collision: true, zIndex: 1, paddingTop: 18, paddingLeft: 10, paddingRight: 10}, {idle: {sequences: [70]}});
 
-  extendSprite(Backbone.Tile, "g-tombstone1", {collision: true, paddingTop: 4}, {idle: {sequences: [72]}});
-  extendSprite(Backbone.Tile, "g-tombstone2", {collision: true}, {idle: {sequences: [73]}});
-  extendSprite(Backbone.Tile, "g-tombstone3", {collision: true, paddingTop: 24}, {idle: {sequences: [74]}});
+  extendSprite(Backbone.Tile, "g-tombstone1", {collision: true, zIndex: 1, paddingTop: 4}, {idle: {sequences: [72]}});
+  extendSprite(Backbone.Tile, "g-tombstone2", {collision: true, zIndex: 1}, {idle: {sequences: [73]}});
+  extendSprite(Backbone.Tile, "g-tombstone3", {collision: true, zIndex: 1, paddingTop: 24}, {idle: {sequences: [74]}});
 
 }).call(this);

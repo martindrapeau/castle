@@ -48,6 +48,7 @@
       collision: false,
       doorX: 168,
       doorY: 240,
+      zIndex: 0,
       static: true
     }),
     animations: {
@@ -287,8 +288,8 @@
     if (state != "idle" && state != "inside") return;
 
     if (this.get("state") == "idle") {
-      var keys = character.get("keys");
-      if (keys == 0) {
+      var key = character.get("key");
+      if (!key) {
         var callout = new Backbone.Callout({
           x: this.door.get("x"),
           y: this.door.get("y") - Backbone.Callout.prototype.defaults.height,
@@ -297,7 +298,7 @@
         this.world.add(callout);
         console.log(callout);
       } else {
-        character.set({keys: keys-1});
+        character.set({key: false});
         this.open(character);
       }
     } else {

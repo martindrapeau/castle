@@ -434,16 +434,25 @@
         );
       }
 
+      var secondPass = [];
       for (var col = tileX1; col <= tileX2; col++)
         for (var row = tileY1; row <= tileY2; row++) {
           index = col * this.attributes.height + row;
           if (this.staticSprites.lookup[index])
             for (var s = 0; s < this.staticSprites.lookup[index].length; s++) {
               sprite = this.staticSprites.lookup[index][s];
-              sprite.draw.call(sprite, context, this.spriteOptions);
-              count++;
+              if (!sprite.attributes.zIndex) {
+                sprite.draw.call(sprite, context, this.spriteOptions);
+                count++;
+              }  else {
+                secondPass.push(sprite);
+              }
             }
         }
+      for (var s = 0; s < secondPass.length; s++) {
+        sprite = secondPass[s];
+        sprite.draw.call(sprite, context, this.spriteOptions);
+      }
 
       if (this.debugPanel) this.debugPanel.set({
         staticDrwan: count,
