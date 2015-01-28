@@ -93,9 +93,6 @@
       }
       return this;
     },
-    isBlocking: function(sprite) {
-      return false;
-    },
     knockout: function(sprite, dir) {
       this.set({
         state: "ko",
@@ -158,9 +155,6 @@
       Backbone.Object.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "endHit");
       this.explosion = new Backbone.Explosion();
-    },
-    isBlocking: function(sprite) {
-      return true;
     },
     hit: function(sprite, dir, dir2) {
       if (!sprite || !sprite.get("hero") || dir2 != "attack") return;

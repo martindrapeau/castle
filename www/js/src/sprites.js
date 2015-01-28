@@ -36,9 +36,6 @@
       height: 64,
       isBarrier: true
     }),
-    isBlocking: function(sprite) {
-      return true;
-    },
     update: function(dt) {
       return false;
     }
@@ -81,12 +78,8 @@
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
       this.world = options.world;
-      _.bindAll(this, "isBlocking");
 
       this.on("hit", this.hit, this);
-    },
-    isBlocking: function(sprite) {
-      return false;
     },
     knockout: function(sprite, dir) {
       this.world.remove(this);

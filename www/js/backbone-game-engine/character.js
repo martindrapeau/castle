@@ -81,7 +81,7 @@
     }
   };
 
-  var hurtBounceVelocity = -100,
+  var hurtBounceVelocity = -250,
       hurtAnimation = {
         sequences: [0],
         delay: 300,
@@ -104,7 +104,7 @@
       height: 32,
       zIndex: 1,
       spriteSheet: undefined,
-      state: "idle-right",
+      state: "walk-left",
       velocity: 0,
       yVelocity: 0,
       collision: true,
@@ -118,7 +118,6 @@
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
       this.world = options.world;
-      _.bindAll(this, "isBlocking");
 
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
@@ -129,13 +128,8 @@
     onAttach: function() {
       if (!this.engine) return;
       this.onDetach();
-
-      if (this.world) this.set("state", this.buildState("walk", null, "left"));
     },
     onDetach: function() {
-    },
-    isBlocking: function(sprite) {
-      return true;
     },
     knockout: function(sprite, dir) {
       this.set({

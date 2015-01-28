@@ -260,6 +260,7 @@
         throw "Invalid or missing dirIntent. Must be left or right."
 
       var cur = this.getStateInfo(),
+          now = _.now(),
           opoIntent = dirIntent == "right" ? "left" : "right",
           dirPressed = this.input ? this.input[dirIntent+"Pressed"]() : false,
           opoPressed = this.input ? this.input[opoIntent+"Pressed"]() : false,
@@ -283,6 +284,7 @@
             var animation = this.getAnimation(attrs.state);
             if (animation.minVelocity && Math.abs(velocity) < Math.abs(animation.minVelocity))
               attrs.velocity = animation.minVelocity;
+            this.startWalk = now;
           } else if (cur.dir == opoIntent) {
             // Skid trying to stop before turning
             attrs.state = this.buildState("skid", opoIntent);
@@ -299,6 +301,8 @@
         } else {
           attrs.state = this.buildState("release", dirIntent);
           attrs.nextState = this.buildState("idle", dirIntent);
+          if (now < this.startWalk + 250)
+            attrs.velocity = velocity = velocity * 0.5;
         }
       }
 
