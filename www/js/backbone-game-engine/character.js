@@ -10,9 +10,9 @@
    */
 
   var sequenceDelay = 100,
-      walkVelocity = 50,
+      walkVelocity = 40,
       fallAcceleration = 1200,
-      fallVelocity = 600;
+      fallVelocity = 400;
 
   var animations = {
     "idle-left": {
@@ -64,8 +64,8 @@
     "ko-left": {
       sequences: [2, 3],
       delay: sequenceDelay,
-      velocity: -walkVelocity,
-      yVelocity: fallVelocity,
+      velocity: -walkVelocity/2,
+      yVelocity: fallVelocity/2,
       yAcceleration: fallAcceleration,
       scaleX: 1,
       scaleY: -1
@@ -73,16 +73,15 @@
     "ko-right": {
       sequences: [2, 3],
       delay: sequenceDelay,
-      velocity: walkVelocity,
-      yVelocity: fallVelocity,
+      velocity: walkVelocity/2,
+      yVelocity: fallVelocity/2,
       yAcceleration: fallAcceleration,
       scaleX: -1,
       scaleY: -1
     }
   };
 
-  var hurtBounceVelocity = -250,
-      hurtAnimation = {
+  var hurtAnimation = {
         sequences: [0],
         delay: 300,
         yVelocity: fallVelocity,
@@ -132,10 +131,11 @@
     onDetach: function() {
     },
     knockout: function(sprite, dir) {
+      var opo = dir == "left" ? "right" : "left";
       this.set({
-        state: this.buildState("ko", null, dir),
-        velocity: this.animations["ko-left"].velocity,
-        yVelocity: -this.animations["ko-left"].yVelocity/2,
+        state: this.buildState("ko", null, opo),
+        velocity: this.animations["ko-"+opo].velocity,
+        yVelocity: -this.animations["ko-"+opo].yVelocity,
         sequenceIndex: 0,
         collision: false
       });
@@ -147,15 +147,18 @@
           dir = options.dir || cur.dir,
           opo = dir == "left" ? "right" : "left";
       
-      if (health == 0)
-        return this.knockout(null, opo);
-      else if (health < this.previous("health"))
+      if (health == 0) {
+        console.log("dir", options);
+        return this.knockout(null, dir);
+      }
+      else if (health < this.previous("health")) {
         this.set({
           state: this.buildState("fall", "hurt", dir),
-          yVelocity: hurtBounceVelocity,
-          velocity: hurtBounceVelocity * (opo == "left" ? -1 : 1) / 2,
+          velocity: this.animations["ko-"+dir].velocity,
+          yVelocity: -this.animations["ko-"+dir].yVelocity,
           sequenceIndex: 0
         });
+      }
 
       return this;
     },
@@ -176,12 +179,12 @@
 
       return this;
     },
-    startNewAnimation: function(state, done) {
+    startNewAnimation: function(state, attrs, done) {
       this.lastSequenceChangeTime = _.now();
-      this.set({
+      this.set(_.extend({
         state: state,
         sequenceIndex: 0
-      });
+      }, attrs));
       this.whenAnimationEnds = done;
       return this;
     },
@@ -308,7 +311,7 @@
       // When not in play mode, do not allow horizontal displacements or animations
       if (this.world.get("state") != "play") {
         velocity = 0;
-        attrs.sequenceIndex = 0;
+        attrs.sequenceIndex = this.get("sequenceIndex");
 
       } else {
         

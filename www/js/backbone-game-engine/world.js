@@ -567,8 +567,8 @@
       }
 
       // Look in dynamic sprites first (lookup by index)
-      for (c = col-4; c <= col+2; c++)
-        for (r = row-4; r <= row+2; r++) {
+      for (c = col-2; c <= col+2; c++)
+        for (r = row-2; r <= row+2; r++) {
           index = c * this.attributes.height + r;
           if (this.dynamicSprites.lookup[index])
             for (s = 0; s < this.dynamicSprites.lookup[index].length; s++)
@@ -618,10 +618,10 @@
           map[m].sprite = null;
         }
 
-      var minCol = this.getWorldCol(minX) - 1,
-          minRow = this.getWorldRow(minY) - 1,
-          maxCol = this.getWorldCol(maxX),
-          maxRow = this.getWorldRow(maxY);
+      var minCol = this.getWorldCol(minX) - 2,
+          minRow = this.getWorldRow(minY) - 2,
+          maxCol = this.getWorldCol(maxX) + 2,
+          maxRow = this.getWorldRow(maxY) + 2;
 
       function doIt(sprite) {
         if (sprite.id && sprite.id != id &&

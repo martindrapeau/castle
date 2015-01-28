@@ -56,8 +56,8 @@
     "ko-left": {
       sequences: [25, 26, 27, 28, 29, 30],
       delay: koDelay,
-      velocity: -walkVelocity,
-      yVelocity: fallVelocity,
+      velocity: -walkVelocity*0.5,
+      yVelocity: fallVelocity*0.75,
       yAcceleration: fallAcceleration,
       scaleX: 1,
       scaleY: 1
@@ -65,8 +65,8 @@
     "ko-right": {
       sequences: [25, 26, 27, 28, 29, 30],
       delay: koDelay,
-      velocity: walkVelocity,
-      yVelocity: fallVelocity,
+      velocity: walkVelocity*0.5,
+      yVelocity: fallVelocity*0.75,
       yAcceleration: fallAcceleration,
       scaleX: -1,
       scaleY: 1

@@ -326,7 +326,7 @@
 
       } else if (mode == "attack") {
         if (pressed && cur.mov2 != "attack") {
-          this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), this.endAttack);
+          this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
           this.world.setTimeout(this.midAttack, 200);
         }
         else if (!pressed && cur.mov2 == "attack")

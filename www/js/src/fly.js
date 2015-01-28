@@ -1,7 +1,7 @@
 (function() {
 
   var sequenceDelay = 50,
-      walkVelocity = 200,
+      koHurtVelocity = 200,
       fallAcceleration = 1200,
       fallVelocity = 600,
       koDelay = 100;
@@ -22,7 +22,7 @@
     "fall-left": {
       sequences: [16],
       delay: sequenceDelay,
-      velocity: -walkVelocity,
+      velocity: -koHurtVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
       scaleX: 1,
@@ -31,7 +31,7 @@
     "fall-right": {
       sequences: [16],
       delay: sequenceDelay,
-      velocity: walkVelocity,
+      velocity: koHurtVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
       scaleX: -1,
@@ -40,7 +40,7 @@
     "ko-left": {
       sequences: [16, 17, 18, 19, 20],
       delay: koDelay,
-      velocity: -walkVelocity,
+      velocity: -koHurtVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
       scaleX: 1,
@@ -49,7 +49,7 @@
     "ko-right": {
       sequences: [16, 17, 18, 19, 20],
       delay: koDelay,
-      velocity: walkVelocity,
+      velocity: koHurtVelocity,
       yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
       scaleX: -1,
@@ -58,9 +58,9 @@
   };
 
   var hurtAnimation = {
-        sequences: [16, 17],
-        delay: 300,
-        yVelocity: fallVelocity,
+        sequences: [16, 17, 16],
+        delay: 100,
+        yVelocity: 0,
         yAcceleration: fallAcceleration
       };
   animations["fly-hurt-left"] = _.extend({}, animations["fly-left"], hurtAnimation);
@@ -83,9 +83,36 @@
       attackDamage: 2
     }),
     animations: animations,
+    onHealthChange: function(model, health, options) {
+      options || (options = {});
+      var cur = this.getStateInfo(),
+          dir = options.dir || cur.dir,
+          opo = dir == "left" ? "right" : "left";
+      
+      if (health == 0)
+        return this.knockout(null, dir);
+      else if (health < this.previous("health")) {
+        var fly = this;
+        this.startNewAnimation(
+          this.buildState("fly", "hurt", opo), {
+            velocity: this.animations["ko-"+opo].velocity,
+          }, function() {
+            fly.set({
+              state: this.buildState("fly", null, dir),
+              velocity: 0
+            });
+          }
+        );
+      }
+
+      return this;
+    },
     update: function(dt) {
       if (!this.world) return true;
       this.cancelUpdate = false;
+
+      var cur = this.getStateInfo();
+      if (cur.mov == "ko") return Backbone.Character.prototype.update.apply(this, arguments);
 
       // Velocity and state
       var self = this,
@@ -94,27 +121,47 @@
           x = this.get("x"),
           y = this.get("y"),
           state = this.get("state"),
-          cur = this.getStateInfo(),
           animation = this.getAnimation(),
           attrs = {};
 
-      if ((cur.mov == "ko" || cur.mov2 == "hurt") &&
-          this.get("sequenceIndex") == animation.sequences.length-1) {
-        // No sequence change - stay on last one
-      } else {
-        attrs.sequenceIndex = this.updateSequenceIndex();
-      }
+      attrs.sequenceIndex = this.updateSequenceIndex();
 
-      if (cur.mov == "ko" || cur.mov2 == "hurt") {
-        if (yVelocity < animation.yVelocity)
-          yVelocity += animation.yAcceleration * (dt/1000);
-
-        if (yVelocity >= animation.yVelocity)
-          yVelocity = animation.yVelocity;
-        attrs.yVelocity = yVelocity;
-      }
+      // TO DO - AI with movement...
 
 
+      // Collision detection
+      var tileWidth = this.get("width"),
+          tileHeight = this.get("height"),
+          paddingLeft = this.get("paddingLeft"),
+          paddingRight = this.get("paddingRight"),
+          paddingBottom = this.get("paddingBottom"),
+          paddingTop = this.get("paddingTop"),
+          charWidth = tileWidth - paddingLeft - paddingRight,
+          charHeight = tileHeight - paddingTop - paddingBottom,
+          charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
+          charTopY = charBottomY - charHeight,
+          charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
+          charRightX = charLeftX + charWidth;
+
+      this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
+      this.world.findCollisions(this.collisionMap, null, this, true);
+
+      var sprites = [];
+      for (var c in this.collisionMap)
+        if (this.collisionMap.hasOwnProperty(c) && c.sprite && !_.contains(sprites, c.sprite)) {
+          debugger;
+          switch (c.dir) {
+            case "right":
+              attrs.velocity = velocity = 0;
+              attrs.x = x = c.sprite.getRight(true) - paddingLeft;
+              break;
+            case "left":
+              attrs.velocity = velocity = 0;
+              attrs.x = x = c.sprite.getLeft(true) - charWidth - paddingLeft;
+              break;
+          }
+          c.sprite.trigger("hit", this, c.dir);
+        }
 
       if (velocity) attrs.x = x = x + velocity * (dt/1000);
       if (yVelocity) attrs.y = y = y + yVelocity * (dt/1000);
@@ -124,6 +171,29 @@
 
       //if (this.engine.debugPanel) this.engine.debugPanel.set({state: this.get("state")})
       return true;      
+    },
+    buildCollisionMap: function(top, right, bottom, left) {
+      this.collisionMap || (this.collisionMap = {
+        topLeft: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        topRight: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        rightTop: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        rightBottom: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        bottomLeft: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
+        bottomRight: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
+        leftTop: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
+        leftBottom: {x: 0, y: 0, dir: "right", sprites: [], sprite: null}
+      });
+
+      var width = right - left,
+          height = bottom - top;
+      this.collisionMap.topLeft.x = this.collisionMap.bottomLeft.x = left + width*0.2;
+      this.collisionMap.topRight.x = this.collisionMap.bottomRight.x = left + width*0.8;
+      this.collisionMap.topLeft.y = this.collisionMap.topRight.y = top;
+      this.collisionMap.bottomLeft.y = this.collisionMap.bottomRight.y = bottom;
+      this.collisionMap.leftTop.y = this.collisionMap.rightTop.y = top + height*0.2;
+      this.collisionMap.leftBottom.y = this.collisionMap.rightBottom.y = top + height*0.8;
+      this.collisionMap.leftTop.x = this.collisionMap.leftBottom.x = left;
+      this.collisionMap.rightTop.x = this.collisionMap.rightBottom.x = right;
     }
 	});
 
