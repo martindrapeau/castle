@@ -110,7 +110,8 @@
       health: 2,
       attackDamage: 1,
       floor: null,
-      ceiling: null
+      ceiling: null,
+      aiDelay: 1000
     }),
     animations: animations,
     initialize: function(attributes, options) {
@@ -123,6 +124,7 @@
 
       this.on("hit", this.hit, this);
       this.on("change:health", this.onHealthChange, this);
+      this.on("beforeFall", this.onBeforeFall, this);
     },
     onAttach: function() {
       if (!this.engine) return;
@@ -130,15 +132,7 @@
     },
     onDetach: function() {
     },
-    knockout: function(sprite, dir) {
-      var opo = dir == "left" ? "right" : "left";
-      this.set({
-        state: this.buildState("ko", null, opo),
-        velocity: this.animations["ko-"+opo].velocity,
-        yVelocity: -this.animations["ko-"+opo].yVelocity,
-        sequenceIndex: 0,
-        collision: false
-      });
+    onBeforeFall: function() {
       return this;
     },
     onHealthChange: function(model, health, options) {
@@ -147,19 +141,35 @@
           dir = options.dir || cur.dir,
           opo = dir == "left" ? "right" : "left";
       
-      if (health == 0) {
-        console.log("dir", options);
+      if (health == 0)
         return this.knockout(null, dir);
-      }
-      else if (health < this.previous("health")) {
-        this.set({
-          state: this.buildState("fall", "hurt", dir),
-          velocity: this.animations["ko-"+dir].velocity,
-          yVelocity: -this.animations["ko-"+dir].yVelocity,
-          sequenceIndex: 0
-        });
-      }
+      else if (health < this.previous("health")) 
+        return this.hurt(null, dir);
+      
+      this.lastAIEvent = _.now();
 
+      return this;
+    },
+    knockout: function(sprite, dir) {
+      var opo = dir == "left" ? "right" : "left";
+      this.whenAnimationEnds = null;
+      this.set({
+        state: this.buildState("ko", opo),
+        velocity: this.animations["ko-"+opo].velocity,
+        yVelocity: -this.animations["ko-"+opo].yVelocity,
+        sequenceIndex: 0,
+        collision: false
+      });
+      return this;
+    },
+    hurt: function(sprite, dir) {
+      this.whenAnimationEnds = null;
+      this.set({
+        state: this.buildState("fall", "hurt", dir),
+        velocity: this.animations["ko-"+dir].velocity,
+        yVelocity: -this.animations["ko-"+dir].yVelocity,
+        sequenceIndex: 0
+      });
       return this;
     },
     hit: function(sprite, dir, dir2) {
@@ -209,11 +219,14 @@
       }
 
       if (triggerAnimationEnd && typeof this.whenAnimationEnds == "function") {
-        this.whenAnimationEnds();
+        this.whenAnimationEnds.call(this);
         this.whenAnimationEnds = null;
       }
 
       return sequenceIndex;
+    },
+    ai: function(dt) {
+      return this;
     },
     update: function(dt) {
       // Movements are only possible inside a world
@@ -229,7 +242,18 @@
           state = this.get("state"),
           cur = this.getStateInfo(),
           animation = this.getAnimation(),
+          now = _.now(),
+          aiDelay = this.get("aiDelay"),
           attrs = {};
+
+      // Handle AI
+      if (!this.lastAIEvent)
+        this.lastAIEvent = now;
+      else if (now > this.lastAIEvent + aiDelay) {
+        this.ai(now - this.lastAIEvent);
+        this.lastAIEvent = now;
+        if (this.cancelUpdate) return true;
+      }
 
       if ((cur.mov == "ko" || cur.mov2 == "hurt") &&
           this.get("sequenceIndex") == animation.sequences.length-1) {
@@ -290,6 +314,11 @@
         } else if (cur.mov != "fall" && cur.mov != "ko" && charBottomY < bottomY) {
           // Start falling if no obstacle below
           attrs.state = this.buildState("fall", null, cur.dir);
+
+          if (cur.mov == "walk" && velocity != 0) {
+            this.trigger("beforeFall");
+            if (this.cancelUpdate) return true;
+          }
         }
 
       } else if (yVelocity < 0) {
@@ -375,7 +404,7 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
-      //if (this.engine.debugPanel) this.engine.debugPanel.set({state: this.get("state")})
+      if (this.engine.debugPanel) this.engine.debugPanel.set({spider: this.get("state")})
 
       return true;
     },
@@ -398,6 +427,10 @@
       stateInfo.dir = pieces.length == 3 ? pieces[2] : pieces[1];
       stateInfo.opo = stateInfo.dir == "right" ? "left" : "right";
       return stateInfo;
+    },
+    isAttacking: function() {
+      var cur = this.getStateInfo();
+      return cur.mov2 == "attack";
     },
     buildState: function(piece1, piece2, piece3) {
       var state = "";

@@ -115,34 +115,24 @@
       paddingRight: 24,
       health: 2,
       attackDamage: 2,
-      aiDelay: 1500,
+      aiDelay: 1000,
       collision: false
     }),
     animations: animations,
-    onHealthChange: function(model, health, options) {
-      options || (options = {});
-      var cur = this.getStateInfo(),
-          dir = options.dir || cur.dir,
+    hurt: function(sprite, dir) {
+      var fly = this,
           opo = dir == "left" ? "right" : "left";
-      
-      if (health == 0)
-        return this.knockout(null, dir);
-      else if (health < this.previous("health")) {
-        var fly = this;
-        this.startNewAnimation(
-          this.buildState("fly", "hurt", opo), {
-            velocity: this.animations["fly-hurt-"+opo].velocity,
-          }, function() {
-            fly.set({
-              state: this.buildState("idle", dir),
-              velocity: 0
-            });
-            fly.lastAIEvent = _.now();
-          }
-        );
-      }
-      this.lastAIEvent = _.now();
-
+      this.startNewAnimation(
+        this.buildState("fly", "hurt", opo), {
+          velocity: this.animations["fly-hurt-"+opo].velocity,
+        }, function() {
+          fly.set({
+            state: this.buildState("idle", dir),
+            velocity: 0
+          });
+          fly.lastAIEvent = _.now();
+        }
+      );
       return this;
     },
     hit: function(sprite, dir, dir2) {
@@ -159,20 +149,129 @@
       } else if (dir2 == "collision") {
         // Wiplash from a collision
         this.cancelUpdate = true;
-        var fly = this;
         this.startNewAnimation(
-          this.buildState("fly", "collision", cur.dir), {
-            velocity: this.animations["fly-collision-"+opo].velocity,
-          }, function() {
-            fly.set({
-              state: this.buildState("idle", cur.dir),
-              velocity: 0
-            });
-            fly.lastAIEvent = _.now();
-          }
+          this.buildState("fly", "collision", cur.dir),
+          {velocity: this.animations["fly-collision-"+opo].velocity},
+          this.endHurt
         );
       }
 
+      return this;
+    },
+    endHurt: function() {
+      var cur = this.getStateInfo();
+      this.set({
+        state: this.buildState("idle", cur.dir),
+        velocity: 0,
+        yVelocity: 0
+      });
+      this.lastAIEvent = _.now();
+      return this;
+    },
+    endAttack: function() {
+      var cur = this.getStateInfo();
+      this.set({
+        state: this.buildState("idle", cur.dir),
+        velocity: 0,
+        yVelocity: 0
+      });
+      this.lastAIEvent = _.now();
+      return this;
+    },
+    ai: function(dt) {
+      var cur = this.getStateInfo();
+      if (cur.mov == "ko" || cur.mov2 == "hurt") return this;
+
+      var hero = this.world.sprites.findWhere({hero: true});
+      if (!hero && cur.mov != "idle") {
+        this.set({
+          state: this.buildState("idle", cur.dir),
+          velocity: 0,
+          yVelocity: 0
+        });
+        this.cancelUpdate = true;
+        return this;
+      }
+
+      var heroBbox = hero.getBbox(true),
+          bbox = this.getBbox(true),
+          velocity = this.get("velocity") || 0,
+          yVelocity = this.get("yVelocity") || 0,
+          newMov = cur.mov,
+          newMov2 = cur.mov2,
+          newDir = cur.dir,
+          newVelocity = velocity,
+          newYVelocity = yVelocity,
+          attrs = {};
+
+      // Horizontal displacement and state
+      if (heroBbox.x2 < bbox.x1) {
+        if (cur.mov == "fly" && cur.dir == "right") {
+          newMov = "idle";
+          newVelocity = 0;
+        } else {
+          newMov = "fly";
+          newDir = "left";
+          newVelocity = -flyVelocity;
+        }
+      } else if (heroBbox.x1 > bbox.x2) {
+        if (cur.mov == "fly" && cur.dir == "left") {
+          newMov = "idle";
+          newVelocity = 0;
+        } else {
+          newMov = "fly";
+          newDir = "right";
+          newVelocity = flyVelocity;
+        }
+      } else if (cur.mov != "idle") {
+        newMov = "idle";
+        newVelocity = 0;
+      }
+
+      // Vertical displacement
+      if (newMov == "fly") {
+        if (heroBbox.y2 < bbox.y1) {
+          newYVelocity = -flyVelocity/2;
+        } else if (heroBbox.y1 > bbox.y2) {
+          newYVelocity = flyVelocity/2;
+        } else {
+          newYVelocity = 0;
+        }
+      } else {
+        newYVelocity = 0;
+      }
+
+      if (newVelocity != velocity)
+        attrs.velocity = velocity = newVelocity;
+      if (newYVelocity != yVelocity)
+        attrs.yVelocity = yVelocity = newYVelocity;
+
+      // Attack hero if in line of sight
+      if (newMov2 == null && heroBbox.y2 > bbox.y1 && heroBbox.y1 < bbox.y2) {
+        if (newMov == "idle" && heroBbox.x2 > bbox.x1 && heroBbox.x1 < bbox.x2) {
+          newMov2 = "attack";
+        } else if (newMov == "fly") {
+          var heroWidth = heroBbox.x2 - heroBbox.x1;
+          if (newDir == "left" && heroBbox.x2 > bbox.x1 - heroWidth*2 && heroBbox.x1 < bbox.x2) {
+            newMov2 = "attack";
+          } else if (newDir =="right" && heroBbox.x1 < bbox.x2 + heroWidth*2 && heroBbox.x2 > bbox.x1) {
+            newMov2 = "attack";
+          }
+        }
+        if (newMov2 == "attack") {
+          this.cancelUpdate = true;
+          this.startNewAnimation(this.buildState(newMov, newMov2, newDir), attrs, this.endAttack);
+          return this;
+        }
+      }
+
+      if (newMov != cur.mov || newMov2 != cur.mov2 || newDir != cur.dir)
+        attrs.state = this.buildState(newMov, newMov2, newDir);
+
+      if (!_.isEmpty(attrs)) {
+        this.cancelUpdate = true;
+        this.set(attrs);
+      }
       return this;
     },
     update: function(dt) {
@@ -195,72 +294,14 @@
 
       attrs.sequenceIndex = this.updateSequenceIndex();
 
-      // AI
-      // !*@* very linear and mechanic for now - gotta change this...
+      // Handle AI
       if (!this.lastAIEvent)
         this.lastAIEvent = now;
-      else if (now > this.lastAIEvent + aiDelay && cur.mov != "ko" && cur.mov2 == null) {
-        var hero = this.world.sprites.findWhere({hero: true});
-
-        if (hero) {
-          var bbox = hero.getBbox(true),
-              newMov = cur.mov,
-              newDir = cur.dir,
-              newVelocity = velocity,
-              newYVelocity = yVelocity;
-
-          // Horizontal displacement and state
-          if (bbox.x2 < this.getLeft(true)) {
-            if (cur.mov == "fly" && cur.dir == "right") {
-              newMov = "idle";
-              newVelocity = 0;
-            } else {
-              newMov = "fly";
-              newDir = "left";
-              newVelocity = -flyVelocity;
-            }
-          } else if (bbox.x1 > this.getRight(true)) {
-            if (cur.mov == "fly" && cur.dir == "left") {
-              newMov = "idle";
-              newVelocity = 0;
-            } else {
-              newMov = "fly";
-              newDir = "right";
-              newVelocity = flyVelocity;
-            }
-          } else if (cur.mov != "idle") {
-            newMov = "idle";
-            newVelocity = 0;
-          }
-
-          // Vertical displacement
-          if (newMov == "fly") {
-            if (bbox.y2 < this.getTop(true)) {
-              newYVelocity = -flyVelocity/2;
-            } else if (bbox.y1 > this.getBottom(true)) {
-              newYVelocity = flyVelocity/2;
-            } else {
-              newYVelocity = 0;
-            }
-          } else {
-            newYVelocity = 0;
-          }
-
-          if (newMov != cur.mov || newDir != cur.dir)
-            attrs.state = this.buildState(newMov, newDir);
-          if (newVelocity != velocity)
-            attrs.velocity = velocity = newVelocity;
-          if (newYVelocity != yVelocity)
-            attrs.yVelocity = yVelocity = newYVelocity;
-          this.lastAIEvent = now;
-
-        } else if (cur.mov != "idle") {
-          attrs.state = this.buildState("idle", cur.dir);
-          attrs.velocity = velocity = 0;
-          attrs.yVelocity = yVelocity =0;
-        }
+      else if (now > this.lastAIEvent + aiDelay) {
+        this.ai(now - this.lastAIEvent);
+        this.lastAIEvent = now;
+        if (this.cancelUpdate) return true;
       }
-
 
       // Collision detection
       var tileWidth = this.get("width"),

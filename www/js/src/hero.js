@@ -340,9 +340,9 @@
       if (cur.mov2 != "attack") return this;
 
       var height = this.get("height") - this.get("paddingTop") - this.get("paddingBottom"),
-          x = this.get("x") + (cur.dir == "right" ? this.get("width")*1.2 : -0.2),
+          x = this.get("x") + (cur.dir == "right" ? this.get("width")*1.5 : -0.5),
           y = this.get("y") + this.get("paddingTop") + height*0.50;
-          sprites = this.world.filterAt(x, y, null, this, true);
+          sprites = this.world.filterAt(x, y, "character", this, false);
       
       for (var s = 0; s < sprites.length; s++)
         sprites[s].trigger("hit", this, cur.dir == "left" ? "right" : "left", "attack");
@@ -355,23 +355,29 @@
       this.set("state", this.buildState(cur.mov, cur.dir));
       return this;
     },
-    onHealthChange: function(model, health, options) {
-      options || (options = {});
+    knockout: function(sprite, dir) {
+      dir || (dir = cur.dir);
       var cur = this.getStateInfo(),
-          dir = options.dir || cur.dir,
-          opo = dir == "left" ? "right" : "left";
-      
-      if (health == 0)
-        return this.knockout(null, opo);
-      else if (health < this.previous("health"))
-        this.set({
-          state: this.buildState("jump", "hurt", opo),
-          nextState: this.buildState("idle", null, dir),
-          yVelocity: hurtBounceVelocity,
-          velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
-          sequenceIndex: 0
-        });
+          state = this.buildState("ko", dir);
 
+      this.set({
+        state: state,
+        velocity: this.animations[state].velocity,
+        yVelocity: -this.animations[state].yVelocity/2,
+        nextState: this.buildState("dead", null, dir),
+        dead: true,
+        collision: false
+      });
+      return this;
+    },
+    hurt: function(sprite, dir) {
+      this.set({
+        state: this.buildState("jump", "hurt", dir == "left" ? "right" : "left"),
+        nextState: this.buildState("idle", null, dir),
+        yVelocity: hurtBounceVelocity,
+        velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
+        sequenceIndex: 0
+      });
       return this;
     },
     hit: function(sprite, dir, dir2) {
@@ -423,28 +429,15 @@
             sprite.trigger("hit", this, cur.opo, "attack");
           } else {
             this.cancelUpdate = true;
-            var attackDamage = sprite.get("attackDamage") || 10;
-            this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+            if (sprite.isAttacking()) {
+              var attackDamage = sprite.get("attackDamage") || 10;
+              this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+            }
             if (sprite.get("collision") == false)
               sprite.trigger("hit", this, cur.opo, "collision");
           }
         }
       }
-      return this;
-    },
-    knockout: function(sprite, dir) {
-      dir || (dir = cur.dir);
-      var cur = this.getStateInfo(),
-          state = this.buildState("ko", dir);
-
-      this.set({
-        state: state,
-        velocity: this.animations[state].velocity,
-        yVelocity: -this.animations[state].yVelocity/2,
-        nextState: this.buildState("dead", null, dir),
-        dead: true,
-        collision: false
-      });
       return this;
     },
     // Jump
@@ -763,8 +756,8 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
-      /*if (this.debugPanel)
-        this.debugPanel.set({state: this.attributes.state, nextState: this.attributes.nextState});*/
+      if (this.debugPanel)
+        this.debugPanel.set({hero: this.attributes.state});
 
       return true;
     }
