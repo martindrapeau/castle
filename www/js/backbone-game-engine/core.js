@@ -50,6 +50,7 @@
     saveAttributes: ["name", "state", "sequenceIndex", "x", "y"],
     initialize: function(attributes, options) {
       this.lastSequenceChangeTime = 0;
+      this.bbox = {x1: 0, y1: 0, y1: 0, y2: 0};
     },
     toSave: function() {
       return this.get("persist") ? _.pick(this.toJSON(), this.saveAttributes) : null;
@@ -65,6 +66,13 @@
     },
     getBottom: function(withPadding) {
       return this.attributes.y + this.attributes.height - (withPadding && this.attributes.paddingBottom ? this.attributes.paddingBottom : 0);
+    },
+    getBbox: function(withPadding) {
+      this.bbox.x1 = this.getLeft(withPadding);
+      this.bbox.x2 = this.getRight(withPadding);
+      this.bbox.y1 = this.getTop(withPadding);
+      this.bbox.y2 = this.getBottom(withPadding);
+      return this.bbox;
     },
     update: function(dt) {
       // Fetch animation and change sequence if need be

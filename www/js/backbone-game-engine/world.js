@@ -597,8 +597,9 @@
     // Map is a map of objects describing the locations to look at, and the result.
     // Each map item is an object with:
     //  - x, y: The lookup coordinate.
+    //  - dir: The lookout direction; top, right, bottom or left.
     //  - sprites: array of detected colliding sprites. Reset/initialized to [] every call.
-    //  - sprite: the first detected sprite or null if none.
+    //  - sprite: The closest sprite based on the lookout direction.
     // Returns the number of found collisions.
     findCollisions: function(map, type, exclude, collision) {
       if (_.size(map) == 0) return 0;
@@ -636,6 +637,33 @@
             }
       }
 
+      function findClosestSprites() {
+        for (m in map)
+          if (map.hasOwnProperty(m) && map[m].sprites.length > 0)
+            if (map[m].sprites.length == 1)
+              map[m].sprite = map[m].sprites[0];
+            else
+              for (s = 0; s < map[m].sprites.length; s++)
+                switch (map[m].dir) {
+                  case "left":
+                    c = map[m].sprites[s].getLeft(true);
+                    if (c > map[m].x) map[m].sprite = map[m].sprites[s];
+                    break;
+                  case "right":
+                    c = map[m].sprites[s].getRight(true);
+                    if (c < map[m].x) map[m].sprite = map[m].sprites[s];
+                    break;
+                  case "top":
+                    c = map[m].sprites[s].getTop(true);
+                    if (c > map[m].y) map[m].sprite = map[m].sprites[s];
+                    break;
+                  case "bottom":
+                    c = map[m].sprites[s].getBottom(true);
+                    if (c < map[m].y) map[m].sprite = map[m].sprites[s];
+                    break;
+                }
+      }
+
       // Look in dynamic sprites first (lookup by index)
       for (c = minCol; c <= maxCol; c++)
         for (r = minRow; r <= maxRow; r++) {
@@ -644,8 +672,10 @@
             for (s = 0; s < this.dynamicSprites.lookup[index].length; s++)
               doIt(this.dynamicSprites.lookup[index][s]);
         }
-      if (type == "character") return count;
-
+      if (type == "character") {
+        findClosestSprites();
+        return count;
+      }
       // Finally in static ones
       for (c = minCol; c <= maxCol; c++)
         for (r = minRow; r <= maxRow; r++) {
@@ -655,6 +685,7 @@
               doIt(this.staticSprites.lookup[index][s]);
         }
 
+      findClosestSprites();
       return count;
     },
     // Static tiles lookup.

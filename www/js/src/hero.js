@@ -425,6 +425,8 @@
             this.cancelUpdate = true;
             var attackDamage = sprite.get("attackDamage") || 10;
             this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+            if (sprite.get("collision") == false)
+              sprite.trigger("hit", this, cur.opo, "collision");
           }
         }
       }

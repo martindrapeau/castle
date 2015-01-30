@@ -310,7 +310,7 @@
 
       // When not in play mode, do not allow horizontal displacements or animations
       if (this.world.get("state") != "play") {
-        velocity = 0;
+        attrs.velocity = velocity = 0;
         attrs.sequenceIndex = this.get("sequenceIndex");
 
       } else {
