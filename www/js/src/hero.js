@@ -340,8 +340,9 @@
       if (cur.mov2 != "attack") return this;
 
       var x = this.get("x") + this.get("width") * (cur.dir == "right" ? 1.2 : -0.2),
-          y = this.get("y") + this.get("height") * 0.6,
-          sprites = this.world.filterAt(x, y, "character", this);
+          y1 = this.get("y") + this.get("height")*0.50,
+          y2 = this.get("y") + this.get("height")*0.75,
+          sprites = _.union(this.world.filterAt(x, y1, "character", this), this.world.filterAt(x, y2, "character", this));
 
       for (var s = 0; s < sprites.length; s++)
         sprites[s].trigger("hit", this, cur.dir == "left" ? "right" : "left", "attack");
