@@ -175,7 +175,7 @@
     hit: function(sprite, dir, dir2) {
       var cur = this.getStateInfo(),
           opo = dir == "left" ? "right" : "left";
-
+      
       if (cur.mov2 == "hurt") return this;
 
       if (dir2 == "attack") {

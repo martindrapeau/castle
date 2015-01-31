@@ -554,7 +554,7 @@
       function test(sprite) {
         return (sprite.id && sprite.id != id) &&
           (!type || sprite.get("type") == type) &&
-          (!collision || sprite.get("collision")) &&
+          (collision === undefined || sprite.attributes.collision === collision) &&
           sprite.overlaps.call(sprite, x, y);
       }
 
@@ -627,7 +627,7 @@
       function doIt(sprite) {
         if (sprite.id && sprite.id != id &&
             (!type || sprite.attributes.type == type) &&
-            (!collision || sprite.attributes.collision))
+            (collision === undefined || sprite.attributes.collision === collision))
           for (m in map)
             if (map.hasOwnProperty(m) &&
                 sprite.overlaps.call(sprite, map[m].x, map[m].y)) {

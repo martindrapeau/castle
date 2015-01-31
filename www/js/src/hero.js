@@ -339,11 +339,10 @@
       var cur = this.getStateInfo();
       if (cur.mov2 != "attack") return this;
 
-      var height = this.get("height") - this.get("paddingTop") - this.get("paddingBottom"),
-          x = this.get("x") + (cur.dir == "right" ? this.get("width")*1.5 : -0.5),
-          y = this.get("y") + this.get("paddingTop") + height*0.50;
-          sprites = this.world.filterAt(x, y, "character", this, false);
-      
+      var x = this.get("x") + this.get("width") * (cur.dir == "right" ? 1.2 : -0.2),
+          y = this.get("y") + this.get("height") * 0.6,
+          sprites = this.world.filterAt(x, y, "character", this);
+
       for (var s = 0; s < sprites.length; s++)
         sprites[s].trigger("hit", this, cur.dir == "left" ? "right" : "left", "attack");
 
@@ -428,8 +427,8 @@
           if (cur.mov2 == "attack" && cur.dir == dir) {
             sprite.trigger("hit", this, cur.opo, "attack");
           } else {
-            this.cancelUpdate = true;
             if (sprite.isAttacking()) {
+              this.cancelUpdate = true;
               var attackDamage = sprite.get("attackDamage") || 10;
               this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
             }
