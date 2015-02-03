@@ -182,7 +182,7 @@
         this.cancelUpdate = true;
         var attackDamage = sprite.get("attackDamage") || 1;
         this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
-      } else if (cur.dir == dir) {
+      } else if (cur.dir == dir && cur.mov2 == null) {
         this.cancelUpdate = true;
         this.set("state", this.buildState(cur.mov, null, cur.opo));
       }
@@ -365,7 +365,7 @@
             attrs.state = this.buildState(cur.mov, null, cur.opo);
             attrs.x = x = leftX - paddingLeft;
             if (leftCharacter && cur.mov2 != "hurt") {
-              leftCharacter.trigger("hit", this, "right");
+              leftCharacter.trigger("hit", this, "right", cur.mov2);
               if (this.cancelUpdate) return true;
             }
           }
@@ -391,7 +391,7 @@
             attrs.state = this.buildState(cur.mov, null, cur.opo);
             attrs.x = x = rightX - charWidth - paddingLeft;
             if (rightCharacter && cur.mov2 != "hurt") {
-              rightCharacter.trigger("hit", this, "left");
+              rightCharacter.trigger("hit", this, "left", cur.mov2);
               if (this.cancelUpdate) return true;
             }
           }

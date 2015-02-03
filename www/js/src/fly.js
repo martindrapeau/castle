@@ -115,7 +115,7 @@
       paddingRight: 24,
       health: 2,
       attackDamage: 2,
-      aiDelay: 1000,
+      aiDelay: 500,
       collision: false
     }),
     animations: animations,
@@ -195,6 +195,7 @@
 
       var heroBbox = hero.getBbox(true),
           bbox = this.getBbox(true),
+          padding = 64,
           velocity = this.get("velocity") || 0,
           yVelocity = this.get("yVelocity") || 0,
           newMov = cur.mov,
@@ -230,9 +231,9 @@
 
       // Vertical displacement
       if (newMov == "fly") {
-        if (heroBbox.y2 < bbox.y1) {
+        if (heroBbox.y1 < bbox.y1) {
           newYVelocity = -flyVelocity/2;
-        } else if (heroBbox.y1 > bbox.y2) {
+        } else if (heroBbox.y1 > bbox.y1) {
           newYVelocity = flyVelocity/2;
         } else {
           newYVelocity = 0;
@@ -247,7 +248,7 @@
         attrs.yVelocity = yVelocity = newYVelocity;
 
       // Attack hero if in line of sight
-      if (newMov2 == null && heroBbox.y2 > bbox.y1 && heroBbox.y1 < bbox.y2) {
+      if (newMov2 == null && heroBbox.y2 > bbox.y1 - padding && heroBbox.y1 < bbox.y2 + padding) {
         if (newMov == "idle" && heroBbox.x2 > bbox.x1 && heroBbox.x1 < bbox.x2) {
           newMov2 = "attack";
         } else if (newMov == "fly") {

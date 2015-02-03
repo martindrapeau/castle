@@ -51,7 +51,11 @@
     initialize: function(attributes, options) {
       this.lastSequenceChangeTime = 0;
       this.bbox = {x1: 0, y1: 0, y1: 0, y2: 0};
+      this.on("attach", this.onAttach, this);
+      this.on("detach", this.onDetach, this);
     },
+    onAttach: function() {},
+    onDetach: function() {},
     toSave: function() {
       return this.get("persist") ? _.pick(this.toJSON(), this.saveAttributes) : null;
     },

@@ -107,11 +107,12 @@
       paddingRight: 24,
       health: 2,
       attackDamage: 2,
-      aiDelay: 1000
+      aiDelay: 500
     }),
     animations: animations,
     onBeforeFall: function(condition) {
       var cur = this.getStateInfo();
+      if (cur.mov2 != null) return this;
       this.set({
         state: this.buildState(cur.mov, cur.opo),
         velocity: this.get("velocity") * -1
@@ -150,8 +151,8 @@
 
       // Attack hero if in line of sight
       var heroWidth = heroBbox.x2 - heroBbox.x1;
-      if ((cur.dir == "left" && heroBbox.x2 > bbox.x1 - heroWidth*2 && heroBbox.x1 < bbox.x2) ||
-          (cur.dir == "right" && heroBbox.x1 < bbox.x2 + heroWidth*2 && heroBbox.x2 > bbox.x1)) {
+      if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth*1.5 && heroBbox.x1 <= bbox.x2) ||
+          (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth*1.5 && heroBbox.x2 >= bbox.x1)) {
         this.cancelUpdate = true;
         this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
       }

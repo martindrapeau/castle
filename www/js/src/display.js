@@ -21,17 +21,31 @@
         delay: 0
       }
     },
+    initialize: function() {
+      Backbone.Sprite.prototype.initialize.apply(this, arguments);
+      _.bindAll(this, "flash");
+    },
+    flash: function() {
+      var health = this;
+      health.showFlash = true;
+      setTimeout(function() {
+        health.showFlash = false;
+      }, 1000);
+    },
     draw: function(context) {
       Backbone.Sprite.prototype.draw.apply(this, arguments);
 
       var frame = this.spriteSheet.frames[0],
           width = Math.floor(frame.width * this.attributes.health/this.attributes.healthMax);
 
+      context.save();
+      if (this.showFlash && _.now() % 10 < 3) context.globalCompositeOperation = "lighter";
       context.drawImage(
         this.spriteSheet.img,
         frame.x, frame.y, width, frame.height,
         this.get("x"), this.get("y"), width, frame.height
       );
+      context.restore();
 
       return this;
     }
@@ -74,27 +88,31 @@
         x: x + 448, y: y
       });
 
+      var display = this;
+      this.listenTo(this.world.sprites, "add", function(sprite) {
+        if (sprite.get("hero")) display.trigger("attach");
+      });
+      this.listenTo(this.world.sprites, "remove", function(sprite) {
+        if (sprite.get("hero")) display.trigger("detach");
+      });
+
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
     },
     onAttach: function() {
+      this.onDetach();
+
       this.coin.engine = this.engine;
       this.coin.trigger("attach");
 
-      var display = this;
-      this.listenTo(this.world.sprites, "add", function(sprite) {
-        if (sprite.get("hero")) display.hero = sprite;
-      });
-      this.listenTo(this.world.sprites, "remove", function(sprite) {
-        if (sprite == display.hero) hero = undefined;
-      });
       this.hero = this.world.sprites.findWhere({hero: true});
+      this.listenTo(this.hero, "change:health", this.health.flash);
     },
     onDetach: function() {
       this.coin.trigger("detach");
       this.coin.engine = undefined;
-
-      this.stopListening();
+      if (this.hero) this.stopListening(this.hero);
+      this.hero = undefined;
     },
     update: function(dt) {
       var assets = this.getAssets();

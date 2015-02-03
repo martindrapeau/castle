@@ -410,10 +410,10 @@
     drawStaticSprites: function(context) {
       var start =_.now(),
           sprite, index, count = 0,
-          tileX1 = this.getWorldCol(-this.attributes.x + this.attributes.viewportLeft - this.staticSprites.maxSpriteWidth),
-          tileX2 = this.getWorldCol(-this.attributes.x + context.canvas.width - this.attributes.viewportRight),
-          tileY1 = this.getWorldRow(-this.attributes.y + this.attributes.viewportTop - this.staticSprites.maxSpriteHeight),
-          tileY2 = this.getWorldRow(-this.attributes.y + context.canvas.height - this.attributes.viewportBottom);
+          tileX1 = this.getWorldCol(-this.attributes.x + this.attributes.viewportLeft - this.staticSprites.maxSpriteWidth/2),
+          tileX2 = this.getWorldCol(-this.attributes.x + context.canvas.width - this.attributes.viewportRight + this.staticSprites.maxSpriteWidth/2),
+          tileY1 = this.getWorldRow(-this.attributes.y + this.attributes.viewportTop - this.staticSprites.maxSpriteHeight/2),
+          tileY2 = this.getWorldRow(-this.attributes.y + context.canvas.height - this.attributes.viewportBottom + this.staticSprites.maxSpriteHeight/2);
       this.spriteOptions.offsetX = this.attributes.x;
       this.spriteOptions.offsetY = this.attributes.y;
 
