@@ -2,7 +2,7 @@
 
   var sequenceDelay = 50,
       flyVelocity = 250,
-      flyAcceleration = 200,
+      flyAcceleration = 400,
       koHurtVelocity = 200,
       fallAcceleration = 1200,
       fallVelocity = 600,
@@ -12,13 +12,13 @@
     "idle-left": {
       sequences: [
         {frame: 0, x: 0, y: 0},
-        {frame: 1, x: 0, y: -1},
-        {frame: 2, x: -1, y: -1},
-        {frame: 3, x: -1, y: 0},
+        {frame: 1, x: 0, y: -2},
+        {frame: 2, x: -2, y: -2},
+        {frame: 3, x: -2, y: 0},
         {frame: 4, x: 0, y: 0},
-        {frame: 5, x: 0, y: 1},
-        {frame: 6, x: 1, y: 1},
-        {frame: 7, x: 1, y: 0}
+        {frame: 5, x: 0, y: 2},
+        {frame: 6, x: 2, y: 2},
+        {frame: 7, x: 2, y: 0}
       ],
       delay: sequenceDelay,
       scaleX: -1,
@@ -27,13 +27,13 @@
     "idle-right": {
       sequences: [
         {frame: 0, x: 0, y: 0},
-        {frame: 1, x: 0, y: -1},
-        {frame: 2, x: -1, y: -1},
-        {frame: 3, x: -1, y: 0},
+        {frame: 1, x: 0, y: -2},
+        {frame: 2, x: -2, y: -2},
+        {frame: 3, x: -2, y: 0},
         {frame: 4, x: 0, y: 0},
-        {frame: 5, x: 0, y: 1},
-        {frame: 6, x: 1, y: 1},
-        {frame: 7, x: 1, y: 0}
+        {frame: 5, x: 0, y: 2},
+        {frame: 6, x: 2, y: 2},
+        {frame: 7, x: 2, y: 0}
       ],
       delay: sequenceDelay,
       scaleX: 1,
@@ -116,7 +116,9 @@
       health: 2,
       attackDamage: 2,
       aiDelay: 500,
-      collision: false
+      collision: false,
+      dX: 0,
+      dY: 0
     }),
     animations: animations,
     knockout: function(sprite, dir) {
@@ -202,56 +204,60 @@
       var heroBbox = hero.getBbox(true),
           bbox = this.getBbox(true),
           padding = 64,
-          velocity = this.get("velocity") || 0,
-          yVelocity = this.get("yVelocity") || 0,
+          dX = this.get("dX"),
+          dY = this.get("dY"),
           newMov = cur.mov,
           newMov2 = cur.mov2,
           newDir = cur.dir,
-          newVelocity = velocity,
-          newYVelocity = yVelocity,
+          newDX = dX,
+          newDY = dY,
           attrs = {};
 
       // Horizontal displacement and state
       if (heroBbox.x2 < bbox.x1) {
         if (cur.mov == "fly" && cur.dir == "right") {
           newMov = "idle";
-          newVelocity = 0;
+          newDX = 0;
         } else {
           newMov = "fly";
           newDir = "left";
-          newVelocity = -flyVelocity;
+          newDX = -1;
         }
       } else if (heroBbox.x1 > bbox.x2) {
         if (cur.mov == "fly" && cur.dir == "left") {
           newMov = "idle";
-          newVelocity = 0;
+          newDX = 0;
         } else {
           newMov = "fly";
           newDir = "right";
-          newVelocity = flyVelocity;
+          newDX = 1;
         }
       } else if (cur.mov != "idle") {
         newMov = "idle";
-        newVelocity = 0;
+        newDX = 0;
       }
 
       // Vertical displacement
       if (newMov == "fly") {
         if (heroBbox.y1 < bbox.y1) {
-          newYVelocity = -flyVelocity/2;
+          newDY = -1;
         } else if (heroBbox.y1 > bbox.y1) {
-          newYVelocity = flyVelocity/2;
+          newDY = 1;
         } else {
-          newYVelocity = 0;
+          newDY = 0;
         }
       } else {
-        newYVelocity = 0;
+        newDY = 0;
       }
 
-      if (newVelocity != velocity)
-        attrs.velocity = velocity = newVelocity;
-      if (newYVelocity != yVelocity)
-        attrs.yVelocity = yVelocity = newYVelocity;
+      if (newDX != dX)
+        attrs.dX = dX = newDX;
+      if (newDY != dY)
+        attrs.dY = dY = newDY;
+      if (newMov == "idle") {
+        attrs.velocity = 0;
+        attrs.yVelocity = 0;
+      }
 
       // Attack hero if in line of sight
       if (newMov2 == null && heroBbox.y2 > bbox.y1 - padding && heroBbox.y1 < bbox.y2 + padding) {
@@ -310,6 +316,19 @@
         if (this.cancelUpdate) return true;
       }
 
+      // Handle acceleration
+      if (cur.mov == "fly") {
+        var targetVelocity = this.get("dX") * flyVelocity;
+        if (velocity < targetVelocity) velocity += flyAcceleration * (dt/1000);
+        if (velocity >= targetVelocity) velocity = targetVelocity;
+        attrs.velocity = velocity;
+
+        var targetYVelocity = this.get("dY") * flyVelocity/2;
+        if (yVelocity < targetYVelocity) yVelocity += flyAcceleration * (dt/1000);
+        if (yVelocity >= targetYVelocity) yVelocity = targetYVelocity;
+        attrs.yVelocity = yVelocity;
+      }
+
       // Collision detection
       var tileWidth = this.get("width"),
           tileHeight = this.get("height"),
@@ -352,9 +371,6 @@
               this.world.remove(this);
               return false;
             }
-            /*velocity = velocity * -1;
-            attrs.state = this.buildState(cur.mov, null, cur.opo);
-            attrs.x = x = leftX - charWidth - paddingLeft;*/
             if ((sprite1 || sprite2) && cur.mov2 != "hurt" && cur.mov2 != "collision") {
               if (sprite1) sprite1.trigger("hit", this, "right");
               if (sprite2) sprite2.trigger("hit", this, "right");
@@ -379,9 +395,6 @@
               this.world.remove(this);
               return false;
             }
-            /*velocity = velocity * -1;
-            attrs.state = this.buildState(cur.mov, null, cur.opo);
-            attrs.x = x = rightX - paddingLeft;*/
             if ((sprite1 || sprite2) && cur.mov2 != "hurt" && cur.mov2 != "collision") {
               if (sprite1) sprite1.trigger("hit", this, "left");
               if (sprite2) sprite2.trigger("hit", this, "left");
