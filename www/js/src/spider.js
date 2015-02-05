@@ -112,10 +112,10 @@
     animations: animations,
     onBeforeFall: function(condition) {
       var cur = this.getStateInfo();
-      if (cur.mov2 != null) return this;
+      if (cur.mov2 == "hurt") return this;
       this.set({
-        state: this.buildState(cur.mov, cur.opo),
-        velocity: this.get("velocity") * -1
+        state: this.buildState("walk", cur.opo),
+        velocity: this.animations["walk-"+cur.opo].velocity
       });
       this.cancelUpdate = true;
       return this;
@@ -127,6 +127,23 @@
         velocity: 0
       });
       this.lastAIEvent = _.now();
+      return this;
+    },
+    knockout: function(sprite, dir) {
+      this.ouch(dir);
+      return Backbone.Character.prototype.knockout.apply(this, arguments);
+    },
+    hurt: function(sprite, dir) {
+      this.ouch(dir);
+      return Backbone.Character.prototype.hurt.apply(this, arguments);
+    },
+    ouch: function(dir) {
+      if (!this.ouchSprite) this.ouchSprite = new Backbone.Explosion();
+      this.ouchSprite.set({
+        x: dir == "left" ? this.getLeft(true) : (this.getRight(true) - this.ouchSprite.get("width")),
+        y: this.getTop(true)
+      });
+      this.world.add(this.ouchSprite);
       return this;
     },
     ai: function(dt) {

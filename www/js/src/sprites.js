@@ -164,7 +164,7 @@
 
   });
 
-  // Disappears after animation
+  // Disappears after animation by removing itself from the World.
   Backbone.Ephemeral = Backbone.Sprite.extend({
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
       type: "decoration",

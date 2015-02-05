@@ -7,12 +7,31 @@
       spriteSheet: "artifacts",
       state: "explode",
       width: 64,
-      height: 64
+      height: 64,
+      zIndex: 1
     }),
     animations: {
       explode: {
         sequences: [0, 1, 2, 3, 4],
         delay: 50
+      }
+    }
+  });
+
+  // Hit (disappears afteranimation)
+  Backbone.Hit = Backbone.Ephemeral.extend({
+    defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {
+      name: "hit",
+      spriteSheet: "hit",
+      state: "explode",
+      width: 37,
+      height: 54,
+      zIndex: 1
+    }),
+    animations: {
+      explode: {
+        sequences: [1, 0, 1],
+        delay: 100
       }
     }
   });

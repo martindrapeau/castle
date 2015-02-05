@@ -119,7 +119,12 @@
       collision: false
     }),
     animations: animations,
+    knockout: function(sprite, dir) {
+      this.ouch(dir);
+      return Backbone.Character.prototype.knockout.apply(this, arguments);
+    },
     hurt: function(sprite, dir) {
+      this.ouch(dir);
       var fly = this,
           opo = dir == "left" ? "right" : "left";
       this.startNewAnimation(
@@ -135,6 +140,7 @@
       );
       return this;
     },
+    ouch: Backbone.Spider.prototype.ouch,
     hit: function(sprite, dir, dir2) {
       var cur = this.getStateInfo(),
           opo = dir == "left" ? "right" : "left";
