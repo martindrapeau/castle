@@ -60,6 +60,15 @@ $(window).on("load", function() {
         tileColumns: 2,
         tileRows: 1
       }, {
+        id: "cave",
+        img: "#houses",
+        x: 0,
+        y: 1394,
+        tileWidth: 384,
+        tileHeight: 192,
+        tileColumns: 2,
+        tileRows: 1
+      }, {
         id: "artifacts",
         img: "#artifacts",
         x: 0,

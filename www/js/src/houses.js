@@ -36,6 +36,7 @@
 
   createDoor("house-door", [6, 7, 8, 9, 10]);
   createDoor("wall-door", [0, 1, 2, 3, 4, 5]);
+  createDoor("cave-door", [12, 13, 14, 16, 17, 18]);
 
 
   // Houses
@@ -252,6 +253,18 @@
     {name: "barrier", x: 320, y: 150},
     {name: "barrier1x2", x: 390, y: 256}
   ]);
+  createHouse("h-cave", 2, {
+    door: "cave-door",
+    doorX: 284,
+    doorY: 48
+  }, [
+    {name: "a-crate-coin", x: 60, y: 128},
+    {name: "barrier1x2", x: 0, y: 64},
+    {name: "barrier2x1", x: 64, y: 0},
+    {name: "barrier2x1", x: 192, y: 0},
+    {name: "barrier", x: 320, y: 0}
+  ]);
+
 
   var Wall = createHouse("h-wall", 0, {
     spriteSheet: "wall",
