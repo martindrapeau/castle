@@ -9,6 +9,35 @@
    *
    */
 
+
+  var drawSpriteFn = function(context, options) {
+    options || (options = {});
+    var animation = this.getAnimation(),
+        sequenceIndex = this.get("sequenceIndex") || 0;
+    if (!animation || animation.sequences.length == 0) return;
+    if (sequenceIndex >= animation.sequences.length) sequenceIndex = 0;
+
+    var sequence = animation.sequences[sequenceIndex]
+        frameIndex = _.isNumber(sequence) ? sequence : sequence.frame,
+        frame = this.spriteSheet.frames[frameIndex];
+
+    var width = options.tileWidth,
+        height = options.tileHeight;
+    if (this.attributes.width > this.attributes.height && this.attributes.width > options.tileWidth) {
+      height = this.attributes.height * options.tileWidth / this.attributes.width;
+    } else if (this.attributes.height > this.attributes.width && this.attributes.height > options.tileHeight) {
+      width = this.attributes.width * options.tileHeight / this.attributes.height;
+    }
+
+    context.drawImage(
+      this.spriteSheet.img,
+      frame.x, frame.y, frame.width, frame.height,
+      this.get("x"), this.get("y"), width, height
+    );
+
+    return this;
+  };
+
   // World Editor
   // Allows the user to place tiles and characters in the World.
   Backbone.WorldEditor = Backbone.Model.extend({
@@ -44,6 +73,9 @@
         });
       }
       this.sprites = new Backbone.SpriteCollection(defs);
+      this.sprites.each(function(sprite) {
+        sprite.draw = drawSpriteFn;
+      });
 
       this.world = options.world;
       if (!this.world && !_.isFunction(this.world.add))
@@ -128,8 +160,7 @@
       var sp = this.toJSON(),
           x = sp.x + sp.tileWidth + 4*sp.padding,
           y = sp.y + 2*sp.padding,
-          page = 0,
-          maxHeight = this.attributes.height - 4;
+          page = 0;
 
       this.sprites.each(function(sprite) {
         if (sprite.attributes.page > page) {
@@ -139,7 +170,7 @@
         }
 
         sprite.set({x: x, y: y});
-        x += sprite.attributes.width + 2*sp.padding;
+        x += sp.tileWidth + 2*sp.padding;
 
         if (x >= sp.x + sp.width - 2) {
           x = sp.x + 2*sp.padding;
@@ -171,14 +202,14 @@
       var st = this.sprites.findWhere({name: sp.selected}),
           sx = st ? st.get("x") - 2 : sp.x,
           sy = st ? st.get("y") - 2 : sp.y,
-          sw = st ? st.get("width") + 4 : sp.tileWidth + 4,
-          sh = st ? st.get("height") + 4 : sp.tileHeight + 4;
+          sw = sp.tileWidth + 4,
+          sh = sp.tileHeight + 4;
       drawRect(context, sx, sy, sw, sh, sp.selectColor);
 
       // Draw sprites
       this.sprites.each(function(sprite) {
         if (sprite.attributes.page == sp.page && (sprite.attributes.type == "tile" || sprite.attributes.type == "character"))
-          sprite.draw(context);
+          sprite.draw(context, sp);
       });
 
       // Highlight tile position (on desktop)
@@ -225,7 +256,7 @@
         editor.set({selected: null});
         this.sprites.each(function(sprite) {
           var s = sprite.toJSON();
-          if (s.page == sp.page && x >= s.x && y >= s.y && x <= s.x + s.width && y <= s.y + s.height) {
+          if (s.page == sp.page && x >= s.x && y >= s.y && x <= s.x + sp.tileWidth && y <= s.y + sp.tileHeight) {
             editor.set({selected: s.name});
             return false;
           }

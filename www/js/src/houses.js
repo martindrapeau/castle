@@ -36,7 +36,7 @@
 
   createDoor("house-door", [6, 7, 8, 9, 10]);
   createDoor("wall-door", [0, 1, 2, 3, 4, 5]);
-  createDoor("cave-door", [12, 13, 14, 16, 17, 18]);
+  createDoor("cave-door", [12, 13, 14, 15, 16, 17]);
 
 
   // Houses
@@ -253,16 +253,27 @@
     {name: "barrier", x: 320, y: 150},
     {name: "barrier1x2", x: 390, y: 256}
   ]);
-  createHouse("h-cave", 2, {
+  createHouse("h-cave", 0, {
+    spriteSheet: "cave",
     door: "cave-door",
+    width: 384,
+    height: 256,
     doorX: 284,
     doorY: 48
   }, [
-    {name: "a-crate-coin", x: 60, y: 128},
+    {name: "a-crate-coin", x: 60, y: 192},
+    {name: "barrier2x1", x: 256, y: 192},
     {name: "barrier1x2", x: 0, y: 64},
-    {name: "barrier2x1", x: 64, y: 0},
-    {name: "barrier2x1", x: 192, y: 0},
-    {name: "barrier", x: 320, y: 0}
+    {name: "barrier", x: 0, y: 192},
+    {name: "barrier2x1", x: 0, y: 0},
+    {name: "barrier2x1", x: 128, y: 0},
+    {name: "barrier2x1", x: 256, y: -20},
+    {name: "barrier1x2", x: 384, y: 128}
+  ],[
+    {name: "barrier2x1", x: 256, y: -20},
+    {name: "barrier2x1", x: 256, y: 192},
+    {name: "barrier1x2", x: 216, y: 0},
+    {name: "barrier1x2", x: 216, y: 128}
   ]);
 
 

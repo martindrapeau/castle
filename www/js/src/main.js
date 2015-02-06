@@ -63,9 +63,9 @@ $(window).on("load", function() {
         id: "cave",
         img: "#houses",
         x: 0,
-        y: 1394,
+        y: 1344,
         tileWidth: 384,
-        tileHeight: 192,
+        tileHeight: 256,
         tileColumns: 2,
         tileRows: 1
       }, {
@@ -112,7 +112,7 @@ $(window).on("load", function() {
         tileWidth: 100,
         tileHeight: 144,
         tileColumns: 6,
-        tileRows: 2
+        tileRows: 3
       }, {
         id: "spider",
         img: "#spider",
