@@ -11,6 +11,10 @@ $(window).on("load", function() {
       options || (options = {});
       var controller = this;
 
+      this.state = {
+        saved: undefined
+      };
+
       // Create our sprite sheets and attach them to existing sprite classes
       this.spriteSheets = new Backbone.SpriteSheetCollection(Backbone.spriteSheetDefinitions).attachToSpriteClasses();
 
@@ -24,22 +28,14 @@ $(window).on("load", function() {
 
       // Camera
       this.camera = new Backbone.Camera({
-        bottom: 228
+        bottom: 400
       });
 
       // Our world
       // Reserve bottom of canvas for input and editor
-      this.world = new Backbone.World(
-        _.extend({
-          tileWidth: tileWidth,
-          tileHeight: tileHeight,
-          width: 15,
-          height: 9,
-          backgroundImage: "#background"
-        }, window._world, {
-          viewportBottom: 180,
+      this.world = new Backbone.World({
           state: "pause"
-        }), {
+      }, {
         input: this.input,
         camera: this.camera
       });
@@ -65,8 +61,12 @@ $(window).on("load", function() {
 
       this.gui = new Backbone.Gui({
         img: "#title-screen"
+      }, {
+        state: this.state
       });
-      this.gui.on("new", this.play, this);
+      this.gui.on("new", function() {
+        this.play(true);
+      }, this);
       this.gui.on("resume", this.play, this);
 
       // The game engine
@@ -87,13 +87,19 @@ $(window).on("load", function() {
 
       this.showGui();
     },
-    play: function() {
+    play: function(newGame) {
+      if (!this.engine.isRunning()) this.engine.start();
       this.engine.remove([
         this.gui,
         this.debugPanel
       ]);
 
       this.debugPanel.clear();
+
+      if (newGame) {
+        this.world.set(Backbone.levels[0]);
+        this.world.spawnSprites();
+      }
 
       this.engine.add([
         this.world,
@@ -109,6 +115,7 @@ $(window).on("load", function() {
       return this;
     },
     showGui: function() {
+      if (!this.engine.isRunning()) this.engine.start();
       this.world.set("state", "pause");
 
       this.engine.remove([

@@ -2,10 +2,10 @@
 
   var textContextAttributes = {
     fillStyle: "#000",
-    font: "24px arcade, Verdana, Arial, Sans-Serif",
-    textBaseline: "top",
+    font: "34px arcade, Verdana, Arial, Sans-Serif",
+    textBaseline: "middle",
     fontWeight: "normal",
-    textAlign: "left",
+    textAlign: "right"
   };
 
 	Backbone.Gui = Backbone.Model.extend({
@@ -13,16 +13,21 @@
       img: undefined
     },
     initialize: function(attributes, options) {
-      var gui = this;
+      options || (options = {});
+      this.state = options.state;
 
+      var gui = this;
       _.bindAll(this, "onTap");
       if (!this.img && this.attributes.img) this.spawnImg();
 
       this.newGame = new Backbone.Button({
-        x: 0, y: 200,
-        width: 250,
-        height: 50,
-        text: "New Game",
+        x: -5,
+        y: 500,
+        width: 224,
+        height: 60,
+        text: "New Game ",
+        textPadding: 10,
+        borderRadius: 5,
         textContextAttributes: textContextAttributes
       });
       this.newGame.on("tap", function() {
@@ -30,10 +35,13 @@
       });
 
       this.resume = new Backbone.Button({
-        x: 0, y: 400,
-        width: 250,
-        height: 50,
-        text: "Resume",
+        x: -5,
+        y: 600,
+        width: 170,
+        height: 60,
+        text: "Resume ",
+        textPadding: 10,
+        borderRadius: 5,
         textContextAttributes: textContextAttributes
       });
       this.resume.on("tap", function() {
@@ -47,7 +55,8 @@
       if (!this.hammertime) this.hammertime = Hammer(document);
       this.onDetach();
       this.hammertime.on("tap", this.onTap);
-      this.engine.add([this.newGame, this.resume]);
+      this.engine.add(this.newGame);
+      if (this.state.saved) this.engine.add(this.resume);
     },
     onDetach: function() {
       this.engine.remove([this.newGame, this.resume]);

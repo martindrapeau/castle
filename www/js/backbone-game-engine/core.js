@@ -403,6 +403,7 @@
       imgMargin:0,
       backgroundColor: "rgba(160, 160, 160, {0})",
       text:  undefined,
+      textPadding: 0,
       textContextAttributes: undefined
     },
     initialize: function() {
@@ -436,13 +437,39 @@
         );
 
       var text = this.get("text"),
+          x = b.x,
+          y = b.y,
+          padding = this.get("textPadding"),
           textContextAttributes = this.get("textContextAttributes");
       if (text) {
         if (typeof textContextAttributes == "object")
           for (var attr in textContextAttributes)
             if (textContextAttributes.hasOwnProperty(attr))
               context[attr] = textContextAttributes[attr];
-        context.fillText(text, b.x, b.y);
+        switch (context.textAlign) {
+          case "left":
+          case "start":
+            x += padding;
+            break;
+          case "right":
+          case "end":
+            x += b.width - padding;
+            break;
+          case "center":
+            x += b.width/2;
+            break;
+        }
+        switch (context.textBaseline) {
+          case "top":
+            y += padding;
+          case "bottom":
+            y += b.height - padding;
+            break;
+          case "middle":
+            y += b.height/2;
+            break;
+        }
+        context.fillText(text, x, y);
       }
 
       return this;

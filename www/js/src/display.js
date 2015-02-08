@@ -106,7 +106,7 @@
       this.coin.trigger("attach");
 
       this.hero = this.world.sprites.findWhere({hero: true});
-      this.listenTo(this.hero, "change:health", this.health.flash);
+      if (this.hero) this.listenTo(this.hero, "change:health", this.health.flash);
     },
     onDetach: function() {
       this.coin.trigger("detach");
