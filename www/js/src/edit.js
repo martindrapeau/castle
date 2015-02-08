@@ -11,6 +11,8 @@ $(window).on("load", function() {
       options || (options = {});
       var controller = this;
 
+      _.bindAll(this, "onChangeState", "toggleState");
+
       // Create our sprite sheets and attach them to existing sprite classes
       this.spriteSheets = new Backbone.SpriteSheetCollection(Backbone.spriteSheetDefinitions).attachToSpriteClasses();
 
@@ -37,11 +39,11 @@ $(window).on("load", function() {
           height: 9,
           backgroundImage: "#background"
         }, window._world, {
-          viewportBottom: 180,
-          state: "pause"
+          viewportBottom: 180
         }), {
         input: this.input,
-        camera: this.camera
+        camera: this.camera,
+        //debugPanel: this.debugPanel
       });
 
       this.display = new Backbone.Display({
@@ -56,24 +58,37 @@ $(window).on("load", function() {
         x: 480, y: 20
       });
 
-      // In-game pause button
-      this.pauseButton = new Backbone.Button({
+      // Buttons
+      this.toggleButton = new Backbone.Button({
         x: 4, y: 4, width: 52, height: 52, borderRadius: 5,
         img: "#icons", imgX: 0, imgY: 0, imgWidth: 32, imgHeight: 32, imgMargin: 10
       });
-      this.pauseButton.on("tap", this.showGui, this);
-
-      this.gui = new Backbone.Gui({
-        img: "#title-screen"
-      });
-      this.gui.on("new", this.play, this);
-      this.gui.on("resume", this.play, this);
+      this.toggleButton.on("tap", this.toggleState, this);
 
       // The game engine
-      this.engine = new Backbone.Engine([
+      this.engine = new Backbone.Engine(_.compact([
+        this.world,
+        this.display,
+        this.camera,
+        this.toggleButton,
+        this.message,
         this.debugPanel
-      ], {
+      ]), {
         canvas: canvas,
+        debugPanel: this.debugPanel
+      });
+
+      // The sprite picker and editor
+      this.editor = new Backbone.WorldEditor({
+        x: canvas.width - ((tileWidth+2)*11 + 128 + 4),
+        y: 544,
+        width: (tileWidth+2)*11 + 128 + 4,
+        height: (tileHeight+2)*2 + 4,
+        spriteNames: spriteNames,
+        tileWidth: tileWidth,
+        tileHeight: tileHeight
+      }, {
+        world: this.world,
         debugPanel: this.debugPanel
       });
 
@@ -85,50 +100,29 @@ $(window).on("load", function() {
           controller.toggleState(); // p to pause and pause
       });
 
-      this.showGui();
+      this.listenTo(this.world, "change:state", this.onChangeState);
+      this.onChangeState();
     },
-    play: function() {
-      this.engine.remove([
-        this.gui,
-        this.debugPanel
-      ]);
-
-      this.debugPanel.clear();
-
-      this.engine.add([
-        this.world,
-        this.display,
-        this.camera,
-        this.pauseButton,
-        this.message,
-        this.input,
-        this.debugPanel
-      ]);
-      this.world.set("state", "play");
-
-      return this;
+    toggleState: function(e) {
+      var state = this.world.get("state");
+      this.world.set("state", state == "pause" ? "play" : "pause");
+      if (!this.engine.isRunning()) this.engine.start();
     },
-    showGui: function() {
-      this.world.set("state", "pause");
-
-      this.engine.remove([
-        this.world,
-        this.display,
-        this.camera,
-        this.pauseButton,
-        this.message,
-        this.input,
-        this.debugPanel
-      ]);
-
-      this.debugPanel.clear();
-
-      this.engine.add([
-        this.gui,
-        this.debugPanel
-      ]);
-
-      return this;
+    onChangeState: function() {
+      var state = this.world.get("state");
+      if (state == "pause") {
+        // Edit
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        this.engine.remove(this.input);
+        this.engine.add(this.editor);
+        this.toggleButton.set({imgX: 32});
+      } else {
+        // Play
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        this.engine.remove(this.editor);
+        this.engine.add(this.input);
+        this.toggleButton.set({imgX: 0});
+      }
     }
   });
   

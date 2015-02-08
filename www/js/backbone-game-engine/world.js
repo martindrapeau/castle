@@ -9,12 +9,6 @@
    *
    */
 
-  var ZCollection = Backbone.Collection.extend({
-    comparator: function(model) {
-      return -model.attributes.zIndex;
-    }
-  });
-
   // Backbone.World is Backbone model which contains a collection of sprites.
   Backbone.World = Backbone.Model.extend({
     defaults: {
@@ -37,7 +31,6 @@
     spriteOptions: {offsetX:0, offsetY:0},
     initialize: function(attributes, options) {
       options || (options = {});
-      this.backgroundImage = options.backgroundImage;
       this.input = options.input;
       this.camera = options.camera;
       this.debugPanel = options.debugPanel;
@@ -48,7 +41,7 @@
         "setTimeout", "clearTimeout", "onTap", "onKey"
       );
 
-      this.sprites = new ZCollection();
+      this.sprites = new Backbone.Collection();
       this.setupSpriteLayers();
       this.spawnSprites();
 
@@ -75,8 +68,10 @@
         sprite.engine = engine;
         sprite.trigger("attach", engine);
       });
-      if (!this.hammertime) this.hammertime = Hammer(document);
-      this.hammertime.on("tap", this.onTap);
+      if (window.Hammer) {
+        if (!this.hammertime) this.hammertime = Hammer(document);
+        this.hammertime.on("tap", this.onTap);
+      }
       $(document).on("keyup.world", this.onKey);
     },
     onDetach: function() {
@@ -115,8 +110,8 @@
     // Maintain shadow collections to quickly access the two types.
     setupSpriteLayers: function() {
       var world = this,
-          staticSprites = this.staticSprites = new ZCollection(),
-          dynamicSprites = this.dynamicSprites = new ZCollection();
+          staticSprites = this.staticSprites = new Backbone.Collection(),
+          dynamicSprites = this.dynamicSprites = new Backbone.Collection();
       staticSprites.lookup = {};
       staticSprites.maxSpriteWidth = staticSprites.maxSpriteHeight = 0;
       dynamicSprites.lookup = {};
@@ -280,9 +275,11 @@
 
     // When saving, persist the sprite collection in the model attribute sprites.
     save: function() {
-      var sprites = _.compact(this.sprites.map(function(sprite) {
-        return sprite.toSave.apply(sprite);
-      }));
+      var sprites = this.sprites.reduce(function(sprites, sprite) {
+        var s = sprite.toSave.apply(sprite);
+        if (s) sprites.push(s);
+        return s;
+      }, []);
 
       // Save a screenshot of 30x15 tiles, skipping the two top first rows
       if (this.engine && this.viewport && this.viewport.width) {

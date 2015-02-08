@@ -401,7 +401,9 @@
       imgWidth: 0,
       imgHeight:0,
       imgMargin:0,
-      backgroundColor: "rgba(160, 160, 160, {0})"
+      backgroundColor: "rgba(160, 160, 160, {0})",
+      text:  undefined,
+      textContextAttributes: undefined
     },
     initialize: function() {
       _.bindAll(this, "onTap");
@@ -432,6 +434,16 @@
           b.imgX, b.imgY, b.imgWidth, b.imgHeight,
           b.x + b.imgMargin, b.y + b.imgMargin, b.imgWidth, b.imgHeight
         );
+
+      var text = this.get("text"),
+          textContextAttributes = this.get("textContextAttributes");
+      if (text) {
+        if (typeof textContextAttributes == "object")
+          for (var attr in textContextAttributes)
+            if (textContextAttributes.hasOwnProperty(attr))
+              context[attr] = textContextAttributes[attr];
+        context.fillText(text, b.x, b.y);
+      }
 
       return this;
     },

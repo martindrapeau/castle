@@ -298,7 +298,7 @@
       if (y > 0) {
         y = 0;
       } else {
-        var min = -(world.get("height") * world.get("tileHeight") - world.engine.canvas.height + this.get("height"));
+        var min = -(world.get("height") * world.get("tileHeight") - world.engine.canvas.height + world.get("viewportBottom"));
         if (min > 0) min = 0;
         if (y < min) y = min;
       }
