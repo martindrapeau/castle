@@ -196,7 +196,6 @@
         var x = this.get("x"),
             y = this.get("y"),
             artifact = this.get("artifact");
-        this.world.remove(this);
         this.trigger("exploded");
         if (artifact) {
           var instance = new Backbone[_.classify(artifact)]({x: x, y: y});
@@ -204,7 +203,9 @@
           this.trigger("artifact", instance);
         }
         this.explosion.set({x: x, y: y});
+        this.world.remove(this.explosion);
         this.world.add(this.explosion);
+        this.world.remove(this);
       }
     }
   });

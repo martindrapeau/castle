@@ -63,7 +63,6 @@
     },
     initialize: function(attributes, options) {
       Backbone.Tile.prototype.initialize.apply(this, arguments);
-      if (!this.world) return;
 
       _.bindAll(this, "open", "close", "onStep", "tryOpenClose");
 
@@ -97,19 +96,37 @@
         }));
       });
 
-      house.listenTo(world, "tap", function(e) {
-        if (house.overlaps(e)) house.tryOpenClose();
-      });
-      house.listenTo(world, "key", function(e) {
-        if (e.keyCode == 38) house.tryOpenClose();
-      });
-      this.on("attach", function() {
-        _.each(house.outsideSprites, world.add);
-      });
-      this.on("remove  detach", function() {
-        _.each(house.insideSprites, world.remove);
-        _.each(house.outsideSprites, world.remove);
-      });
+      this.on("addWorld", this.onAdd);
+      this.on("removeWorld", this.onRemove);
+    },
+    onAdd: function() {
+      console.log("onAdd", this.get("name"));
+
+      _.each(this.spritesInWorld || this.outsideSprites, this.world.add);
+      this.listenTo(this.world, "tap", function(e) {
+        if (this.overlaps(e)) this.tryOpenClose();
+      }, this);
+      this.listenTo(this.world, "key", function(e) {
+        if (e.keyCode == 38) this.tryOpenClose();
+      }, this);
+      return this;
+    },
+    onRemove:  function() {
+      console.log("onRemove", this.get("name"));
+
+      this.stopListening();
+      this.spritesInWorld = _.union(
+        _.reduce(this.insideSprites, function(sprites, sprite) {
+          if (sprite.world) sprites.push(sprite);
+          return sprites;
+        }, []),
+        _.reduce(this.outsideSprites, function(sprites, sprite) {
+          if (sprite.world) sprites.push(sprite);
+          return sprites;
+        }, [])
+      );
+      _.each(this.spritesInWorld, this.world.remove);
+      return this;
     },
     tryOpenClose: function() {
       var character = this.getHeroOverlappingCharacter("hero1");

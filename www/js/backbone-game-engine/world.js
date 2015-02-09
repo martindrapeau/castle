@@ -12,6 +12,7 @@
   // Backbone.World is Backbone model which contains a collection of sprites.
   Backbone.World = Backbone.Model.extend({
     defaults: {
+      name: "",
       x: 0,
       y: 0,
       tileWidth: 32,
@@ -164,21 +165,6 @@
         world.requestBackgroundRedraw = true;
       });
 
-      this.listenTo(this.sprites, "reset", function(sprites) {
-        staticSprites.reset();
-        dynamicSprites.reset();
-        staticSprites.lookup = {};
-        dynamicSprites.lookup = {};
-
-        sprites.each(function(sprite) {
-        if (sprite.get("static"))
-          add(sprite, staticSprites);
-        else
-          add(sprite, dynamicSprites);
-        });
-        world.requestBackgroundRedraw = true;
-      });
-
       this.listenTo(this.sprites, "remove", function(sprite) {
         if (sprite.get("static"))
           remove(sprite, staticSprites);
@@ -228,47 +214,40 @@
           w = this.toShallowJSON(),
           _sprites = this.get("sprites"),
           options = {
-            world: this,
             input: this.input
           };
 
-      this.sprites.reset();
+      var sprites = _.clone(this.sprites.models);
+      _.each(sprites, function(sprite) {
+        world.remove(sprite);
+        sprite.input = undefined;
+        sprite.trigger("detach");
+      });
 
-      var names = [];
-      function buildId(name) {
-        var count = 0;
-        for (var i=0; i<names.length; i++)
-          if (names[i].indexOf(name) == 0) count += 1;
-        name += "." + (count + 1);
-        names.push(name);
-        return name;
-      }
-
-      var sprites = _.reduce(_sprites, function(sprites, sprite) {
+      _.each(_sprites, function(sprite) {
         var s = sprite.attributes ? sprite.attributes : sprite,
             cls = _.classify(s.name),
             col = world.getWorldCol(s.x),
             row = world.getWorldRow(s.y);
 
-        var id = Backbone[cls].prototype.defaults.type != "tile" ? buildId(s.name) : col * w.height + row;
         var newSprite = new Backbone[cls](_.extend(s,
           {
-            id: id,
             col: col,
             row: row
           }
         ), options);
-        sprites.push(newSprite);
-        
+
+        newSprite = world.add(newSprite);
+        if (world.engine) {
+          newSprite.engine = world.engine;
+          newSprite.trigger("attach");
+        }
+
         if (newSprite.get("hero"))
           world.camera.setOptions({world: world, subject: newSprite});
-
-        return sprites;
-      }, []);
+      });
 
       this.requestBackgroundRedraw = true;
-      this.sprites.reset(sprites);
-      if (this.engine) this.onAttach();
 
       return this;
     },
@@ -692,9 +671,6 @@
       return this.findAt(x, y, "tile", null, true);
     },
     add: function(models, options) {
-      options || (options = {});
-      options.world = this;
-      
       if (_.isArray(models))
         for (var i = 0; i < models.length; i++) {
           if (models[i].attributes)
@@ -711,23 +687,34 @@
 
       models = this.sprites.add.call(this.sprites, models, options);
 
-      if (_.isArray(models))
+      if (_.isArray(models)) {
         for (var i = 0; i < models.length; i++) {
           models[i].world = this;
+          if (!options || !options.silent)
+            models[i].trigger("addWorld", models[i], this, options);
         }
-      else {
+      } else {
         models.world = this;
+        if (!options || !options.silent)
+          models.trigger("addWorld", models, this, options);
       }
 
       return models;
     },
     remove: function(models, options) {
       models = this.sprites.remove.apply(this.sprites, arguments);
-      if (_.isArray(models))
+      if (_.isArray(models)) {
         for (var i = 0; i < models.length; i++)
-          if (models[i].world === this) delete models[i].world;
-      else
-        if (models.world === this) delete models.world;
+          if (models[i].world === this) {
+            if (!options || !options.silent)
+              models[i].trigger("removeWorld", models[i], this, options);
+            models[i].world = undefined;
+          }
+      } else if (models && models.world === this) {
+        if (!options || !options.silent)
+          models.trigger("removeWorld", models, this, options);
+        models.world = undefined;
+      }
       return models;
     },
     cloneAtPosition: function(sprite, x, y, options) {
@@ -809,7 +796,7 @@
         return this.buildIdFromName(attributes.name);
 
       return this.getWorldCol(attributes.x) * this.attributes.height +
-        this.getWorldRow(attributes.y - attributes.height + this.attributes.tileHeight);
+        this.getWorldRow(attributes.y);
     },
     clearBeyondWorldBoundaries: function() {
       var minX = 0,

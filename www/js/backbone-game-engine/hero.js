@@ -176,7 +176,6 @@
       Backbone.Character.prototype.initialize.apply(this, arguments);
 
       this.input = options.input;
-      this.world = options.world;
 
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);

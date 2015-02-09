@@ -77,7 +77,6 @@
     initialize: function(attributes, options) {
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
-      this.world = options.world;
 
       this.on("hit", this.hit, this);
     },
@@ -174,20 +173,19 @@
       persist: false
     }),
     initialize: function(attributes, options) {
-      options || (options = {});
-      this.world = options.world;
-      this.lastSequenceChangeTime = 0;
+      Backbone.Sprite.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "onEnd");
     },
     update: function(dt) {
       Backbone.Sprite.prototype.update.apply(this, arguments);
       var animation = this.getAnimation();
-      if (this.attributes.sequenceIndex == animation.sequences.length - 1)
-        this.world.setTimeout(this.onEnd, 25);
+      if (this.attributes.sequenceIndex == animation.sequences.length - 1 && !this.endTimerId)
+        this.endTimerId = this.world.setTimeout(this.onEnd, 25);
       return true;
     },
     onEnd: function() {
       this.world.remove(this);
+      this.endTimerId = undefined;
     }
   });
 
@@ -202,11 +200,6 @@
       state: "idle",
       static: true,
       persist: true
-    },
-    initialize: function(attributes, options) {
-      options || (options = {});
-      this.world = options.world;
-      this.lastSequenceChangeTime = 0;
     }
   });
 

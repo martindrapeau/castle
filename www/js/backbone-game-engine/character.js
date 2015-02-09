@@ -117,7 +117,6 @@
     initialize: function(attributes, options) {
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
-      this.world = options.world;
 
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);

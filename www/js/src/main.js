@@ -96,9 +96,10 @@ $(window).on("load", function() {
 
       this.debugPanel.clear();
 
-      if (newGame) {
+      if (newGame || !this.state.saved) {
         this.world.set(Backbone.levels[0]);
         this.world.spawnSprites();
+        this.state.saved = true;
       }
 
       this.engine.add([
