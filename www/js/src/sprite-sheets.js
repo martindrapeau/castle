@@ -65,7 +65,7 @@
     tileWidth: tileWidth,
     tileHeight: tileHeight,
     tileColumns: 5,
-    tileRows: 5
+    tileRows: 6
   }, {
     id: "hit",
     img: "#artifacts",
@@ -79,16 +79,16 @@
     id: "health-indicator",
     img: "#artifacts",
     x: 0,
-    y: 256,
+    y: 320,
     tileWidth: 200,
-    tileHeight: 30,
+    tileHeight: 24,
     tileColumns: 1,
     tileRows: 2
   }, {
     id: "callout",
     img: "#artifacts",
     x: 0,
-    y: 316,
+    y: 368,
     tileWidth: 126,
     tileHeight: 116,
     tileColumns: 1,

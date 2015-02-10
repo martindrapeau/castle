@@ -22,7 +22,7 @@ $(window).on("load", function() {
       this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
 
       // User input (turn off touchpad to start)
-      this.input = new Backbone.Input({
+      this.input = new Backbone.Gamepad({
         drawTouchpad: true
       });
 
@@ -54,8 +54,8 @@ $(window).on("load", function() {
 
       // In-game pause button
       this.pauseButton = new Backbone.Button({
-        x: 4, y: 4, width: 52, height: 52, borderRadius: 5,
-        img: "#icons", imgX: 0, imgY: 0, imgWidth: 32, imgHeight: 32, imgMargin: 10
+        x: 16, y: 4, width: 64, height: 64, backgroundColor: "transparent",
+        img: "#artifacts", imgX: 0, imgY: 128, imgWidth: 64, imgHeight: 64, imgMargin: 0
       });
       this.pauseButton.on("tap", this.showGui, this);
 

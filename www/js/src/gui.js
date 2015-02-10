@@ -1,7 +1,7 @@
 (function() {
 
   var textContextAttributes = {
-    fillStyle: "#000",
+    fillStyle: "#F67D00",
     font: "34px arcade, Verdana, Arial, Sans-Serif",
     textBaseline: "middle",
     fontWeight: "normal",
@@ -23,11 +23,12 @@
       this.newGame = new Backbone.Button({
         x: -5,
         y: 500,
-        width: 224,
-        height: 60,
+        width: 230,
+        height: 76,
+        backgroundColor: "transparent",
+        img: "#artifacts", imgX: 372-230, imgY: 538, imgWidth: 230, imgHeight: 80, imgMargin: 0,
         text: "New Game ",
-        textPadding: 10,
-        borderRadius: 5,
+        textPadding: 12,
         textContextAttributes: textContextAttributes
       });
       this.newGame.on("tap", function() {
@@ -38,10 +39,11 @@
         x: -5,
         y: 600,
         width: 170,
-        height: 60,
+        height: 76,
+        backgroundColor: "transparent",
+        img: "#artifacts", imgX: 372-170, imgY: 538, imgWidth: 170, imgHeight: 80, imgMargin: 0,
         text: "Resume ",
         textPadding: 10,
-        borderRadius: 5,
         textContextAttributes: textContextAttributes
       });
       this.resume.on("tap", function() {

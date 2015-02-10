@@ -10,7 +10,7 @@
       name: "health-indicator",
       spriteSheet: "health-indicator",
       width: 200,
-      height: 30,
+      height: 24,
       state: "idle",
       health: 0,
       healthMax: 10
@@ -65,27 +65,31 @@
           y = this.get("y");
 
       this.health = new Backbone.HealthIndicator({
-        x: x, y: y + 17
-      });
-
-      this.coin = new Backbone.ACoin({
-        x: x + 232, y: y
+        x: x, y: y + 20
       });
 
       this.key = new Backbone.AKey({
-        x: x + 384, y: y
+        x: x + 284, y: y
       });
 
       this.redPotion = new Backbone.ARedPotion({
-        x: x + 448, y: y
+        x: x + 348, y: y
       });
 
       this.greenPotion = new Backbone.AGreenPotion({
-        x: x + 448, y: y
+        x: x + 348, y: y
       });
 
       this.bluePotion = new Backbone.ABluePotion({
-        x: x + 448, y: y
+        x: x + 348, y: y
+      });
+
+      this.coin = new Backbone.ADollar({
+        x: x + 500, y: y
+      });
+
+      this.clock = new Backbone.AClock({
+        x: x + 700, y: y
       });
 
       var display = this;
@@ -102,15 +106,10 @@
     onAttach: function() {
       this.onDetach();
 
-      this.coin.engine = this.engine;
-      this.coin.trigger("attach");
-
       this.hero = this.world.sprites.findWhere({hero: true});
       if (this.hero) this.listenTo(this.hero, "change:health", this.health.flash);
     },
     onDetach: function() {
-      this.coin.trigger("detach");
-      this.coin.engine = undefined;
       if (this.hero) this.stopListening(this.hero);
       this.hero = undefined;
     },
@@ -127,6 +126,7 @@
       this.health.draw.apply(this.health, arguments);
 
       this.coin.draw.apply(this.coin, arguments);
+      this.clock.draw.apply(this.clock, arguments);
 
       if (assets.key)
         this.key.draw.apply(this.key, arguments);
@@ -138,13 +138,14 @@
       else if (assets.potion == "blue")
         this.bluePotion.draw.apply(this.bluePotion, arguments);
 
-      context.fillStyle = "#E3BC70";
-      context.font = "24px arcade, Verdana, Arial, Sans-Serif";
+      context.fillStyle = "#FFFF";
+      context.font = "32px arcade, Verdana, Arial, Sans-Serif";
       context.textBaseline = "top";
       context.fontWeight = "normal";
-      
       context.textAlign = "left";
-      context.fillText(assets.coins, this.coin.get("x") + 60, 18);
+
+      context.fillText(assets.coins, this.coin.get("x") + 60, 14);
+      context.fillText("1:10", this.clock.get("x") + 60, 14);
 
     },
     getAssets: function() {

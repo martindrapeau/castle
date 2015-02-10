@@ -55,7 +55,7 @@
     }, {
       button: "right",
       x: 120, y: bottom-100,
-      width: 120,  height: 100,
+      width: 120,  height: 150,
       draw: function(context, pressed) {
         context.save();
         context.beginPath();

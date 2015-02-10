@@ -152,12 +152,14 @@
   }
 
   buildArtifact("a-coin", [5, 6, 7, 8]);
-  buildArtifact("a-death", [10]);
-  buildArtifact("a-health", [11]);
-  buildArtifact("a-key", [17]);
-  buildArtifact("a-blue-potion", [13]);
-  buildArtifact("a-red-potion", [14]);
-  buildArtifact("a-green-potion", [15]);
+  buildArtifact("a-death", [11]);
+  buildArtifact("a-health", [12]);
+  buildArtifact("a-key", [18]);
+  buildArtifact("a-blue-potion", [14]);
+  buildArtifact("a-red-potion", [15]);
+  buildArtifact("a-green-potion", [16]);
+  buildArtifact("a-dollar", [24]);
+  buildArtifact("a-clock", [23]);
 
 
   // Breakable tiles
