@@ -251,7 +251,7 @@
     initialize: function(sprites, options) {
       _.extend(this, this.defaults, _.pick(options || {}, _.keys(this.defaults)));
 
-      _.bindAll(this, "start", "stop", "toggle", "onAnimationFrame");
+      _.bindAll(this, "start", "stop", "toggle", "onAnimationFrame", "onTap", "onKey");
 
       if (!this.canvas || typeof this.canvas.getContext !== "function")
         throw new Error("Missing or invalid canvas.");
@@ -288,6 +288,12 @@
         delete sprite._draw;
         sprite.engine = engine;
       });
+
+      if (window.Hammer) {
+        if (!this.hammertime) this.hammertime = Hammer(document);
+        this.hammertime.on("tap", this.onTap);
+      }
+      $(document).on("keyup.engine", this.onKey);
 
       // For the trigger of reset event
       setTimeout(function() {
@@ -363,6 +369,16 @@
 
       if (this.debugPanel) this.debugPanel.set({fps: this.fps, ct: this.cycleTime});
       return this;
+    },
+    onTap: function(e) {
+      e.canvas = this.canvas;
+      e.canvasX = e.gesture.center.clientX - this.canvas.offsetLeft + this.canvas.scrollLeft;
+      e.canvasY = e.gesture.center.clientY - this.canvas.offsetTop + this.canvas.scrollTop;
+      this.trigger("tap", e);
+    },
+    onKey: function(e) {
+      e.canvas = this.canvas;
+      this.trigger("key", e);
     }
   });
 
@@ -407,7 +423,6 @@
       textContextAttributes: undefined
     },
     initialize: function() {
-      _.bindAll(this, "onTap");
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
       this.on("change:text change:textContextAttributes", this.clearTextMetrics);
@@ -416,13 +431,12 @@
       if (this.textMetrics) this.textMetrics = undefined;
     },
     onAttach: function() {
-      if (!this.hammertime) this.hammertime = Hammer(document);
       this.onDetach();
+      this.listenTo(this.engine, "tap", this.onTap);
       if (!this.img && this.attributes.img) this.spawnImg();
-      this.hammertime.on("tap", this.onTap);
     },
     onDetach: function() {
-      if (this.hammertime) this.hammertime.off("tap", this.onTap);
+      this.stopListening(this.engine);
     },
     update: function(dt) {
       return true;
@@ -484,11 +498,9 @@
       return this;
     },
     onTap: function(e) {
-      var b = this.toJSON(),
-          x = e.gesture.center.clientX - this.engine.canvas.offsetLeft + this.engine.canvas.scrollLeft,
-          y = e.gesture.center.clientY - this.engine.canvas.offsetTop + this.engine.canvas.scrollTop;
-      if (x >= b.x && x <= b.x + b.width && y >= b.y && y <= b.y + b.height)
-        this.trigger("tap");
+      if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
+          e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height)
+        this.trigger("pressed", e);
     },
     overlaps: Backbone.Sprite.prototype.overlaps,
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg

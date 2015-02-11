@@ -39,7 +39,7 @@
       _.bindAll(this,
         "save", "getWorldIndex", "getWorldCol", "getWorldRow", "cloneAtPosition",
         "findAt", "filterAt", "spawnSprites", "height", "width", "add", "remove",
-        "setTimeout", "clearTimeout", "onTap", "onKey"
+        "setTimeout", "clearTimeout"
       );
 
       this.sprites = new Backbone.Collection();
@@ -69,15 +69,11 @@
         sprite.engine = engine;
         sprite.trigger("attach", engine);
       });
-      if (window.Hammer) {
-        if (!this.hammertime) this.hammertime = Hammer(document);
-        this.hammertime.on("tap", this.onTap);
-      }
-      $(document).on("keyup.world", this.onKey);
+      this.listenTo(this.engine, "tap", this.onTap);
+      this.listenTo(this.engine, "key", this.onKey);
     },
     onDetach: function() {
-      $(document).off("keyup.world", this.onKey);
-      if (this.hammertime) this.hammertime.off("tap", this.onTap);
+      this.stopListening(this.engine);
       this.sprites.each(function(sprite) {
         sprite.engine = undefined;
         sprite.trigger("detach");
@@ -96,13 +92,15 @@
     },
     onTap: function(e) {
       if (this.attributes.state != "play") return;
-      var x = e.gesture.center.clientX - this.engine.canvas.offsetLeft + this.engine.canvas.scrollLeft - this.attributes.x,
-          y = e.gesture.center.clientY - this.engine.canvas.offsetTop + this.engine.canvas.scrollTop - this.attributes.y;
-      this.trigger("tap", _.extend(e, {x: x, y: y}));
+      e.world = this;
+      e.worldX = e.canvasX - this.attributes.x;
+      e.worldY = e.canvasY - this.attributes.y;
+      this.trigger("pressed", e);
     },
     onKey: function(e) {
       if (this.attributes.state != "play") return;
-      this.trigger("key", e);
+      e.world = this;
+      this.trigger("keyPressed", e);
     },
 
     // Split static sprites (background tiles) from dynamic ones (animated or moving).

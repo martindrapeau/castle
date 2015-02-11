@@ -22,7 +22,7 @@ $(window).on("load", function() {
       this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
 
       // User input (turn off touchpad to start)
-      this.input = new Backbone.Gamepad({
+      this.input = new Backbone.Input({
         drawTouchpad: true
       });
 
@@ -57,7 +57,7 @@ $(window).on("load", function() {
         x: 16, y: 4, width: 64, height: 64, backgroundColor: "transparent",
         img: "#artifacts", imgX: 0, imgY: 128, imgWidth: 64, imgHeight: 64, imgMargin: 0
       });
-      this.pauseButton.on("tap", this.showGui, this);
+      this.pauseButton.on("pressed", this.showGui, this);
 
       this.gui = new Backbone.Gui({
         img: "#title-screen"
@@ -88,7 +88,7 @@ $(window).on("load", function() {
       this.showGui();
     },
     play: function(newGame) {
-      if (!this.engine.isRunning()) this.engine.start();
+      this.engine.stop();
       this.engine.remove([
         this.gui,
         this.debugPanel
@@ -111,12 +111,14 @@ $(window).on("load", function() {
         this.input,
         this.debugPanel
       ]);
+      this.engine.clearOnDraw = false;
       this.world.set("state", "play");
+      this.engine.start();
 
       return this;
     },
     showGui: function() {
-      if (!this.engine.isRunning()) this.engine.start();
+      this.engine.stop();
       this.world.set("state", "pause");
 
       this.engine.remove([
@@ -135,6 +137,8 @@ $(window).on("load", function() {
         this.gui,
         this.debugPanel
       ]);
+      this.engine.clearOnDraw = true;
+      this.engine.start();
 
       return this;
     }

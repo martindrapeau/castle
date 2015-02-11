@@ -103,10 +103,10 @@
       console.log("onAdd", this.get("name"));
 
       _.each(this.spritesInWorld || this.outsideSprites, this.world.add);
-      this.listenTo(this.world, "tap", function(e) {
-        if (this.overlaps(e)) this.tryOpenClose();
+      this.listenTo(this.world, "pressed", function(e) {
+        if (this.overlaps({x: e.worldX, y: e.worldY})) this.tryOpenClose();
       }, this);
-      this.listenTo(this.world, "key", function(e) {
+      this.listenTo(this.world, "keyPressed", function(e) {
         if (e.keyCode == 38) this.tryOpenClose();
       }, this);
       return this;

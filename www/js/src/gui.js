@@ -61,16 +61,13 @@
       this.state = options.state;
 
       var gui = this;
-      _.bindAll(this, "onTap");
       if (!this.img && this.attributes.img) this.spawnImg();
-
-      this.hammertime = Hammer(document);
 
       this.newGame = new Backbone.PullOutButton({
         y: 500,
         text: "New Game "
       });
-      this.newGame.on("tap", function() {
+      this.newGame.on("pressed", function() {
         gui.trigger("new");
       });
 
@@ -78,7 +75,7 @@
         y: 600,
         text: "Resume "
       });
-      this.resume.on("tap", function() {
+      this.resume.on("pressed", function() {
         gui.trigger("resume");
       });
 
@@ -87,23 +84,19 @@
     },
     onAttach: function() {
       this.onDetach();
-      this.hammertime.on("tap", this.onTap);
       this.engine.add(this.newGame);
       if (this.state.saved) this.engine.add(this.resume);
+      this.listenTo(this.engine, "tap", this.onTap);
     },
     onDetach: function() {
+      this.stopListening(this.engine);
       this.engine.remove([this.newGame, this.resume]);
-      this.hammertime.off("tap", this.onTap);
     },
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg,
     onTap: function(e) {
-      var x = e.gesture.center.clientX - this.engine.canvas.offsetLeft + this.engine.canvas.scrollLeft,
-          y = e.gesture.center.clientY - this.engine.canvas.offsetTop + this.engine.canvas.scrollTop;
-      if (x >= 0 && x <= this.engine.canvas.width && y >= 0 && y <= this.engine.canvas.height) {
-        if (!this.newGame.get("visible")) {
-          this.newGame.set("visible", true);
-          this.resume.set("visible", true);
-        }
+      if (!this.newGame.get("visible")) {
+        this.newGame.set("visible", true);
+        this.resume.set("visible", true);
       }
     },
     update: function(dt) {

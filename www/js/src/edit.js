@@ -20,7 +20,7 @@ $(window).on("load", function() {
       this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
 
       // User input (turn off touchpad to start)
-      this.input = new Backbone.Gamepad({
+      this.input = new Backbone.Input({
         drawTouchpad: true
       });
 
@@ -63,7 +63,7 @@ $(window).on("load", function() {
         x: 4, y: 4, width: 52, height: 52, borderRadius: 5,
         img: "#icons", imgX: 0, imgY: 0, imgWidth: 32, imgHeight: 32, imgMargin: 10
       });
-      this.toggleButton.on("tap", this.toggleState, this);
+      this.toggleButton.on("pressed", this.toggleState, this);
 
       // The game engine
       this.engine = new Backbone.Engine(_.compact([
