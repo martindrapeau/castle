@@ -5,7 +5,7 @@
   <content src="index.html"/>
   <preference name="permissions" value="none"/>
   <preference name="phonegap-version" value="3.5.0"/>
-  <preference name="orientation" value="default"/>
+  <preference name="orientation" value="landscape"/>
   <preference name="target-device" value="universal"/>
   <preference name="fullscreen" value="true"/>
   <preference name="webviewbounce" value="true"/>
@@ -37,6 +37,11 @@
   <gap:plugin name="org.apache.cordova.network-information"/>
   <gap:plugin name="org.apache.cordova.splashscreen"/>
   <gap:plugin name="org.apache.cordova.vibration"/>
+  <gap:config-file platform="ios" parent="UISupportedInterfaceOrientations" mode="replace">
+    <array>
+        <string>UIInterfaceOrientationLandscapeOmg</string>
+    </array>
+  </gap:config-file>
   <icon src="icon.png"/>
   <icon src="www/res/icon/android/icon-36-ldpi.png" gap:platform="android" gap:qualifier="ldpi"/>
   <icon src="www/res/icon/android/icon-48-mdpi.png" gap:platform="android" gap:qualifier="mdpi"/>

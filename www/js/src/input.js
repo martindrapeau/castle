@@ -13,7 +13,7 @@
     touchButtons: [{
       button: "left",
       x: left, y: bottom-100,
-      width: 120,  height: 150,
+      width: 120, height: 150,
       draw: function(context, pressed) {
         context.save();
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(64, 64, 64, 0.5)");
@@ -28,7 +28,7 @@
     }, {
       button: "right",
       x: 120, y: bottom-100,
-      width: 120,  height: 150,
+      width: 120, height: 150,
       draw: function(context, pressed) {
         context.save();
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(128, 128, 128, 0.5)");
@@ -43,7 +43,7 @@
     }, {
       button: "buttonB",
       x: right-240, y: bottom-100,
-      width: 150,  height: 150,
+      width: 150, height: 150,
       draw: function(context, pressed) {
         context.save();
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(192, 192, 192, 0.5)");
@@ -58,7 +58,7 @@
     }, {
       button: "buttonA",
       x: right-352, y: bottom-100,
-      width: 192,  height: 192,
+      width: 192, height: 192,
       draw: function(context, pressed) {
         context.save();
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(255, 255, 255, 0.5)");

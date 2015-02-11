@@ -1,12 +1,56 @@
 (function() {
 
-  var textContextAttributes = {
-    fillStyle: "#F67D00",
-    font: "34px arcade, Verdana, Arial, Sans-Serif",
-    textBaseline: "middle",
-    fontWeight: "normal",
-    textAlign: "right"
-  };
+  var slideVelocity = 800,
+      buttonWidth = 372;
+
+  Backbone.PullOutButton = Backbone.Button.extend({
+    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+      // Change these
+      y: 0,
+      text: "",
+      // Do not change these
+      x: -buttonWidth,
+      velocity: 0,
+      width: buttonWidth,
+      height: 76,
+      visible: false,
+      backgroundColor: "transparent",
+      img: "#artifacts", imgX: 0, imgY: 538, imgWidth: 372, imgHeight: 80, imgMargin: 0,
+      textPadding: 12,
+      textContextAttributes: {
+        fillStyle: "#F67D00",
+        font: "34px arcade, Verdana, Arial, Sans-Serif",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "right"
+      }
+    }),
+    update: function(dt) {
+      if (!this.textMetrics) return true;
+
+      var visible = this.get("visible"),
+          x = this.get("x"),
+          width = this.get("width"),
+          padding = this.get("textPadding"),
+          targetX = visible ? (this.textMetrics.width - width + padding*2) : Math.round(-width),
+          velocity = this.get("velocity"),
+          attrs = {};
+
+      if (visible && x < targetX) {
+        attrs.velocity = velocity = slideVelocity;
+      } else if (!visible && x > targetX) {
+        attrs.velocity = velocity = -slideVelocity;
+      } else {
+        attrs.velocity = velocity = 0;
+      }
+
+      if (velocity) attrs.x = x = x + velocity * (dt/1000);
+
+      if (!_.isEmpty(attrs)) this.set(attrs);
+
+      return true;
+    }
+  })
 
 	Backbone.Gui = Backbone.Model.extend({
     defaults: {
@@ -20,31 +64,19 @@
       _.bindAll(this, "onTap");
       if (!this.img && this.attributes.img) this.spawnImg();
 
-      this.newGame = new Backbone.Button({
-        x: -5,
+      this.hammertime = Hammer(document);
+
+      this.newGame = new Backbone.PullOutButton({
         y: 500,
-        width: 230,
-        height: 76,
-        backgroundColor: "transparent",
-        img: "#artifacts", imgX: 372-230, imgY: 538, imgWidth: 230, imgHeight: 80, imgMargin: 0,
-        text: "New Game ",
-        textPadding: 12,
-        textContextAttributes: textContextAttributes
+        text: "New Game "
       });
       this.newGame.on("tap", function() {
         gui.trigger("new");
       });
 
-      this.resume = new Backbone.Button({
-        x: -5,
+      this.resume = new Backbone.PullOutButton({
         y: 600,
-        width: 170,
-        height: 76,
-        backgroundColor: "transparent",
-        img: "#artifacts", imgX: 372-170, imgY: 538, imgWidth: 170, imgHeight: 80, imgMargin: 0,
-        text: "Resume ",
-        textPadding: 10,
-        textContextAttributes: textContextAttributes
+        text: "Resume "
       });
       this.resume.on("tap", function() {
         gui.trigger("resume");
@@ -54,7 +86,6 @@
       this.on("detach", this.onDetach);
     },
     onAttach: function() {
-      if (!this.hammertime) this.hammertime = Hammer(document);
       this.onDetach();
       this.hammertime.on("tap", this.onTap);
       this.engine.add(this.newGame);
@@ -62,14 +93,18 @@
     },
     onDetach: function() {
       this.engine.remove([this.newGame, this.resume]);
-      if (this.hammertime) this.hammertime.off("tap", this.onTap);
+      this.hammertime.off("tap", this.onTap);
     },
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg,
     onTap: function(e) {
       var x = e.gesture.center.clientX - this.engine.canvas.offsetLeft + this.engine.canvas.scrollLeft,
           y = e.gesture.center.clientY - this.engine.canvas.offsetTop + this.engine.canvas.scrollTop;
-      if (x >= 0 && x <= this.engine.canvas.width && y >= 0 && y <= this.engine.canvas.height)
-        this.trigger("tap");
+      if (x >= 0 && x <= this.engine.canvas.width && y >= 0 && y <= this.engine.canvas.height) {
+        if (!this.newGame.get("visible")) {
+          this.newGame.set("visible", true);
+          this.resume.set("visible", true);
+        }
+      }
     },
     update: function(dt) {
       return true;

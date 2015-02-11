@@ -410,6 +410,10 @@
       _.bindAll(this, "onTap");
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
+      this.on("change:text change:textContextAttributes", this.clearTextMetrics);
+    },
+    clearTextMetrics: function() {
+      if (this.textMetrics) this.textMetrics = undefined;
     },
     onAttach: function() {
       if (!this.hammertime) this.hammertime = Hammer(document);
@@ -426,10 +430,13 @@
     draw: function(context) {
       var pressed = false,
           opacity = pressed ? 1 : 0.8,
-          b = this.toJSON(),
-          fillStyle = (b.backgroundColor).replace("{0}", opacity);
+          b = this.toJSON();
 
-      drawRoundRect(context, b.x, b.y, b.width, b.height, b.borderRadius, fillStyle, false);
+      if (b.backgroundColor && b.backgroundColor != "transparent") {
+        var fillStyle = (b.backgroundColor).replace("{0}", opacity);
+        drawRoundRect(context, b.x, b.y, b.width, b.height, b.borderRadius, fillStyle, false);
+      }
+
       if (this.img)
         context.drawImage(this.img,
           b.imgX, b.imgY, b.imgWidth, b.imgHeight,
@@ -470,6 +477,8 @@
             break;
         }
         context.fillText(text, x, y);
+        if (!this.textMetrics)
+          this.textMetrics = context.measureText(text);
       }
 
       return this;

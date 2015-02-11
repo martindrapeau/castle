@@ -43,6 +43,7 @@
       x: left, y: bottom-100,
       width: 120,  height: 150,
       draw: function(context, pressed) {
+        //drawRect(context, this.x, this.y, this.width, this.height, "rgba(64, 64, 64, 0.5)");
         context.save();
         context.beginPath();
         context.moveTo(100, context.canvas.height-40-90);
@@ -57,6 +58,7 @@
       x: 120, y: bottom-100,
       width: 120,  height: 150,
       draw: function(context, pressed) {
+        //drawRect(context, this.x, this.y, this.width, this.height, "rgba(128, 128, 128, 0.5)");
         context.save();
         context.beginPath();
         context.moveTo(140, context.canvas.height-40-90);
@@ -71,6 +73,7 @@
       x: right-240, y: bottom-100,
       width: 150,  height: 150,
       draw: function(context, pressed) {
+        //drawRect(context, this.x, this.y, this.width, this.height, "rgba(192, 192, 192, 0.5)");
         context.save();
         context.beginPath();
         context.arc(context.canvas.width-60-140, context.canvas.height-40-50, 40, 0, 2*Math.PI, false);
@@ -84,6 +87,7 @@
       x: right-90, y: bottom-100,
       width: 150,  height: 150,
       draw: function(context, pressed) {
+        //drawRect(context, this.x, this.y, this.width, this.height, "rgba(255, 255, 255, 0.5)");
         context.save();
         context.beginPath();
         context.arc(context.canvas.width-60-40, context.canvas.height-40-50, 40, 0, 2*Math.PI, false);
