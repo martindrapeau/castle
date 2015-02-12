@@ -132,6 +132,9 @@
       var character = this.getHeroOverlappingCharacter("hero1");
       if (!character) return;
 
+      var cur = character.getStateInfo();
+      if (cur.mov != "idle" && cur.mov != "walk" && cur.mov != "release") return;
+
       var state = this.get("state");
       if (state != "idle" && state != "inside") return;
 
@@ -162,6 +165,23 @@
       this.character = character;
       this.onStep();
     },
+    positionCharacter: function() {
+      var charX = this.character.get("x") + this.character.get("width")/2,
+          doorX = this.door.get("x") + this.door.get("width")/2,
+          distance = doorX - charX,
+          cur = this.character.getStateInfo(),
+          attrs = {ignoreInput: true};
+      if (charX < doorX) {
+        attrs.state = this.character.buildState("jump", "right");
+        attrs.nextState = this.character.buildState("release", "right");
+      } else {
+        attrs.state = this.character.buildState("jump", "left");
+        attrs.nextState = this.character.buildState("release", "left");
+      }
+      attrs.velocity = distance*2;
+      attrs.yVelocity = this.character.animations["jump-right"].yStartVelocity*0.4;
+      this.character.set(attrs);
+    },
     onStep: function() {
       var house = this,
           state = this.get("state"),
@@ -170,17 +190,17 @@
 
       switch (state) {
         case "open1":
+          this.positionCharacter();
           this.door.set({state: "open-close"});
           world.add(this.door);
           this.set("state", "open2");
-          world.setTimeout(function() {
-            character.set("y", character.get("y") - 16);
-          }, 300);
           world.setTimeout(this.onStep, 700);
+          world.setTimeout(function() {
+            world.remove(character);
+          }, 400);
           break;
 
         case "open2":
-          world.remove(character);
           _.each(this.outsideSprites, world.remove);
           this.set("state", "open3");
           world.setTimeout(this.onStep, 500);
@@ -189,6 +209,7 @@
         case "open3":
           this.set("state", "inside");
           world.add(character);
+          character.set({ignoreInput: false, velocity:  0});
           _.each(this.insideSprites, world.add);
           this.listenTo(world.sprites, "remove", function(sprite) {
             house.insideSprites = _.without(house.insideSprites, sprite);
@@ -214,6 +235,7 @@
         case "close2":
           character.set("y", character.get("y") - 16);
           world.add(character);
+          character.set({ignoreInput: false, velocity:  0});
           _.each(house.outsideSprites, world.add);
           this.character = undefined;
           this.set("state", "idle");

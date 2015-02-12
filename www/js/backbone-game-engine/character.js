@@ -141,9 +141,9 @@
           opo = dir == "left" ? "right" : "left";
       
       if (health == 0)
-        return this.knockout(null, dir);
+        return this.knockout(options.sprite || null, dir, options.dir2 || null);
       else if (health < this.previous("health")) 
-        return this.hurt(null, dir);
+        return this.hurt(options.sprite || null, dir, options.dir2 || null);
       
       this.lastAIEvent = _.now();
 

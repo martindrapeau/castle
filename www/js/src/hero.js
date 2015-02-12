@@ -221,7 +221,8 @@
       attackDamage: 1,
       coins: 0,
       key: false,
-      potion: null
+      potion: null,
+      ignoreInput: false
     }),
     animations: animations,
     saveAttributes: _.union(
@@ -256,6 +257,8 @@
     // User input toggled in right or left direction.
     // Can be pressed or depressed
     dirToggled: function(dirIntent) {
+      if (this.get("ignoreInput")) return this;
+
       if (dirIntent != "left" && dirIntent != "right")
         throw "Invalid or missing dirIntent. Must be left or right."
 
@@ -312,6 +315,8 @@
     },
     // Run or attack
     buttonBToggled: function() {
+      if (this.get("ignoreInput")) return this;
+
       var mode = this.get("buttonBMode"),
           cur = this.getStateInfo(),
           pressed = this.input ? this.input.buttonBPressed() : false;
@@ -358,13 +363,14 @@
     knockout: function(sprite, dir) {
       dir || (dir = cur.dir);
       var cur = this.getStateInfo(),
-          state = this.buildState("ko", dir);
-
+          opo = dir == "left" ? "right" : "left",
+          state = this.buildState("ko", opo);
+      
       this.set({
         state: state,
         velocity: this.animations[state].velocity,
         yVelocity: -this.animations[state].yVelocity/2,
-        nextState: this.buildState("dead", null, dir),
+        nextState: this.buildState("dead", null, opo),
         dead: true,
         collision: false
       });
@@ -442,6 +448,8 @@
     },
     // Jump
     buttonAToggled: function() {
+      if (this.get("ignoreInput")) return this;
+
       var state = this.get("state"),
           cur = this.getStateInfo(),
           attrs = {};
@@ -493,7 +501,7 @@
       var hero = this,
           mode = this.get("buttonBMode"),
           dead = this.get("dead"),
-          input = this.input,
+          input = !this.get("ignoreInput") ? this.input : null,
           velocity = this.get("velocity") || 0,
           yVelocity = this.get("yVelocity") || 0,
           yAcceleration = null,
