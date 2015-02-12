@@ -63,20 +63,21 @@ $(window).on("load", function() {
         x: 4, y: 4, width: 52, height: 52, borderRadius: 5,
         img: "#icons", imgX: 0, imgY: 0, imgWidth: 32, imgHeight: 32, imgMargin: 10
       });
-      this.toggleButton.on("pressed", this.toggleState, this);
+      this.toggleButton.on("tap", this.toggleState, this);
 
       // The game engine
-      this.engine = new Backbone.Engine(_.compact([
+      this.engine = new Backbone.Engine({}, {
+        canvas: canvas,
+        debugPanel: this.debugPanel
+      });
+      this.engine.add(_.compact([
         this.world,
         this.display,
         this.camera,
         this.toggleButton,
         this.message,
         this.debugPanel
-      ]), {
-        canvas: canvas,
-        debugPanel: this.debugPanel
-      });
+      ]));
 
       // The sprite picker and editor
       this.editor = new Backbone.WorldEditor({

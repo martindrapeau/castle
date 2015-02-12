@@ -57,7 +57,7 @@ $(window).on("load", function() {
         x: 16, y: 4, width: 64, height: 64, backgroundColor: "transparent",
         img: "#artifacts", imgX: 0, imgY: 128, imgWidth: 64, imgHeight: 64, imgMargin: 0
       });
-      this.pauseButton.on("pressed", this.showGui, this);
+      this.pauseButton.on("tap", this.showGui, this);
 
       this.gui = new Backbone.Gui({
         img: "#title-screen"
@@ -70,12 +70,11 @@ $(window).on("load", function() {
       this.gui.on("resume", this.play, this);
 
       // The game engine
-      this.engine = new Backbone.Engine([
-        this.debugPanel
-      ], {
+      this.engine = new Backbone.Engine({}, {
         canvas: canvas,
         debugPanel: this.debugPanel
       });
+      this.engine.add(this.debugPanel);
 
       // Controls
       $(document).on("keypress.Controller", function(e) {
@@ -111,7 +110,7 @@ $(window).on("load", function() {
         this.input,
         this.debugPanel
       ]);
-      this.engine.clearOnDraw = false;
+      this.engine.set("clearOnDraw", false);
       this.world.set("state", "play");
       this.engine.start();
 
@@ -137,7 +136,7 @@ $(window).on("load", function() {
         this.gui,
         this.debugPanel
       ]);
-      this.engine.clearOnDraw = true;
+      this.engine.set("clearOnDraw", true);
       this.engine.start();
 
       return this;

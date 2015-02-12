@@ -95,12 +95,12 @@
       e.world = this;
       e.worldX = e.canvasX - this.attributes.x;
       e.worldY = e.canvasY - this.attributes.y;
-      this.trigger("pressed", e);
+      this.trigger("tap", e);
     },
     onKey: function(e) {
       if (this.attributes.state != "play") return;
       e.world = this;
-      this.trigger("keyPressed", e);
+      this.trigger("key", e);
     },
 
     // Split static sprites (background tiles) from dynamic ones (animated or moving).

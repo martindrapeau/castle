@@ -238,20 +238,21 @@
     }
   });
 
-  // Engine class; a Backbone Collection of models that have the required update
-  // and draw methods. Will draw them on an HTML5 canvas.
-  Backbone.Engine = Backbone.Collection.extend({
+  // Engine class; a Backbone Model which wraps a Backbone Collection of
+  // models that have the required update and draw methods. Will draw them
+  // on an HTML5 canvas.
+  Backbone.Engine = Backbone.Model.extend({
     defaults: {
       version: 0.2,
-      canvas: undefined,
-      debugPanel: null,
-      input: null,
       clearOnDraw: false
     },
-    initialize: function(sprites, options) {
-      _.extend(this, this.defaults, _.pick(options || {}, _.keys(this.defaults)));
+    initialize: function(attributes, options) {
+      options || (options = {});
+      this.input = options.input;
+      this.canvas = options.canvas;
+      this.debugPanel = options.debugPanel;
 
-      _.bindAll(this, "start", "stop", "toggle", "onAnimationFrame", "onTap", "onKey");
+      _.bindAll(this, "add", "remove", "start", "stop", "toggle", "onAnimationFrame", "onTap", "onKey");
 
       if (!this.canvas || typeof this.canvas.getContext !== "function")
         throw new Error("Missing or invalid canvas.");
@@ -268,22 +269,24 @@
       this.lastTime = _.now();
       this.start();
 
+      this.sprites = new Backbone.Collection();
+
       // Trigger attach and detach events on sprites
       // Also set the property engine
       var engine = this;
-      this.on("reset", function() {
+      this.sprites.on("reset", function() {
         this.each(function(sprite) {
           sprite.engine = engine;
           sprite._draw = false;
           sprite.trigger("attach", engine);
         });
       });
-      this.on("add", function(sprite) {
+      this.sprites.on("add", function(sprite) {
         sprite.engine = engine;
         sprite._draw = false;
         sprite.trigger("attach", engine);
       });
-      this.on("remove", function(sprite) {
+      this.sprites.on("remove", function(sprite) {
         sprite.trigger("detach", engine);
         delete sprite._draw;
         sprite.engine = engine;
@@ -299,6 +302,12 @@
       setTimeout(function() {
         engine.trigger("reset");
       }, 1);
+    },
+    add: function() {
+      return this.sprites.add.apply(this.sprites, arguments);
+    },
+    remove: function() {
+      return this.sprites.remove.apply(this.sprites, arguments);
     },
     isRunning: function() {
       return !!this.timerId;
@@ -334,17 +343,17 @@
           sprite;
 
       // Update
-      for (var i = 0; i < this.models.length; i++) {
-        sprite = this.models[i];
+      for (var i = 0; i < this.sprites.models.length; i++) {
+        sprite = this.sprites.models[i];
         sprite._draw = sprite.update.call(sprite, dt);
       }
 
-      if (this.clearOnDraw)
+      if (this.attributes.clearOnDraw)
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 
       // Draw
-      for (var i = 0; i < this.models.length; i++) {
-        sprite = this.models[i];
+      for (var i = 0; i < this.sprites.models.length; i++) {
+        sprite = this.sprites.models[i];
         if (sprite._draw) sprite.draw.call(sprite, context);
       }
 
@@ -500,7 +509,7 @@
     onTap: function(e) {
       if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
           e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height)
-        this.trigger("pressed", e);
+        this.trigger("tap", e);
     },
     overlaps: Backbone.Sprite.prototype.overlaps,
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg

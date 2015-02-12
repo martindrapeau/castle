@@ -67,7 +67,7 @@
         y: 500,
         text: "New Game "
       });
-      this.newGame.on("pressed", function() {
+      this.newGame.on("tap", function() {
         gui.trigger("new");
       });
 
@@ -75,7 +75,7 @@
         y: 600,
         text: "Resume "
       });
-      this.resume.on("pressed", function() {
+      this.resume.on("tap", function() {
         gui.trigger("resume");
       });
 
