@@ -419,22 +419,31 @@
       y: 0,
       width: 0,
       height: 0,
-      borderRadius: 0,
+      // Image
       img: undefined,
       imgX: 0,
       imgY: 0,
       imgWidth: 0,
       imgHeight:0,
       imgMargin:0,
+      // Background
+      borderRadius: 0,
       backgroundColor: "rgba(160, 160, 160, {0})",
+      // Text
       text:  undefined,
       textPadding: 0,
-      textContextAttributes: undefined
+      textContextAttributes: undefined,
+      // Animated translation
+      targetX: undefined,
+      targetY: undefined,
+      easingTime: 1000,
+      easing: "linear"
     },
     initialize: function() {
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
       this.on("change:text change:textContextAttributes", this.clearTextMetrics);
+      this.on("change:targetX change:targetY", this.maybeStart);
     },
     clearTextMetrics: function() {
       if (this.textMetrics) this.textMetrics = undefined;
@@ -447,7 +456,39 @@
     onDetach: function() {
       this.stopListening(this.engine);
     },
+    maybeStart: function() {
+      if (typeof this.get("targetX") != "number" ||
+          typeof this.get("targetY") != "number")
+        return true;
+
+      this.startTime = _.now();
+      this.startX = this.get("x");
+      this.startY = this.get("y");
+
+      return this;
+    },
     update: function(dt) {
+      var targetX = this.get("targetX"),
+          targetY = this.get("targetY");
+      if (typeof targetX != "number" || typeof targetY != "number" || !this.startTime) return true;
+
+      var now = _.now(),
+          easingTime = this.get("easingTime");
+
+      if (now < this.startTime + easingTime) {
+        var easing = this.get("easing"),
+            factor = Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime);
+        this.set({
+          x: this.startX + factor * (targetX - this.startX),
+          y: this.startY + factor * (targetY - this.startY)
+        });
+      } else {
+        this.set({x: targetX, y: targetY}, {silent: true});
+        this.startTime = undefined;
+        this.startX = undefined;
+        this.startY = undefined;
+      }
+
       return true;
     },
     draw: function(context) {
@@ -651,5 +692,39 @@
       return _.titleize(String(str).replace(/[\W_]/g, ' ')).replace(/\s/g, '');
     }
   });
+
+  /*
+   * https://gist.github.com/gre/1650294
+   * Easing Functions - inspired from http://gizma.com/easing/
+   * only considering the t value for the range [0, 1] => [0, 1]
+   */
+  Backbone.EasingFunctions = {
+    // no easing, no acceleration
+    linear: function (t) { return t },
+    // accelerating from zero velocity
+    easeInQuad: function (t) { return t*t },
+    // decelerating to zero velocity
+    easeOutQuad: function (t) { return t*(2-t) },
+    // acceleration until halfway, then deceleration
+    easeInOutQuad: function (t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t },
+    // accelerating from zero velocity 
+    easeInCubic: function (t) { return t*t*t },
+    // decelerating to zero velocity 
+    easeOutCubic: function (t) { return (--t)*t*t+1 },
+    // acceleration until halfway, then deceleration 
+    easeInOutCubic: function (t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1 },
+    // accelerating from zero velocity 
+    easeInQuart: function (t) { return t*t*t*t },
+    // decelerating to zero velocity 
+    easeOutQuart: function (t) { return 1-(--t)*t*t*t },
+    // acceleration until halfway, then deceleration
+    easeInOutQuart: function (t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t },
+    // accelerating from zero velocity
+    easeInQuint: function (t) { return t*t*t*t*t },
+    // decelerating to zero velocity
+    easeOutQuint: function (t) { return 1+(--t)*t*t*t*t },
+    // acceleration until halfway, then deceleration 
+    easeInOutQuint: function (t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t }
+  };
 
 }).call(this);
