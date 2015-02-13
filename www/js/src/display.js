@@ -49,7 +49,7 @@
 
       return this;
     }
-  })
+  });
 
 	Backbone.Display = Backbone.Model.extend({
 		defaults: {
@@ -85,11 +85,11 @@
       });
 
       this.coin = new Backbone.ADollar({
-        x: x + 500, y: y
+        x: x + 460, y: y
       });
 
       this.clock = new Backbone.AClock({
-        x: x + 700, y: y
+        x: x + 660, y: y
       });
 
       var display = this;
@@ -145,7 +145,7 @@
       context.textAlign = "left";
 
       context.fillText(assets.coins, this.coin.get("x") + 60, 14);
-      context.fillText("1:10", this.clock.get("x") + 60, 14);
+      context.fillText(this.world.getHumanTime(), this.clock.get("x") + 60, 14);
 
     },
     getAssets: function() {

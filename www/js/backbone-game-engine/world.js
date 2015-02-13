@@ -22,7 +22,8 @@
       viewportTop: 0, viewportRight: 0, viewportBottom: 0, viewportLeft: 0,
       backgroundColor: "rgba(66, 66, 255, 1)",
       sprites: [], // Copy for persistence only. Use the direct member sprites which is a collection.
-      state: "play" // play or pause
+      state: "play", // play or pause
+      time: 0 // Time played in ms
     },
     shallowAttributes: [
       "x", "y", "width", "height", "tileWidth", "tileHeight", "backgroundColor",
@@ -39,7 +40,7 @@
       _.bindAll(this,
         "save", "getWorldIndex", "getWorldCol", "getWorldRow", "cloneAtPosition",
         "findAt", "filterAt", "spawnSprites", "height", "width", "add", "remove",
-        "setTimeout", "clearTimeout"
+        "setTimeout", "clearTimeout", "getHumanTime"
       );
 
       this.sprites = new Backbone.Collection();
@@ -51,6 +52,10 @@
 
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
+
+      this.accumTime = this.get("time");
+      this.on("change:state", this.onStateChange, this);
+      this.onStateChange();
     },
     height: function() {
       return this.get("height") * this.get("tileHeight");
@@ -79,6 +84,20 @@
         sprite.trigger("detach");
       });
       this.off("change:viewportLeft change:viewportRight change:viewportTop change:viewportBottom", this.updateViewport);
+    },
+    onStateChange: function() {
+      var state = this.get("state"),
+          now = _.now();
+
+      if (state == "pause") {
+        this.accumTime += (now - (this.startTime || now));
+        this.set("time", this.accumTime);
+      } else if (state == "play") {
+        this.startTime = now;
+      }
+    },
+    getHumanTime: function() {
+      return _.ms2time(this.attributes.time);
     },
     updateViewport: function() {
       this.viewport.width = this.engine.canvas.width - this.attributes.viewportLeft - this.attributes.viewportRight;
@@ -369,7 +388,10 @@
       this.drawBackground = this.drawBackground || this.lastX != this.attributes.x || this.lastY || this.attributes.y;
       this.lastX = this.attributes.x; this.lastY = this.attributes.y;
 
-      if (this.attributes.state == "play") this.handleTimeouts();
+      if (this.attributes.state == "play") {
+        this.handleTimeouts();
+        this.set({time: this.accumTime + (start - this.startTime)}, {silent: true});
+      }
 
       return true;
     },

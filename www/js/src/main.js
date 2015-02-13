@@ -62,7 +62,8 @@ $(window).on("load", function() {
       this.gui = new Backbone.Gui({
         img: "#title-screen"
       }, {
-        state: this.state
+        state: this.state,
+        world: this.world
       });
       this.gui.on("new", function() {
         this.play(true);

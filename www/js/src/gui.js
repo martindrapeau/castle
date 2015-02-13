@@ -40,12 +40,22 @@
       easing: "easeOutCubic",
       easingTime: 600
     }),
+    initialize: function(attributes, options) {
+      Backbone.Button.prototype.initialize.apply(this, arguments);
+      options || (options = {});
+      this.world = options.world;
+    },
+    onAttach: function() {
+      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      this.set("text", "Level " + this.world.get("level"));
+      this.hero = this.world.sprites.findWhere({hero: true});
+    },
     draw: function(context) {
       Backbone.Button.prototype.draw.apply(this, arguments);
       var x = this.get("x"),
           y = this.get("y"),
-          coins = 10,
-          time = "1h10m";
+          coins = this.hero ? this.hero.get("coins") : "?",
+          time = this.world ? this.world.getHumanTime() : "?";
       context.font = "30px arcade, Verdana, Arial, Sans-Serif";
       context.fillStyle = "#FFF";
       context.fillText(coins, x+80, y+105);
@@ -60,6 +70,7 @@
     initialize: function(attributes, options) {
       options || (options = {});
       this.state = options.state;
+      this.world = options.world;
 
       var gui = this;
       if (!this.img && this.attributes.img) this.spawnImg();
@@ -108,7 +119,9 @@
         gui.trigger("resume");
       });
 
-      this.highScore = new Backbone.HighScore();
+      this.highScore = new Backbone.HighScore({}, {
+        world: this.world
+      });
 
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
@@ -116,9 +129,9 @@
     onAttach: function() {
       this.onDetach();
 
-      this.engine.add([this.banner, this.touchStart, this.newGame, this.highScore]);
-      if (this.state.saved && !this.resume.ready)
-        this.engine.add(this.resume);
+      this.engine.add([this.banner, this.touchStart, this.newGame]);
+      if (this.state.saved)
+        this.engine.add([this.resume, this.highScore]);
 
       if (this.ready)
         setTimeout(this.showResume.bind(this), 100);
@@ -144,10 +157,6 @@
         targetX: this.touchStart.get("x"),
         targetY: 700
       });
-      this.highScore.set({
-        targetX: 720,
-        targetY: this.highScore.get("y")
-      });
       this.stopListening(this.engine);
       this.ready =  true;
     },
@@ -156,7 +165,10 @@
         targetX: -this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2,
         targetY: this.resume.get("y")
       });
-      this.resume.ready = true;
+      this.highScore.set({
+        targetX: 720,
+        targetY: this.highScore.get("y")
+      });
     },
     update: function(dt) {
       return true;
