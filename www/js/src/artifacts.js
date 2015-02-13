@@ -105,11 +105,17 @@
       isArtifact: true
     }),
     hit: function(sprite, dir, dir2) {
+      if (dir == "top" && sprite.get("isBreakableTile")) {
+        sprite.trigger("hit", this, "bottom");
+        return this;
+      }
+
       var opo = dir == "left" ? "right" : "left";
       if (sprite.get("hero")) {
         sprite.trigger("hit", this, opo);
         return this.knockout(sprite, "left");
       }
+
       return this;
     },
     knockout: function(sprite, dir) {
@@ -176,8 +182,18 @@
       Backbone.Object.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "endHit");
       this.explosion = new Backbone.Explosion();
+      this.artifacts = [];
+      if (this.attributes.artifact)
+        this.artifacts.push(new Backbone[_.classify(this.attributes.artifact)]());
     },
     hit: function(sprite, dir, dir2) {
+      if (dir == "bottom") {
+        // Absorb the sprite
+        this.artifacts.push(sprite);
+        this.world.remove(sprite);
+        return this;
+      }
+
       if (!sprite || !sprite.get("hero") || dir2 != "attack") return;
       if (this.get("state") != "idle") return;
 
@@ -188,6 +204,7 @@
         y: this.get("y")
       });
       this.world.add(this.explosion);
+      return this;
     },
     endHit: function() {
       this.set({
@@ -199,10 +216,9 @@
             y = this.get("y"),
             artifact = this.get("artifact");
         this.trigger("exploded");
-        if (artifact) {
-          var instance = new Backbone[_.classify(artifact)]({x: x, y: y});
-          this.world.add(instance);
-          this.trigger("artifact", instance);
+        for (var a = 0; a < this.artifacts.length; a++) {
+          this.artifacts[a].set({x: x, y: y});
+          this.world.add(this.artifacts[a]);
         }
         this.explosion.set({x: x, y: y});
         this.world.remove(this.explosion);

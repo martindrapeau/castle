@@ -136,14 +136,15 @@
       if (this.ready)
         setTimeout(this.showResume.bind(this), 100);
       else
-        this.listenTo(this.engine, "tap", this.onTap);
+        this.listenTo(this.engine, "tap", this.onTouchToStart);
     },
     onDetach: function() {
       this.stopListening(this.engine);
       this.engine.remove([this.banner, this.touchStart, this.newGame, this.highScore, this.resume]);
     },
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg,
-    onTap: function(e) {
+    onTouchToStart: function(e) {
+      // Animate some stuff
       this.newGame.set({
         targetX: -this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2,
         targetY: this.newGame.get("y")

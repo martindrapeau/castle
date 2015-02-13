@@ -110,6 +110,13 @@
       aiDelay: 500
     }),
     animations: animations,
+    hit: function(sprite, dir, dir2) {
+      if (dir == "top" && sprite.get("isBreakableTile")) {
+        sprite.trigger("hit", this, "bottom");
+        return this;
+      }
+      return Backbone.Character.prototype.hit.apply(this, arguments);
+    },
     onBeforeFall: function(condition) {
       var cur = this.getStateInfo();
       if (cur.mov2 == "hurt") return this;

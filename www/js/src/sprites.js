@@ -95,6 +95,7 @@
     update: function(dt) {
       // Movements are only possible inside a world
       if (!this.world) return true;
+      this.cancelUpdate = false;
 
       // Velocity and state
       var yVelocity = this.get("yVelocity") || 0,
@@ -141,6 +142,9 @@
             this.world.remove(this);
             return false;
           }
+
+          if (bottomCharacater) bottomCharacater.trigger("hit", this, "top");
+          if (this.cancelUpdate) return this;
 
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;

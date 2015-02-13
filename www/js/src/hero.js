@@ -278,20 +278,20 @@
         if (cur.mov == "jump") {
             // Update next step
             if (dirIntent != cur.dir && velocity)
-              attrs.nextState = this.buildState("skid", opoIntent);
+              attrs.nextState = this.buildState("skid", cur.mov2, opoIntent);
             else
-              attrs.nextState = this.buildState(run ? "run" : "walk", dirIntent);
+              attrs.nextState = this.buildState(run ? "run" : "walk", cur.mov2, dirIntent);
           } else if (cur.dir == dirIntent || cur.mov == "idle") {
             // Start walking or running
-            attrs.state = this.buildState(run ? "run" : "walk", dirIntent);
+            attrs.state = this.buildState(run ? "run" : "walk", cur.mov2, dirIntent);
             var animation = this.getAnimation(attrs.state);
             if (animation.minVelocity && Math.abs(velocity) < Math.abs(animation.minVelocity))
               attrs.velocity = animation.minVelocity;
             this.startWalk = now;
           } else if (cur.dir == opoIntent) {
             // Skid trying to stop before turning
-            attrs.state = this.buildState("skid", opoIntent);
-            attrs.nextState = this.buildState(run ? "run" : "walk", dirIntent);
+            attrs.state = this.buildState("skid", cur.mov2, opoIntent);
+            attrs.nextState = this.buildState(run ? "run" : "walk", cur.mov2, dirIntent);
           }
         } else if (opoPressed) {
         // Depressed but opposite direction still pressed. Intent = turnaround.
@@ -300,10 +300,10 @@
       } else {
         // Depressed. Intent = stop to idle
         if (cur.mov == "jump") {
-          attrs.nextState = this.buildState("release", dirIntent);
+          attrs.nextState = this.buildState("release", cur.mov2, dirIntent);
         } else {
-          attrs.state = this.buildState("release", dirIntent);
-          attrs.nextState = this.buildState("idle", dirIntent);
+          attrs.state = this.buildState("release", cur.mov2, dirIntent);
+          attrs.nextState = this.buildState("idle", cur.mov2, dirIntent);
           if (now < this.startWalk + 250)
             attrs.velocity = velocity = velocity * 0.5;
         }
@@ -332,10 +332,11 @@
       } else if (mode == "attack") {
         if (pressed && cur.mov2 != "attack") {
           this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
+          this.cancelUpdate = true;
           this.world.setTimeout(this.midAttack, 200);
-        }
-        else if (!pressed && cur.mov2 == "attack")
+        } else if (!pressed && cur.mov2 == "attack") {
           this.endAttack();
+        }
       }
 
       return this;
@@ -355,9 +356,13 @@
       return this;
     },
     endAttack: function() {
-      var cur = this.getStateInfo();
+      var cur = this.getStateInfo(),
+          attrs = {state: this.buildState(cur.mov, cur.dir)},
+          nextState = this.get("nextState"),
+          nex = nextState ? this.getStateInfo(nextState) : null;
+      if (nextState) attrs.nextState = this.buildState(nex.mov, nex.dir);
       this.whenAnimationEnds = null;
-      this.set("state", this.buildState(cur.mov, cur.dir));
+      this.set(attrs);
       return this;
     },
     knockout: function(sprite, dir) {
@@ -458,7 +463,7 @@
 
       if (this.input && this.input.buttonAPressed() && cur.mov != "jump") {
         // Set new state (keep old as next)
-        attrs.state = this.buildState("jump", cur.dir);
+        attrs.state = this.buildState("jump", cur.mov2, cur.dir);
         attrs.nextState = state;
 
         // Determine vertical velocity as a factor of horizontal velocity
@@ -650,11 +655,11 @@
           updateHeroTopBottom();
           attrs.state = nextState;
           if (nex.move == "walk" || nex.move == "run")
-            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", nex.dir);
+            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", cur.mov2, nex.dir);
           else if (nex.mov == "skid")
-            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", nex.opo);
+            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", cur.mov2, nex.opo);
           else if(nex.mov == "release")
-            attrs.nextState = hero.buildState("idle", nex.dir);
+            attrs.nextState = hero.buildState("idle", cur.mov2, nex.dir);
           else if (nex.mov == "dead") {
             attrs.velocity = velocity = 0;
           }
