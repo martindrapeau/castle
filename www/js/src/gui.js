@@ -20,6 +20,39 @@
     })
   });
 
+  Backbone.HighScore = Backbone.Button.extend({
+    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+      x: 960,
+      y: 400,
+      width: 333,
+      height: 80,
+      backgroundColor: "transparent",
+      img: "#artifacts", imgX: 0, imgY: 763, imgWidth: 333, imgHeight: 247, imgMargin: 0,
+      text: "High Score",
+      textPadding: 24,
+      textContextAttributes: {
+        fillStyle: "#F67D00",
+        font: "34px arcade, Verdana, Arial, Sans-Serif",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "left"
+      },
+      easing: "easeOutCubic",
+      easingTime: 600
+    }),
+    draw: function(context) {
+      Backbone.Button.prototype.draw.apply(this, arguments);
+      var x = this.get("x"),
+          y = this.get("y"),
+          coins = 10,
+          time = "1h10m";
+      context.font = "30px arcade, Verdana, Arial, Sans-Serif";
+      context.fillStyle = "#FFF";
+      context.fillText(coins, x+80, y+105);
+      context.fillText(time, x+80, y+170);
+    }
+  });
+
 	Backbone.Gui = Backbone.Model.extend({
     defaults: {
       img: undefined
@@ -60,7 +93,7 @@
       });
 
       this.newGame = new Backbone.PullOutButton({
-        y: 500,
+        y: 300,
         text: "New Game "
       });
       this.newGame.on("tap", function() {
@@ -68,12 +101,14 @@
       });
 
       this.resume = new Backbone.PullOutButton({
-        y: 600,
+        y: 400,
         text: "Resume "
       });
       this.resume.on("tap", function() {
         gui.trigger("resume");
       });
+
+      this.highScore = new Backbone.HighScore();
 
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
@@ -81,7 +116,7 @@
     onAttach: function() {
       this.onDetach();
 
-      this.engine.add([this.banner, this.touchStart, this.newGame]);
+      this.engine.add([this.banner, this.touchStart, this.newGame, this.highScore]);
       if (this.state.saved && !this.resume.ready)
         this.engine.add(this.resume);
 
@@ -92,7 +127,7 @@
     },
     onDetach: function() {
       this.stopListening(this.engine);
-      this.engine.remove([this.banner, this.touchStart, this.newGame, this.resume]);
+      this.engine.remove([this.banner, this.touchStart, this.newGame, this.highScore, this.resume]);
     },
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg,
     onTap: function(e) {
@@ -108,6 +143,10 @@
       this.touchStart.set({
         targetX: this.touchStart.get("x"),
         targetY: 700
+      });
+      this.highScore.set({
+        targetX: 720,
+        targetY: this.highScore.get("y")
       });
       this.stopListening(this.engine);
       this.ready =  true;
