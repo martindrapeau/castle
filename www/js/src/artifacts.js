@@ -82,7 +82,7 @@
           text = this.get("text");
 
       context.fillStyle = "#E3BC70";
-      context.font = "24px arcade, Verdana, Arial, Sans-Serif";
+      context.font = "24px arcade";
       context.textBaseline = "top";
       context.fontWeight = "normal";
       context.textAlign = "center";

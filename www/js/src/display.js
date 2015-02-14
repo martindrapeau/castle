@@ -139,7 +139,7 @@
         this.bluePotion.draw.apply(this.bluePotion, arguments);
 
       context.fillStyle = "#FFFF";
-      context.font = "32px arcade, Verdana, Arial, Sans-Serif";
+      context.font = "32px arcade";
       context.textBaseline = "top";
       context.fontWeight = "normal";
       context.textAlign = "left";

@@ -154,6 +154,6 @@ $(window).on("load", function() {
   });
 
   // Ensure the canvas is always visible and centered
-  if (typeof window.CocoonJS == "undefined")
+  if (!navigator.isCocoonJS)
     adjustViewport(canvas, canvas.width, canvas.height);
 });

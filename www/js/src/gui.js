@@ -11,7 +11,7 @@
       textPadding: 12,
       textContextAttributes: {
         fillStyle: "#F67D00",
-        font: "40px arcade, Verdana, Arial, Sans-Serif",
+        font: "40px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
         textAlign: "center"
@@ -31,7 +31,7 @@
       textPadding: 12,
       textContextAttributes: {
         fillStyle: "#F67D00",
-        font: "34px arcade, Verdana, Arial, Sans-Serif",
+        font: "34px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
         textAlign: "right"
@@ -53,7 +53,7 @@
       textPadding: 24,
       textContextAttributes: {
         fillStyle: "#F67D00",
-        font: "34px arcade, Verdana, Arial, Sans-Serif",
+        font: "34px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
         textAlign: "left"
@@ -76,7 +76,7 @@
           y = this.get("y"),
           coins = this.hero ? this.hero.get("coins") : "?",
           time = this.world ? this.world.getHumanTime() : "?";
-      context.font = "30px arcade, Verdana, Arial, Sans-Serif";
+      context.font = "30px arcade";
       context.fillStyle = "#FFF";
       context.fillText(coins, x+80, y+105);
       context.fillText(time, x+80, y+170);
@@ -95,7 +95,7 @@
       textPadding: 24,
       textContextAttributes: {
         fillStyle: "#F67D00",
-        font: "34px arcade, Verdana, Arial, Sans-Serif",
+        font: "34px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
         textAlign: "center"
@@ -157,6 +157,7 @@
 
       this.loading = new Backbone.LabelButton({
         text: "Loading...",
+        easingTime: 300,
         opacity: 0
       });
 
@@ -164,17 +165,13 @@
         y: 300,
         text: "New Game "
       });
-      this.newGame.on("tap", function() {
-        gui.trigger("new");
-      });
+      this.newGame.on("tap", _.partial(this.play, "new"), this);
 
       this.resume = new Backbone.PullOutButton({
         y: 420,
         text: "Resume "
       });
-      this.resume.on("tap", function() {
-        gui.trigger("resume");
-      });
+      this.resume.on("tap", _.partial(this.play, "resume"), this);
 
       this.showCredits = new Backbone.PullOutButton({
         y: 540,
@@ -223,6 +220,7 @@
         this.resume.moveTo(-this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2, this.resume.get("y"));
         this.savedGame.moveTo(720, this.savedGame.get("y"));
       }
+      this.loading.set("opacity", 0);
     },
     hideButtons: function() {
       this.newGame.moveTo(-this.newGame.get("width"), this.newGame.get("y"));
@@ -241,6 +239,15 @@
       this.panel.moveTo(this.panel.get("x"), 720);
       this.panel = undefined;
       this.showButtons();
+    },
+    play: function(event) {
+      var gui = this;
+      this.loading.fadeIn();
+      this.hideButtons();
+      console.log(event);
+      setTimeout(function() {
+        gui.trigger(event);
+      }, 600);
     },
     update: function(dt) {
       return true;
