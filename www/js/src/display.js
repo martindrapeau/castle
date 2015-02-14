@@ -138,7 +138,7 @@
       else if (assets.potion == "blue")
         this.bluePotion.draw.apply(this.bluePotion, arguments);
 
-      context.fillStyle = "#FFFF";
+      context.fillStyle = "#FFF";
       context.font = "32px arcade";
       context.textBaseline = "top";
       context.fontWeight = "normal";

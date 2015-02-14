@@ -1,4 +1,6 @@
 $(window).on("load", function() {
+
+  var ENV = navigator.isCocoonJS ? "prod" : "dev";
   
   var canvas = document.getElementById("foreground"),
       context = canvas.getContext("2d"),
@@ -19,7 +21,7 @@ $(window).on("load", function() {
       this.spriteSheets = new Backbone.SpriteSheetCollection(Backbone.spriteSheetDefinitions).attachToSpriteClasses();
 
       // Create the debug panel
-      this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
+      this.debugPanel = ENV == "dev" ? new Backbone.DebugPanel({}, {color: "#fff"}) : null;
 
       // User input (turn off touchpad to start)
       this.input = new Backbone.Input({
@@ -75,7 +77,7 @@ $(window).on("load", function() {
         canvas: canvas,
         debugPanel: this.debugPanel
       });
-      this.engine.add(this.debugPanel);
+      if (this.debugPanel) this.engine.add(this.debugPanel);
 
       // Controls
       $(document).on("keypress.Controller", function(e) {
@@ -89,12 +91,12 @@ $(window).on("load", function() {
     },
     play: function(newGame) {
       this.engine.stop();
-      this.engine.remove([
-        this.gui,
-        this.debugPanel
-      ]);
+      this.engine.remove(this.gui);
 
-      this.debugPanel.clear();
+      if (this.debugPanel) {
+        this.engine.remove(this.debugPanel);
+        this.debugPanel.clear();
+      }
 
       if (newGame || !this.state.saved) {
         this.world.set(Backbone.levels[0]);
@@ -108,9 +110,9 @@ $(window).on("load", function() {
         this.camera,
         this.pauseButton,
         this.message,
-        this.input,
-        this.debugPanel
+        this.input
       ]);
+      if (this.debugPanel) this.engine.add(this.debugPanel);
       this.engine.set("clearOnDraw", false);
       this.world.set("state", "play");
       this.engine.start();
@@ -127,16 +129,15 @@ $(window).on("load", function() {
         this.camera,
         this.pauseButton,
         this.message,
-        this.input,
-        this.debugPanel
+        this.input
       ]);
+      if (this.debugPanel) {
+        this.engine.remove(this.debugPanel);
+        this.debugPanel.clear();
+      }
 
-      this.debugPanel.clear();
-
-      this.engine.add([
-        this.gui,
-        this.debugPanel
-      ]);
+      this.engine.add(this.gui);
+      if (this.debugPanel) this.engine.add(this.debugPanel);
       this.engine.set("clearOnDraw", true);
       this.engine.start();
 
