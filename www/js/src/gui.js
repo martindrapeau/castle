@@ -1,5 +1,26 @@
 (function() {
 
+  Backbone.LabelButton = Backbone.Button.extend({
+    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+      x: 400,
+      y: 400,
+      width: 160,
+      height: 100,
+      backgroundColor: "transparent",
+      text: "",
+      textPadding: 12,
+      textContextAttributes: {
+        fillStyle: "#F67D00",
+        font: "40px arcade, Verdana, Arial, Sans-Serif",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "center"
+      },
+      easing: "easeInCubic",
+      easingTime: 400
+    })
+  });
+
   Backbone.PullOutButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: -372,
@@ -50,8 +71,7 @@
       this.set("text", "Level " + this.world.get("level"));
       this.hero = this.world.sprites.findWhere({hero: true});
     },
-    draw: function(context) {
-      Backbone.Button.prototype.draw.apply(this, arguments);
+    onDraw: function(context) {
       var x = this.get("x"),
           y = this.get("y"),
           coins = this.hero ? this.hero.get("coins") : "?",
@@ -89,13 +109,13 @@
     defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
       text: "Credits"
     }),
-    draw: function(context) {
-      Backbone.Panel.prototype.draw.apply(this, arguments);
+    onDraw: function(context) {
       var x = this.get("x"),
           y = this.get("y");
 
+      // TO DO...
     }
-  })
+  });
 
   /*
     --Credits--
@@ -131,23 +151,13 @@
         easingTime: 400
       });
 
-      this.touchStart = new Backbone.Button({
-        x: 400,
-        y: 400,
-        width: 160,
-        height: 100,
-        backgroundColor: "transparent",
-        text: "Touch to start",
-        textPadding: 12,
-        textContextAttributes: {
-          fillStyle: "#F67D00",
-          font: "40px arcade, Verdana, Arial, Sans-Serif",
-          textBaseline: "middle",
-          fontWeight: "normal",
-          textAlign: "center"
-        },
-        easing: "easeInCubic",
-        easingTime: 400
+      this.touchStart = new Backbone.LabelButton({
+        text: "Touch to start"
+      });
+
+      this.loading = new Backbone.LabelButton({
+        text: "Loading...",
+        opacity: 0
       });
 
       this.newGame = new Backbone.PullOutButton({
@@ -185,7 +195,7 @@
     onAttach: function() {
       this.onDetach();
 
-      this.engine.add([this.banner, this.touchStart, this.newGame, this.showCredits, this.credits]);
+      this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits]);
       if (this.state.saved)
         this.engine.add([this.resume, this.savedGame]);
 
@@ -196,63 +206,39 @@
     },
     onDetach: function() {
       this.stopListening(this.engine);
-      this.engine.remove([this.banner, this.touchStart, this.newGame, this.showCredits, this.credits, this.savedGame, this.resume]);
+      this.engine.remove([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.savedGame, this.resume]);
     },
     onTouchStart: function(e) {
       // Animate some stuff
-      this.banner.set({
-        targetX: this.banner.get("x"),
-        targetY: 50
-      });
-      this.touchStart.set({
-        targetX: this.touchStart.get("x"),
-        targetY: 700
-      });
+      this.banner.moveTo(this.banner.get("x"), 50);
+      this.touchStart.moveTo(this.touchStart.get("x"), 700);
       this.stopListening(this.engine);
       this.ready =  true;
       this.showButtons();
     },
     showButtons: function() {
-      this.newGame.set({
-        targetX: -this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2,
-        targetY: this.newGame.get("y")
-      });
-      this.showCredits.set({
-        targetX: -this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2,
-        targetY: this.showCredits.get("y")
-      });
+      this.newGame.moveTo(-this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2, this.newGame.get("y"));
+      this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
       if (this.state.saved) {
-        this.resume.set({
-          targetX: -this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2,
-          targetY: this.resume.get("y")
-        });
-        this.savedGame.set({
-          targetX: 720,
-          targetY: this.savedGame.get("y")
-        });
+        this.resume.moveTo(-this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2, this.resume.get("y"));
+        this.savedGame.moveTo(720, this.savedGame.get("y"));
       }
     },
     hideButtons: function() {
-      this.newGame.set("targetX", -this.newGame.get("width"));
-      this.showCredits.set("targetX", -this.showCredits.get("width"));
-      this.resume.set("targetX", -this.resume.get("width"));
-      this.savedGame.set("targetX", 960);
+      this.newGame.moveTo(-this.newGame.get("width"), this.newGame.get("y"));
+      this.showCredits.moveTo(-this.showCredits.get("width"), this.showCredits.get("y"));
+      this.resume.moveTo(-this.resume.get("width"), this.resume.get("y"));
+      this.savedGame.moveTo(960, this.savedGame.get("y"));
     },
     showPanel: function(panel) {
       this.panel = panel;
-      this.panel.set({
-        targetX: this.panel.get("x"),
-        targetY: 200
-      });
+      this.panel.moveTo(this.panel.get("x"), 200);
       this.hideButtons();
       this.listenTo(this.engine, "tap", this.hidePanel);
     },
     hidePanel: function() {
       this.stopListening(this.engine);
-      this.panel.set({
-        targetX: this.panel.get("x"),
-        targetY: 720
-      });
+      this.panel.moveTo(this.panel.get("x"), 720);
       this.panel = undefined;
       this.showButtons();
     },

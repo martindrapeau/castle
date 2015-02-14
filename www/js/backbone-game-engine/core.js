@@ -238,6 +238,7 @@
     }
   });
 
+
   // Engine class; a Backbone Model which wraps a Backbone Collection of
   // models that have the required update and draw methods. Will draw them
   // on an HTML5 canvas.
@@ -252,7 +253,10 @@
       this.canvas = options.canvas;
       this.debugPanel = options.debugPanel;
 
-      _.bindAll(this, "add", "remove", "start", "stop", "toggle", "onAnimationFrame", "onTap", "onKey");
+      _.bindAll(this,
+        "add", "remove", "start", "stop", "toggle", "onAnimationFrame",
+        "onTouchStart", "onTouchEnd", "onTouchMove", "onKey"
+      );
 
       if (!this.canvas || typeof this.canvas.getContext !== "function")
         throw new Error("Missing or invalid canvas.");
@@ -292,10 +296,19 @@
         sprite.engine = engine;
       });
 
-      if (window.Hammer) {
-        if (!this.hammertime) this.hammertime = Hammer(document);
-        this.hammertime.on("tap", this.onTap);
-      }
+      // Touch (triggers tap event)
+      this.touchStarted = false;
+      this.currX = this.cachedX = 0;
+      this.currY = this.cachedY = 0;
+      $(document).on("touchstart.engine", this.onTouchStart);
+      $(document).on("mousedown.engine", this.onTouchStart);
+      $(document).on("touchend.engine", this.onTouchEnd);
+      $(document).on("mouseup.engine", this.onTouchEnd);
+      $(document).on("touchcancel.engine", this.onTouchEnd);
+      $(document).on("touchmove.engine", this.onTouchMove);
+      $(document).on("mousemove.engine", this.onTouchMove);
+
+      // Keyboard (triggers key event)
       $(document).on("keyup.engine", this.onKey);
 
       // For the trigger of reset event
@@ -379,12 +392,42 @@
       if (this.debugPanel) this.debugPanel.set({fps: this.fps, ct: this.cycleTime});
       return this;
     },
-    onTap: function(e) {
-      e.canvas = this.canvas;
-      e.canvasX = e.gesture.center.clientX - this.canvas.offsetLeft + this.canvas.scrollLeft;
-      e.canvasY = e.gesture.center.clientY - this.canvas.offsetTop + this.canvas.scrollTop;
-      this.trigger("tap", e);
+
+    // Handle touch and trigger tap event
+    getPointerEvent: function(e) {
+      return e.targetTouches ? e.targetTouches[0] : e;
     },
+    onTouchStart: function(e) {
+      e.preventDefault(); 
+      var pointer = this.getPointerEvent(e);
+      this.cachedX = this.currX = pointer.pageX;
+      this.cachedY = this.currY = pointer.pageY;
+
+      touchStarted = true;
+
+      var engine = this;
+      setTimeout(function (){
+        if ((engine.cachedX === engine.currX) && !engine.touchStarted && (engine.cachedY === engine.currY)) {
+          e.canvas = engine.canvas;
+          e.canvasX = pointer.pageX - engine.canvas.offsetLeft + engine.canvas.scrollLeft;
+          e.canvasY = pointer.pageY - engine.canvas.offsetTop + engine.canvas.scrollTop;
+          engine.trigger("tap", e);
+        }
+      }, 200);
+    },
+    onTouchEnd: function(e) {
+      e.preventDefault();
+      this.touchStarted = false;
+    },
+    onTouchMove: function(e) {
+      if (!this.touchStarted) return;
+      e.preventDefault();
+      var pointer = this.getPointerEvent(e);
+      this.currX = pointer.pageX;
+      this.currY = pointer.pageY;
+    },
+
+    // Handle keyboard and trigger key event
     onKey: function(e) {
       e.canvas = this.canvas;
       this.trigger("key", e);
@@ -433,17 +476,15 @@
       text:  undefined,
       textPadding: 0,
       textContextAttributes: undefined,
-      // Animated translation
-      targetX: undefined,
-      targetY: undefined,
+      // Animations
       easingTime: 1000,
-      easing: "linear"
+      easing: "linear",
+      opacity: 1
     },
     initialize: function() {
       this.on("attach", this.onAttach);
       this.on("detach", this.onDetach);
       this.on("change:text change:textContextAttributes", this.clearTextMetrics);
-      this.on("change:targetX change:targetY", this.maybeStart);
     },
     clearTextMetrics: function() {
       if (this.textMetrics) this.textMetrics = undefined;
@@ -456,48 +497,83 @@
     onDetach: function() {
       this.stopListening(this.engine);
     },
-    maybeStart: function() {
-      if (typeof this.get("targetX") != "number" ||
-          typeof this.get("targetY") != "number")
-        return true;
-
+    moveTo: function(x, y) {
+      this.animation = "move";
       this.startTime = _.now();
       this.startX = this.get("x");
       this.startY = this.get("y");
-
-      return this;
+      this.targetX = x;
+      this.targetY = y;
+    },
+    fadeIn: function() {
+      this.animation = "fadeIn";
+      this.startTime = _.now();
+      this.set("opacity", 0);
+    },
+    fadeOut: function() {
+      this.animation = "fadeOut";
+      this.startTime = _.now();
+      this.set("opacity", 1);
     },
     update: function(dt) {
-      var targetX = this.get("targetX"),
-          targetY = this.get("targetY");
-      if (typeof targetX != "number" || typeof targetY != "number" || !this.startTime) return true;
-
       var now = _.now(),
-          easingTime = this.get("easingTime");
+          easingTime = this.get("easingTime"),
+          easing = this.get("easing");
 
-      if (now < this.startTime + easingTime) {
-        var easing = this.get("easing"),
-            factor = Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime);
-        this.set({
-          x: this.startX + factor * (targetX - this.startX),
-          y: this.startY + factor * (targetY - this.startY)
-        });
-      } else {
-        this.set({x: targetX, y: targetY}, {silent: true});
-        this.startTime = undefined;
-        this.startX = undefined;
-        this.startY = undefined;
+      switch (this.animation) {
+        case "move":
+          if (now < this.startTime + easingTime) {
+            var factor = Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime);
+            this.set({
+              x: this.startX + factor * (this.targetX - this.startX),
+              y: this.startY + factor * (this.targetY - this.startY)
+            });
+          } else {
+            this.set({x: this.targetX, y: this.targetY}, {silent: true});
+            this.trigger("end", this, this.animation);
+            this.animation = undefined;
+            this.startTime = undefined;
+            this.startX = undefined;
+            this.startY = undefined;
+            this.targetX = undefined;
+            this.targetY = undefined;
+          }
+          break;
+
+        case "fadeIn":
+          if (now < this.startTime + easingTime) {
+            this.set("opacity", Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
+          } else {
+            this.set("opacity", 1);
+            this.trigger("end", this, this.animation);
+            this.animation = undefined;
+            this.startTime = undefined;
+          }
+          break;
+
+        case "fadeOut":
+          if (now < this.startTime + easingTime) {
+            this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
+          } else {
+            this.set("opacity", 0);
+            this.trigger("end", this, this.animation);
+            this.animation = undefined;
+            this.startTime = undefined;
+          }
+          break;
       }
 
       return true;
     },
     draw: function(context) {
-      var pressed = false,
-          opacity = pressed ? 1 : 0.8,
-          b = this.toJSON();
+      var b = this.toJSON();
+
+      context.save();
+
+      context.globalAlpha = b.opacity;
 
       if (b.backgroundColor && b.backgroundColor != "transparent") {
-        var fillStyle = (b.backgroundColor).replace("{0}", opacity);
+        var fillStyle = b.backgroundColor;
         drawRoundRect(context, b.x, b.y, b.width, b.height, b.borderRadius, fillStyle, false);
       }
 
@@ -544,6 +620,10 @@
         if (!this.textMetrics)
           this.textMetrics = context.measureText(text);
       }
+
+      if (typeof this.onDraw == "function") this.onDraw(context);
+
+      context.restore();
 
       return this;
     },

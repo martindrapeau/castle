@@ -191,11 +191,13 @@
       });
 
       this.backgroundCanvas = document.createElement("canvas");
+      this.backgroundCanvas.screencanvas = false;
       this.backgroundCanvas.style.display = "none";
       document.body.appendChild(this.backgroundCanvas);
       this.backgroundContext = this.backgroundCanvas.getContext("2d");
 
       this.previewCanvas = document.createElement("canvas");
+      this.previewCanvas.screencanvas = false;
       this.previewCanvas.style.display = "none";
       this.previewCanvas.width = 300;
       this.previewCanvas.height = 180;
