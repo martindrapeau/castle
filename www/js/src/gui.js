@@ -146,7 +146,7 @@
         x: 0, y: 240,
         width: 960, height: 145,
         backgroundColor: "transparent",
-        img: "#artifacts", imgX: 0, imgY: 618, imgWidth: 960, imgHeight: 145, imgMargin: 5,
+        img: "#artifacts", imgX: 0, imgY: 618, imgWidth: 960, imgHeight: 144, imgMargin: 5,
         easing: "easeInOutQuad",
         easingTime: 400
       });
@@ -192,9 +192,7 @@
     onAttach: function() {
       this.onDetach();
 
-      this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits]);
-      if (this.state.saved)
-        this.engine.add([this.resume, this.savedGame]);
+      this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.resume, this.savedGame]);
 
       if (this.ready)
         setTimeout(this.showButtons.bind(this), 100);
@@ -214,10 +212,10 @@
       this.showButtons();
     },
     showButtons: function() {
-      this.newGame.moveTo(-this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*4, this.newGame.get("y"));
-      this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*4, this.showCredits.get("y"));
+      this.newGame.moveTo(-155, this.newGame.get("y"));
+      this.showCredits.moveTo(-215, this.showCredits.get("y"));
       if (this.state.saved) {
-        this.resume.moveTo(-this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2, this.resume.get("y"));
+        this.resume.moveTo(-208, this.resume.get("y"));
         this.savedGame.moveTo(720, this.savedGame.get("y"));
       }
       this.loading.set("opacity", 0);

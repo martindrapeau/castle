@@ -10,9 +10,9 @@
    */
 
   var left = 0,
-      right = 900,
-      top = 0,
-      bottom = 660;
+      right = 960,
+      too = 0,
+      bottom = 720;
 
   // Input class; a Backbone Model which captures input events
   // and stores them as model attributes with true if pressed.
@@ -40,60 +40,76 @@
     // Touch pad buttons to draw on screen
     touchButtons: [{
       button: "left",
-      x: left, y: bottom-100,
-      width: 120,  height: 150,
+      x: 0, y: bottom-160,
+      width: 160,  height: 160,
       draw: function(context, pressed) {
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(64, 64, 64, 0.5)");
         context.save();
         context.beginPath();
-        context.moveTo(100, context.canvas.height-40-90);
-        context.lineTo(40, context.canvas.height-40-50);
-        context.lineTo(100, context.canvas.height-40-10);
+        context.moveTo(130, context.canvas.height-140);
+        context.lineTo(40, context.canvas.height-80);
+        context.lineTo(130, context.canvas.height-20);
+        context.lineTo(100, context.canvas.height-80);
+        context.lineTo(130, context.canvas.height-140);
+        context.lineJoin = 'bevel';
         context.fillStyle = pressed ? "#00FF00" : "#009900";
         context.fill();
+        context.lineWidth = 5;
+        context.strokeStyle = '#000';
+        context.stroke();
         context.restore();
       }
     }, {
       button: "right",
-      x: 120, y: bottom-100,
-      width: 120,  height: 150,
+      x: 160, y: bottom-160,
+      width: 160,  height: 160,
       draw: function(context, pressed) {
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(128, 128, 128, 0.5)");
         context.save();
         context.beginPath();
-        context.moveTo(140, context.canvas.height-40-90);
-        context.lineTo(200, context.canvas.height-40-50);
-        context.lineTo(140, context.canvas.height-40-10);
+        context.moveTo(190, context.canvas.height-140);
+        context.lineTo(280, context.canvas.height-80);
+        context.lineTo(190, context.canvas.height-20);
+        context.lineTo(210, context.canvas.height-80);
+        context.lineTo(190, context.canvas.height-140);
+        context.lineJoin = 'bevel';
         context.fillStyle = pressed ? "#00FF00" : "#009900";
         context.fill();
+        context.lineWidth = 5;
+        context.strokeStyle = '#000';
+        context.stroke();
         context.restore();
       }
     }, {
       button: "buttonB",
-      x: right-240, y: bottom-100,
-      width: 150,  height: 150,
+      x: right-160, y: bottom-160,
+      width: 160,  height: 160,
       draw: function(context, pressed) {
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(192, 192, 192, 0.5)");
         context.save();
         context.beginPath();
-        context.arc(context.canvas.width-60-140, context.canvas.height-40-50, 40, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-240, context.canvas.height-80, 60, 0, 2*Math.PI, false);
         context.fillStyle = pressed ? "#FF0000" : "#990000";
         context.fill();
-        drawButtonLabel(context, "B", context.canvas.width-60-140, context.canvas.height-40-50);
+        context.lineWidth = 5;
+        context.strokeStyle = '#000';
+        context.stroke();
         context.restore();
       }
     }, {
       button: "buttonA",
-      x: right-90, y: bottom-100,
-      width: 150,  height: 150,
+      x: right-320, y: bottom-160,
+      width: 160,  height: 160,
       draw: function(context, pressed) {
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(255, 255, 255, 0.5)");
         context.save();
         context.beginPath();
-        context.arc(context.canvas.width-60-40, context.canvas.height-40-50, 40, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-80, context.canvas.height-80, 60, 0, 2*Math.PI, false);
         context.fillStyle = pressed ? "#0000FF" : "#000099";
         context.fill();
-        drawButtonLabel(context, "A", context.canvas.width-60-40, context.canvas.height-40-50);
+        context.lineWidth = 5;
+        context.strokeStyle = '#000';
+        context.stroke();
         context.restore();
       }
     }, {
@@ -166,18 +182,18 @@
             button.x = (canvas.width - 60)/2 - 90;
             break;
           case "buttonA":
-            button.x = canvas.width - 60 - 90;
+            button.x = canvas.width - 160;
             break;
           case "buttonB":
-            button.x = canvas.width - 60 - 240;
+            button.x = canvas.width - 320;
             break;
         }
         switch (button.button) {
           case "pause":
-            button.y = canvas.height - 40 - 80;
+            button.y = canvas.height - 140;
             break;
           default:
-            button.y = canvas.height - 40 - 100;
+            button.y = canvas.height - 160;
         }
       });
 
