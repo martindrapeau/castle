@@ -471,7 +471,7 @@
       imgMargin:0,
       // Background
       borderRadius: 0,
-      backgroundColor: "rgba(160, 160, 160, {0})",
+      backgroundColor: "rgba(160, 160, 160, 1)",
       // Text
       text:  undefined,
       textPadding: 0,
@@ -530,7 +530,7 @@
             });
           } else {
             this.set({x: this.targetX, y: this.targetY}, {silent: true});
-            this.trigger("end", this, this.animation);
+            this.trigger("endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
             this.startX = undefined;
@@ -545,7 +545,7 @@
             this.set("opacity", Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
             this.set("opacity", 1);
-            this.trigger("end", this, this.animation);
+            this.trigger("endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
           }
@@ -556,7 +556,7 @@
             this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
             this.set("opacity", 0);
-            this.trigger("end", this, this.animation);
+            this.trigger("endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
           }
@@ -573,8 +573,10 @@
       context.globalAlpha = b.opacity;
 
       if (b.backgroundColor && b.backgroundColor != "transparent") {
-        var fillStyle = b.backgroundColor;
-        drawRoundRect(context, b.x, b.y, b.width, b.height, b.borderRadius, fillStyle, false);
+        if (b.borderRadius)
+          drawRoundRect(context, b.x, b.y, b.width, b.height, b.borderRadius, b.backgroundColor, false);
+        else
+          drawRect(context, b.x, b.y, b.width, b.height, b.backgroundColor, false)
       }
 
       if (this.img)

@@ -70,6 +70,11 @@ $(window).on("load", function() {
       }, this);
       this.gui.on("resume", this.play, this);
 
+      this.leveStartScene = new Backbone.LevelStartScene({}, {
+        state: this.state,
+        world: this.world
+      });
+
       // The game engine
       this.engine = new Backbone.Engine({}, {
         canvas: canvas,
@@ -110,9 +115,9 @@ $(window).on("load", function() {
         this.message,
         this.input
       ]);
+      if (newGame) this.engine.add(this.leveStartScene);
       if (this.debugPanel) this.engine.add(this.debugPanel);
       this.engine.set("clearOnDraw", false);
-      this.world.set("state", "play");
       this.engine.start();
 
       return this;

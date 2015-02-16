@@ -225,7 +225,6 @@
       var gui = this;
       this.loading.fadeIn();
       this.hideButtons();
-      console.log(event);
       setTimeout(function() {
         gui.trigger(event);
       }, 600);
