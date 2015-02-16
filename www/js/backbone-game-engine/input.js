@@ -55,7 +55,7 @@
         context.fillStyle = pressed ? "#00FF00" : "#009900";
         context.fill();
         context.lineWidth = 5;
-        context.strokeStyle = '#000';
+        context.strokeStyle = '#111';
         context.stroke();
         context.restore();
       }
@@ -76,7 +76,7 @@
         context.fillStyle = pressed ? "#00FF00" : "#009900";
         context.fill();
         context.lineWidth = 5;
-        context.strokeStyle = '#000';
+        context.strokeStyle = '#111';
         context.stroke();
         context.restore();
       }
@@ -88,12 +88,13 @@
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(192, 192, 192, 0.5)");
         context.save();
         context.beginPath();
-        context.arc(context.canvas.width-240, context.canvas.height-80, 60, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-80, context.canvas.height-80, 65, 0, 2*Math.PI, false);
+        context.fillStyle = "#111";
+        context.fill();
+        context.beginPath();
+        context.arc(context.canvas.width-80, context.canvas.height-80, 60, 0, 2*Math.PI, false);
         context.fillStyle = pressed ? "#FF0000" : "#990000";
         context.fill();
-        context.lineWidth = 5;
-        context.strokeStyle = '#000';
-        context.stroke();
         context.restore();
       }
     }, {
@@ -104,12 +105,13 @@
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(255, 255, 255, 0.5)");
         context.save();
         context.beginPath();
-        context.arc(context.canvas.width-80, context.canvas.height-80, 60, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-240, context.canvas.height-80, 65, 0, 2*Math.PI, false);
+        context.fillStyle = "#111";
+        context.fill();
+        context.beginPath();
+        context.arc(context.canvas.width-240, context.canvas.height-80, 60, 0, 2*Math.PI, false);
         context.fillStyle = pressed ? "#0000FF" : "#000099";
         context.fill();
-        context.lineWidth = 5;
-        context.strokeStyle = '#000';
-        context.stroke();
         context.restore();
       }
     }, {
@@ -182,10 +184,10 @@
             button.x = (canvas.width - 60)/2 - 90;
             break;
           case "buttonA":
-            button.x = canvas.width - 160;
+            button.x = canvas.width - 320;
             break;
           case "buttonB":
-            button.x = canvas.width - 320;
+            button.x = canvas.width - 160;
             break;
         }
         switch (button.button) {

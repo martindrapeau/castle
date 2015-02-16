@@ -152,7 +152,8 @@
       });
 
       this.touchStart = new Backbone.LabelButton({
-        text: "Touch to start"
+        text: "Touch to start",
+        opacity: 0
       });
 
       this.loading = new Backbone.LabelButton({
@@ -189,15 +190,24 @@
       this.on("detach", this.onDetach);
     },
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg,
+    postInitialize: function() {
+      this.listenTo(this.engine, "tap", this.onTouchStart);
+
+      // Hack to avoid FOUT
+      this.touchStart.set("opacity", 1);
+      this.newGame.textMetrics = undefined;
+      this.showCredits.textMetrics = undefined;
+      this.resume.textMetrics = undefined;
+    },
     onAttach: function() {
       this.onDetach();
 
       this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.resume, this.savedGame]);
 
-      if (this.ready)
+      if (!this.ready)
+        setTimeout(this.postInitialize.bind(this), 200);
+      else 
         setTimeout(this.showButtons.bind(this), 100);
-      else
-        this.listenTo(this.engine, "tap", this.onTouchStart);
     },
     onDetach: function() {
       this.stopListening(this.engine);
@@ -212,10 +222,10 @@
       this.showButtons();
     },
     showButtons: function() {
-      this.newGame.moveTo(-155, this.newGame.get("y"));
-      this.showCredits.moveTo(-215, this.showCredits.get("y"));
+      this.newGame.moveTo(-this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2, this.newGame.get("y"));
+      this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
       if (this.state.saved) {
-        this.resume.moveTo(-208, this.resume.get("y"));
+        this.resume.moveTo(-this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2, this.resume.get("y"));
         this.savedGame.moveTo(720, this.savedGame.get("y"));
       }
       this.loading.set("opacity", 0);
