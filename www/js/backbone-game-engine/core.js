@@ -269,7 +269,7 @@
       });
 
       this.context = this.canvas.getContext("2d");
-      this.context.imageSmoothingEnabled = false;
+      //this.context.imageSmoothingEnabled = false;
       this.lastTime = _.now();
       this.start();
 

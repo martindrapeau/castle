@@ -1,26 +1,5 @@
 (function() {
 
-  Backbone.LabelButton = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
-      x: 400,
-      y: 400,
-      width: 160,
-      height: 100,
-      backgroundColor: "transparent",
-      text: "",
-      textPadding: 12,
-      textContextAttributes: {
-        fillStyle: "#F67D00",
-        font: "40px arcade",
-        textBaseline: "middle",
-        fontWeight: "normal",
-        textAlign: "center"
-      },
-      easing: "easeInCubic",
-      easingTime: 400
-    })
-  });
-
   Backbone.PullOutButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: -372,
@@ -114,33 +93,30 @@
           y = this.get("y");
 
       // TO DO...
+      /*
+        --Credits--
+
+        Graphics: pzUH, TikusJenaka, kemotaku, simirk, dxc, Saranai
+        Music: Edvard Grieg
+        Testing: Lodovic, Emilia
+        Coding: Martin
+
+        Built with Backbone Game Engine
+
+        A Game by Martin Drapeau
+      */
     }
   });
 
-  /*
-    --Credits--
 
-    Graphics: pzUH, TikusJenaka, kemotaku, simirk, dxc, Saranai
-    Music: Edvard Grieg
-    Testing: Lodovic, Emilia
-    Coding: Martin
-
-    Built with Backbone Game Engine
-
-    A Game by Martin Drapeau
-  */
-
-	Backbone.Gui = Backbone.Model.extend({
-    defaults: {
-      img: undefined
-    },
+	Backbone.Gui = Backbone.Scene.extend({
+    defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
+        img: "#title-screen",
+        imgWidth: 960,
+        imgHeight: 700
+    }),
     initialize: function(attributes, options) {
-      options || (options = {});
-      this.state = options.state;
-      this.world = options.world;
-
-      var gui = this;
-      if (!this.img && this.attributes.img) this.spawnImg();
+      Backbone.Scene.prototype.initialize.apply(this, arguments);
 
       this.banner = new Backbone.Button({
         x: 0, y: 240,
@@ -185,11 +161,7 @@
 
       this.credits = new Backbone.Credits();
       this.showCredits.on("tap", _.partial(this.showPanel, this.credits), this);
-
-      this.on("attach", this.onAttach);
-      this.on("detach", this.onDetach);
     },
-    spawnImg: Backbone.SpriteSheet.prototype.spawnImg,
     postInitialize: function() {
       this.listenTo(this.engine, "tap", this.onTouchStart);
 
@@ -200,7 +172,8 @@
       this.resume.textMetrics = undefined;
     },
     onAttach: function() {
-      this.onDetach();
+      Backbone.Scene.prototype.onAttach.apply(this, arguments);
+      this.stopListening(this.engine);
 
       this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.resume, this.savedGame]);
 
@@ -210,7 +183,7 @@
         setTimeout(this.showButtons.bind(this), 100);
     },
     onDetach: function() {
-      this.stopListening(this.engine);
+      Backbone.Scene.prototype.onDetach.apply(this, arguments);
       this.engine.remove([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.savedGame, this.resume]);
     },
     onTouchStart: function(e) {
@@ -256,24 +229,6 @@
       setTimeout(function() {
         gui.trigger(event);
       }, 600);
-    },
-    update: function(dt) {
-      return true;
-    },
-    draw: function(context) {
-
-      if (this.img) {
-        var img = this.img,
-            width = context.canvas.width < img.width ? context.canvas.width : img.width,
-            height = context.canvas.height < img.height ? context.canvas.height : img.height;
-        context.drawImage(
-          img,
-          0, 0, width, height,
-          0, 0, width, height
-        );
-      }
-
-      return this;
     }
 	});
 

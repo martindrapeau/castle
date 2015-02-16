@@ -29,8 +29,8 @@
       "x", "y", "width", "height", "tileWidth", "tileHeight", "backgroundColor",
       "viewportLeft", "viewportRight", "viewportTop", "viewportBottom"
     ],
-    viewport: {x:0, y:0, width:0, height: 0},
-    spriteOptions: {offsetX:0, offsetY:0},
+    viewport: {x: 0, y: 0, width: 0, height: 0},
+    spriteOptions: {offsetX: 0, offsetY: 0},
     initialize: function(attributes, options) {
       options || (options = {});
       this.input = options.input;

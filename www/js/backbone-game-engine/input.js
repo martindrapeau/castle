@@ -82,34 +82,34 @@
       }
     }, {
       button: "buttonB",
-      x: right-160, y: bottom-160,
+      x: right-320, y: bottom-160,
       width: 160,  height: 160,
       draw: function(context, pressed) {
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(192, 192, 192, 0.5)");
         context.save();
         context.beginPath();
-        context.arc(context.canvas.width-80, context.canvas.height-80, 65, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-240, context.canvas.height-80, 60, 0, 2*Math.PI, false);
         context.fillStyle = "#111";
         context.fill();
         context.beginPath();
-        context.arc(context.canvas.width-80, context.canvas.height-80, 60, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-240, context.canvas.height-80, 55, 0, 2*Math.PI, false);
         context.fillStyle = pressed ? "#FF0000" : "#990000";
         context.fill();
         context.restore();
       }
     }, {
       button: "buttonA",
-      x: right-320, y: bottom-160,
+      x: right-160, y: bottom-160,
       width: 160,  height: 160,
       draw: function(context, pressed) {
         //drawRect(context, this.x, this.y, this.width, this.height, "rgba(255, 255, 255, 0.5)");
         context.save();
         context.beginPath();
-        context.arc(context.canvas.width-240, context.canvas.height-80, 65, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-80, context.canvas.height-80, 60, 0, 2*Math.PI, false);
         context.fillStyle = "#111";
         context.fill();
         context.beginPath();
-        context.arc(context.canvas.width-240, context.canvas.height-80, 60, 0, 2*Math.PI, false);
+        context.arc(context.canvas.width-80, context.canvas.height-80, 55, 0, 2*Math.PI, false);
         context.fillStyle = pressed ? "#0000FF" : "#000099";
         context.fill();
         context.restore();
@@ -184,10 +184,10 @@
             button.x = (canvas.width - 60)/2 - 90;
             break;
           case "buttonA":
-            button.x = canvas.width - 320;
+            button.x = canvas.width - 160;
             break;
           case "buttonB":
-            button.x = canvas.width - 160;
+            button.x = canvas.width - 320;
             break;
         }
         switch (button.button) {

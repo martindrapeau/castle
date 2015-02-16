@@ -61,9 +61,7 @@ $(window).on("load", function() {
       });
       this.pauseButton.on("tap", this.showGui, this);
 
-      this.gui = new Backbone.Gui({
-        img: "#title-screen"
-      }, {
+      this.gui = new Backbone.Gui({}, {
         state: this.state,
         world: this.world
       });
@@ -154,7 +152,11 @@ $(window).on("load", function() {
     controller: controller,
   });
 
-  // Ensure the canvas is always visible and centered
-  if (!navigator.isCocoonJS)
+  if (navigator.isCocoonJS) {
+    //Cocoon.Utils.setNPOTEnabled(true);
+  } else {
+    // Ensure the canvas is always visible and centered
     adjustViewport(canvas, canvas.width, canvas.height);
+  }
+
 });
