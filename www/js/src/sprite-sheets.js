@@ -67,15 +67,6 @@
     tileColumns: 5,
     tileRows: 6
   }, {
-    id: "hit",
-    img: "#artifacts",
-    x: 0,
-    y: 432,
-    tileWidth: 37,
-    tileHeight: 54,
-    tileColumns: 2,
-    tileRows: 1
-  }, {
     id: "health-indicator",
     img: "#artifacts",
     x: 0,

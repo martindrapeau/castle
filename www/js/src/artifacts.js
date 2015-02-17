@@ -18,24 +18,6 @@
     }
   });
 
-  // Hit (disappears afteranimation)
-  Backbone.Hit = Backbone.Ephemeral.extend({
-    defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {
-      name: "hit",
-      spriteSheet: "hit",
-      state: "explode",
-      width: 37,
-      height: 54,
-      zIndex: 1
-    }),
-    animations: {
-      explode: {
-        sequences: [1, 0, 1],
-        delay: 100
-      }
-    }
-  });
-
   // Shows a callout (bubble) with instructions and disappears
   Backbone.Callout = Backbone.Ephemeral.extend({
     defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {

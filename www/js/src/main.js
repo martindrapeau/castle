@@ -104,7 +104,13 @@ $(window).on("load", function() {
       if (newGame || !this.state.saved) {
         this.world.set(Backbone.levels[0]);
         this.world.spawnSprites();
-        this.state.saved = true;
+        var hero = this.world.sprites.findWhere({hero: true});
+        this.state.saved = {
+          health: hero.get("health"),
+          coins: hero.get("coins"),
+          level: this.world.get("level"),
+          time: this.world.get("time")
+        };
       }
 
       this.engine.add([

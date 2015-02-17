@@ -6,7 +6,7 @@
       width: 372,
       height: 76,
       backgroundColor: "transparent",
-      img: "#artifacts", imgX: 0, imgY: 538, imgWidth: 372, imgHeight: 80, imgMargin: 0,
+      img: "#gui", imgX: 0, imgY: 0, imgWidth: 372, imgHeight: 80, imgMargin: 0,
       textPadding: 12,
       textContextAttributes: {
         fillStyle: "#F67D00",
@@ -27,7 +27,7 @@
       width: 333,
       height: 80,
       backgroundColor: "transparent",
-      img: "#artifacts", imgX: 0, imgY: 763, imgWidth: 333, imgHeight: 247, imgMargin: 0,
+      img: "#gui", imgX: 0, imgY: 225, imgWidth: 333, imgHeight: 247, imgMargin: 0,
       text: "High Score",
       textPadding: 24,
       textContextAttributes: {
@@ -69,7 +69,7 @@
       width: 640,
       height: 140,
       backgroundColor: "transparent",
-      img: "#artifacts", imgX: 0, imgY: 1010, imgWidth: 640, imgHeight: 480, imgMargin: 0,
+      img: "#gui", imgX: 0, imgY: 472, imgWidth: 640, imgHeight: 480, imgMargin: 0,
       text: "",
       textPadding: 24,
       textContextAttributes: {
@@ -108,6 +108,19 @@
     }
   });
 
+  Backbone.PausePanel = Backbone.Panel.extend({
+    defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
+      text: "Pause",
+      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0,
+    }),
+    onDraw: function(context) {
+      var x = this.get("x"),
+          y = this.get("y");
+
+      // TO DO: play, restart, exit
+    }
+  });
+
 
 	Backbone.Gui = Backbone.Scene.extend({
     defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
@@ -122,7 +135,7 @@
         x: 0, y: 240,
         width: 960, height: 145,
         backgroundColor: "transparent",
-        img: "#artifacts", imgX: 0, imgY: 618, imgWidth: 960, imgHeight: 144, imgMargin: 5,
+        img: "#gui", imgX: 0, imgY: 80, imgWidth: 960, imgHeight: 144, imgMargin: 5,
         easing: "easeInOutQuad",
         easingTime: 400
       });
