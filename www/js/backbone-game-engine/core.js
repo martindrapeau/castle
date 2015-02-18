@@ -535,6 +535,7 @@
               y: this.startY + factor * (this.targetY - this.startY)
             });
           } else {
+            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
             this.set({x: this.targetX, y: this.targetY}, {silent: true});
             this.animation = undefined;
             this.startTime = undefined;
@@ -542,8 +543,7 @@
             this.startY = undefined;
             this.targetX = undefined;
             this.targetY = undefined;
-            if (typeof this.callback == "function")
-              _.defer(this.callback.bind(this));
+            this.callback = undefined;
           }
           break;
 
@@ -551,11 +551,11 @@
           if (now < this.startTime + easingTime) {
             this.set("opacity", Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
-            this.set("opacity", 1);
+            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
+            this.set({opacity: 1}, {silent: true});
             this.animation = undefined;
             this.startTime = undefined;
-            if (typeof this.callback == "function")
-              _.defer(this.callback.bind(this));
+            this.callback = undefined;
           }
           break;
 
@@ -563,11 +563,11 @@
           if (now < this.startTime + easingTime) {
             this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
-            this.set("opacity", 0);
+            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
+            this.set({opacity: 0}, {silent: true});
             this.animation = undefined;
             this.startTime = undefined;
-            if (typeof this.callback == "function")
-              _.defer(this.callback.bind(this));
+            this.callback = undefined;
           }
           break;
       }
