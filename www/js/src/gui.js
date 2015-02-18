@@ -42,7 +42,6 @@
     }),
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
-      options || (options = {});
       this.world = options.world;
     },
     onAttach: function() {
@@ -74,7 +73,7 @@
       textPadding: 24,
       textContextAttributes: {
         fillStyle: "#F67D00",
-        font: "34px arcade",
+        font: "40px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
         textAlign: "center"
@@ -110,23 +109,109 @@
 
   Backbone.PausePanel = Backbone.Panel.extend({
     defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
+      name: "pausePanel",
+      x: 320, y:720, width: 320, height: 240,
       text: "Pause",
-      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0,
+      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
     }),
+    initialize: function(attributes, options) {
+      Backbone.Panel.prototype.initialize.apply(this, arguments);
+      this.pauseButton = options.pauseButton;
+      this.world = options.world;
+      this.input = options.input;
+      this.showGui = options.showGui;
+      this.levelInOutScene = options.levelInOutScene;
+
+      this.resumeButton = new Backbone.Button({
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 140, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
+      });
+      this.resumeButton.on("tap", this.resume, this);
+
+      this.homeButton = new Backbone.Button({
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
+      });
+      this.homeButton.on("tap", this.exit, this);
+
+      this.listenTo(this.pauseButton, "tap", this.show);
+    },
+    onAttach: function() {
+      Backbone.Panel.prototype.onAttach.apply(this, arguments);
+      this.resumeButton.engine = this.engine;
+      this.homeButton.engine = this.engine;
+      this.resumeButton.trigger("attach");
+      this.homeButton.trigger("attach");
+    },
+    onDetach: function() {
+      Backbone.Panel.prototype.onDetach.apply(this, arguments);
+      this.resumeButton.trigger("detach");
+      this.homeButton.trigger("detach");
+      this.resumeButton.engine = undefined;
+      this.homeButton.engine = undefined;
+    },
     onDraw: function(context) {
       var x = this.get("x"),
           y = this.get("y");
 
-      // TO DO: play, restart, exit
+      this.resumeButton.set({x: x + 80, y: y + 180}, {silent: true}).draw(context);
+      this.homeButton.set({x: x + 170, y: y + 180}, {silent: true}).draw(context);
+      
+      return this;
+    },
+    show: function() {
+      this.world.set("state", "pause");
+
+      this.resumeButton.trigger("detach");
+      this.homeButton.trigger("detach");
+      this.pauseButton.trigger("detach");
+      this.input.trigger("detach");
+
+      this.moveTo(this.get("x"), 200);
+
+      var panel = this;
+      setTimeout(function() {
+        panel.resumeButton.trigger("attach");
+        panel.homeButton.trigger("attach");
+      }, 700);
+    },
+    resume: function() {
+      this.resumeButton.trigger("detach");
+      this.homeButton.trigger("detach");
+
+      this.moveTo(this.get("x"), 720);
+
+      var panel = this;
+      setTimeout(function() {
+        panel.world.set("state", "play");
+        panel.pauseButton.trigger("attach");
+        panel.input.trigger("attach");
+      }, 500);
+    },
+    exit: function() {
+      var panel = this;
+
+      this.engine.add(this.levelInOutScene);
+      this.levelInOutScene.exit();
+
+      setTimeout(function() {
+        panel.engine.remove(this.levelInOutScene);
+        panel.pauseButton.trigger("attach");
+        panel.input.trigger("attach");
+        panel.set({y: 720});
+        panel.showGui();
+      }, 500);
     }
   });
 
 
 	Backbone.Gui = Backbone.Scene.extend({
     defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
-        img: "#title-screen",
-        imgWidth: 960,
-        imgHeight: 700
+      img: "#title-screen",
+      imgWidth: 960,
+      imgHeight: 700
     }),
     initialize: function(attributes, options) {
       Backbone.Scene.prototype.initialize.apply(this, arguments);
@@ -187,6 +272,7 @@
     onAttach: function() {
       Backbone.Scene.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
+      this.set("opacity", 1);
 
       this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.resume, this.savedGame]);
 
@@ -235,12 +321,18 @@
       this.showButtons();
     },
     play: function(event) {
+      var delay = 400;
+      if (event == "new") {
+        this.loading.fadeIn();
+        delay = 600;
+      }
+
       var gui = this;
-      this.loading.fadeIn();
       this.hideButtons();
       setTimeout(function() {
         gui.trigger(event);
-      }, 600);
+        gui.loading.set("opacity", 0);
+      }, delay);
     }
 	});
 

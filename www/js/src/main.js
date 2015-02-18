@@ -13,6 +13,8 @@ $(window).on("load", function() {
       options || (options = {});
       var controller = this;
 
+      _.bindAll(this, "showGui");
+
       this.state = {
         saved: undefined
       };
@@ -25,43 +27,68 @@ $(window).on("load", function() {
 
       // User input (turn off touchpad to start)
       this.input = new Backbone.Input({
+        id: "input",
         drawTouchpad: true
       });
 
       // Camera
       this.camera = new Backbone.Camera({
+        id: "camera",
         bottom: 400
       });
 
       // Our world
       // Reserve bottom of canvas for input and editor
       this.world = new Backbone.World({
-          state: "pause"
+        id: "world",
+        state: "pause"
       }, {
         input: this.input,
         camera: this.camera
       });
 
       this.display = new Backbone.Display({
+        id: "display",
         x: 100,
         y: 0
       }, {
         world: this.world
       });
 
-      // Message
-      this.message = new Backbone.Message({
-        x: 480, y: 20
+      // In-game
+
+      this.leveStartScene = new Backbone.LevelStartScene({
+        id: "leveStartScene"
+      }, {
+        state: this.state,
+        world: this.world
       });
 
-      // In-game pause button
+      this.levelInOutScene = new Backbone.LevelInOutScene({
+        id: "levelInOutScene"
+      }, {
+        state: this.state,
+        world: this.world
+      });
+
       this.pauseButton = new Backbone.Button({
+        id: "pauseButton",
         x: 16, y: 4, width: 64, height: 64, backgroundColor: "transparent",
         img: "#artifacts", imgX: 0, imgY: 128, imgWidth: 64, imgHeight: 64, imgMargin: 0
       });
-      this.pauseButton.on("tap", this.showGui, this);
+      this.pausePanel = new Backbone.PausePanel({}, {
+        id: "pausePanel",
+        pauseButton: this.pauseButton,
+        world: this.world,
+        input: this.input,
+        showGui: this.showGui,
+        levelInOutScene: this.levelInOutScene
+      });
 
-      this.gui = new Backbone.Gui({}, {
+
+      this.gui = new Backbone.Gui({
+        id: "gui",
+      }, {
         state: this.state,
         world: this.world
       });
@@ -70,10 +97,6 @@ $(window).on("load", function() {
       }, this);
       this.gui.on("resume", this.play, this);
 
-      this.leveStartScene = new Backbone.LevelStartScene({}, {
-        state: this.state,
-        world: this.world
-      });
 
       // The game engine
       this.engine = new Backbone.Engine({}, {
@@ -101,7 +124,9 @@ $(window).on("load", function() {
         this.debugPanel.clear();
       }
 
+      var startScene = this.levelInOutScene;
       if (newGame || !this.state.saved) {
+        console.log("newGame");
         this.world.set(Backbone.levels[0]);
         this.world.spawnSprites();
         var hero = this.world.sprites.findWhere({hero: true});
@@ -111,6 +136,7 @@ $(window).on("load", function() {
           level: this.world.get("level"),
           time: this.world.get("time")
         };
+        startScene = this.leveStartScene;
       }
 
       this.engine.add([
@@ -118,13 +144,15 @@ $(window).on("load", function() {
         this.display,
         this.camera,
         this.pauseButton,
-        this.message,
-        this.input
+        this.input,
+        this.pausePanel,
+        startScene
       ]);
-      if (newGame) this.engine.add(this.leveStartScene);
       if (this.debugPanel) this.engine.add(this.debugPanel);
       this.engine.set("clearOnDraw", false);
       this.engine.start();
+
+      startScene.enter();
 
       return this;
     },
@@ -137,8 +165,8 @@ $(window).on("load", function() {
         this.display,
         this.camera,
         this.pauseButton,
-        this.message,
-        this.input
+        this.input,
+        this.pausePanel
       ]);
       if (this.debugPanel) {
         this.engine.remove(this.debugPanel);

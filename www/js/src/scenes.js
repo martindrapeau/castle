@@ -28,15 +28,26 @@
 			width: 960,
 			height: 700,
 			backgroundColor: "#000",
-			opacity: 1,
-			text: ""
+			opacity: 0,
+			text: "",
+    	easing: "easeInCubic",
+    	easingTime: 400
   	}),
   	initialize: function(attributes, options) {
   		Backbone.Button.prototype.initialize.apply(this, arguments);
       options || (options = {});
       this.state = options.state;
       this.world = options.world;
-  	}
+      _.bindAll(this, "enter", "exit");
+  	},
+    enter: function() {
+    	this.set("opacity", 0);
+    	this.fadeIn();
+    },
+    exit: function() {
+    	this.set("opacity", 1);
+    	this.fadeOut();
+    }
   });
 
   Backbone.LevelStartScene = Backbone.Scene.extend({
@@ -51,26 +62,50 @@
     	easing: "easeInCubic",
     	easingTime: 400
     }),
-    onAttach: function() {
-    	Backbone.Scene.prototype.onAttach.apply(this, arguments);
-    	this.stopListening(this.engine);
-    	this.start();
-    },
-    start: function() {
+    enter: function() {
+    	this.set("opacity", 1);
     	this.world.set("state", "pause");
     	this.set("text", "Level " + this.world.get("level") + " - " + this.world.get("name"));
 
     	var scene = this;
     	setTimeout(function() {
     		scene.fadeOut();
-    		setTimeout(scene.end.bind(scene), 500);
+    		setTimeout(function() {
+    			scene.world.set("state", "play");
+    			scene.engine.remove(scene);
+    		}, 500);
     	}, 2000);
-    },
-    end: function() {
-    	this.world.set("state", "play");
-    	this.engine.remove(this);
-    	this.set("opacity", 1);
     }
   });
+
+  Backbone.LevelInOutScene = Backbone.Scene.extend({
+    defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
+    	opacity: 0,
+    	easing: "easeInCubic",
+    	easingTime: 400
+    }),
+    enter: function() {
+    	this.set("opacity", 1);
+    	this.world.set("state", "pause");
+
+    	this.fadeOut();
+    	var scene = this;
+    	setTimeout(function() {
+    		scene.world.set("state", "play");
+    		scene.engine.remove(scene);
+    	}, 500);
+    },
+    exit: function() {
+    	this.set("opacity", 0);
+    	this.world.set("state", "pause");
+
+    	this.fadeIn();
+    	var scene = this;
+    	setTimeout(function() {
+    		scene.world.set("state", "play");
+    		scene.engine.remove(scene);
+    	}, 500);
+    }
+   });
 
 }).call(this);

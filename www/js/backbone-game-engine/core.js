@@ -504,16 +504,19 @@
       this.startY = this.get("y");
       this.targetX = x;
       this.targetY = y;
+      return this;
     },
     fadeIn: function() {
       this.animation = "fadeIn";
       this.startTime = _.now();
       this.set("opacity", 0);
+      return this;
     },
     fadeOut: function() {
       this.animation = "fadeOut";
       this.startTime = _.now();
       this.set("opacity", 1);
+      return this;
     },
     update: function(dt) {
       var now = _.now(),
@@ -530,7 +533,7 @@
             });
           } else {
             this.set({x: this.targetX, y: this.targetY}, {silent: true});
-            this.trigger("endAnimation", this, this.animation);
+            _.defer(this.trigger, "endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
             this.startX = undefined;
@@ -545,7 +548,7 @@
             this.set("opacity", Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
             this.set("opacity", 1);
-            this.trigger("endAnimation", this, this.animation);
+            _.defer(this.trigger, "endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
           }
@@ -556,7 +559,7 @@
             this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
             this.set("opacity", 0);
-            this.trigger("endAnimation", this, this.animation);
+            _.defer(this.trigger, "endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
           }
@@ -567,6 +570,7 @@
     },
     draw: function(context) {
       var b = this.toJSON();
+      if (b.opacity == 0) return this;
 
       context.save();
 
@@ -630,6 +634,7 @@
       return this;
     },
     onTap: function(e) {
+      if (this.get("opacity") == 0) return;
       if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
           e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height)
         this.trigger("tap", e);
