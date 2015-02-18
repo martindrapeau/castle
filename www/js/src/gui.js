@@ -169,40 +169,37 @@
       this.pauseButton.trigger("detach");
       this.input.trigger("detach");
 
-      this.moveTo(this.get("x"), 200);
-
-      var panel = this;
-      setTimeout(function() {
-        panel.resumeButton.trigger("attach");
-        panel.homeButton.trigger("attach");
-      }, 700);
+      this.moveTo(this.get("x"), 200, function() {
+        this.resumeButton.trigger("attach");
+        this.homeButton.trigger("attach");
+      });
+      return this;
     },
     resume: function() {
       this.resumeButton.trigger("detach");
       this.homeButton.trigger("detach");
 
-      this.moveTo(this.get("x"), 720);
+      this.moveTo(this.get("x"), 720, function() {
+        this.world.set("state", "play");
+        this.pauseButton.trigger("attach");
+        this.input.trigger("attach");
+      });
 
-      var panel = this;
-      setTimeout(function() {
-        panel.world.set("state", "play");
-        panel.pauseButton.trigger("attach");
-        panel.input.trigger("attach");
-      }, 500);
+      return this;
     },
     exit: function() {
       var panel = this;
 
       this.engine.add(this.levelInOutScene);
-      this.levelInOutScene.exit();
-
-      setTimeout(function() {
+      this.levelInOutScene.exit().once("detach", function() {
         panel.engine.remove(this.levelInOutScene);
         panel.pauseButton.trigger("attach");
         panel.input.trigger("attach");
         panel.set({y: 720});
         panel.showGui();
-      }, 500);
+      });
+
+      return this;
     }
   });
 
@@ -290,7 +287,7 @@
       this.banner.moveTo(this.banner.get("x"), 50);
       this.touchStart.moveTo(this.touchStart.get("x"), 700);
       this.stopListening(this.engine);
-      this.ready =  true;
+      this.ready = true;
       this.showButtons();
     },
     showButtons: function() {

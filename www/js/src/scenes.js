@@ -43,10 +43,12 @@
     enter: function() {
     	this.set("opacity", 0);
     	this.fadeIn();
+      return this;
     },
     exit: function() {
     	this.set("opacity", 1);
     	this.fadeOut();
+      return this;
     }
   });
 
@@ -63,18 +65,19 @@
     	easingTime: 400
     }),
     enter: function() {
+      var scene = this;
     	this.set("opacity", 1);
     	this.world.set("state", "pause");
     	this.set("text", "Level " + this.world.get("level") + " - " + this.world.get("name"));
 
-    	var scene = this;
     	setTimeout(function() {
-    		scene.fadeOut();
-    		setTimeout(function() {
-    			scene.world.set("state", "play");
-    			scene.engine.remove(scene);
-    		}, 500);
+    		scene.fadeOut(function() {
+          scene.world.set("state", "play");
+          scene.engine.remove(scene);
+        });
     	}, 2000);
+
+      return this;
     }
   });
 
@@ -88,23 +91,22 @@
     	this.set("opacity", 1);
     	this.world.set("state", "pause");
 
-    	this.fadeOut();
-    	var scene = this;
-    	setTimeout(function() {
-    		scene.world.set("state", "play");
-    		scene.engine.remove(scene);
-    	}, 500);
+    	this.fadeOut(function() {
+        this.world.set("state", "play");
+        this.engine.remove(this);
+      });
+
+      return this;
     },
     exit: function() {
     	this.set("opacity", 0);
     	this.world.set("state", "pause");
 
-    	this.fadeIn();
-    	var scene = this;
-    	setTimeout(function() {
-    		scene.world.set("state", "play");
-    		scene.engine.remove(scene);
-    	}, 500);
+    	this.fadeIn(function() {
+        this.engine.remove(this);
+      });
+      
+      return this;
     }
    });
 

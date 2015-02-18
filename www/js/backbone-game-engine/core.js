@@ -497,24 +497,27 @@
     onDetach: function() {
       this.stopListening(this.engine);
     },
-    moveTo: function(x, y) {
+    moveTo: function(x, y, callback) {
       this.animation = "move";
       this.startTime = _.now();
       this.startX = this.get("x");
       this.startY = this.get("y");
       this.targetX = x;
       this.targetY = y;
+      this.callback = callback;
       return this;
     },
-    fadeIn: function() {
+    fadeIn: function(callback) {
       this.animation = "fadeIn";
       this.startTime = _.now();
+      this.callback = callback;
       this.set("opacity", 0);
       return this;
     },
-    fadeOut: function() {
+    fadeOut: function(callback) {
       this.animation = "fadeOut";
       this.startTime = _.now();
+      this.callback = callback;
       this.set("opacity", 1);
       return this;
     },
@@ -533,13 +536,14 @@
             });
           } else {
             this.set({x: this.targetX, y: this.targetY}, {silent: true});
-            _.defer(this.trigger, "endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
             this.startX = undefined;
             this.startY = undefined;
             this.targetX = undefined;
             this.targetY = undefined;
+            if (typeof this.callback == "function")
+              _.defer(this.callback.bind(this));
           }
           break;
 
@@ -548,9 +552,10 @@
             this.set("opacity", Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
             this.set("opacity", 1);
-            _.defer(this.trigger, "endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
+            if (typeof this.callback == "function")
+              _.defer(this.callback.bind(this));
           }
           break;
 
@@ -559,9 +564,10 @@
             this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
           } else {
             this.set("opacity", 0);
-            _.defer(this.trigger, "endAnimation", this, this.animation);
             this.animation = undefined;
             this.startTime = undefined;
+            if (typeof this.callback == "function")
+              _.defer(this.callback.bind(this));
           }
           break;
       }
