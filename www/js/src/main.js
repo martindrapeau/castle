@@ -13,7 +13,7 @@ $(window).on("load", function() {
       options || (options = {});
       var controller = this;
 
-      _.bindAll(this, "showGui");
+      _.bindAll(this, "showGui", "nextLevel");
 
       this.state = {
         saved: undefined
@@ -76,13 +76,27 @@ $(window).on("load", function() {
         x: 16, y: 4, width: 64, height: 64, backgroundColor: "transparent",
         img: "#artifacts", imgX: 0, imgY: 128, imgWidth: 64, imgHeight: 64, imgMargin: 0
       });
-      this.pausePanel = new Backbone.PausePanel({}, {
-        id: "pausePanel",
+
+      this.pausePanel = new Backbone.PausePanel({
+        id: "pausePanel"
+      }, {
         pauseButton: this.pauseButton,
         world: this.world,
         input: this.input,
         showGui: this.showGui,
         levelInOutScene: this.levelInOutScene
+      });
+
+      this.levelEndPanel = new Backbone.LevelEndPanel({
+        id: "levelEndPanel"
+      }, {
+        pauseButton: this.pauseButton,
+        world: this.world,
+        input: this.input,
+        showGui: this.showGui,
+        nextLevel: this.nextLevel,
+        levelInOutScene: this.levelInOutScene,
+        state: this.state
       });
 
 
@@ -146,6 +160,7 @@ $(window).on("load", function() {
         this.pauseButton,
         this.input,
         this.pausePanel,
+        this.levelEndPanel,
         startScene
       ]);
       if (this.debugPanel) this.engine.add(this.debugPanel);
@@ -166,7 +181,8 @@ $(window).on("load", function() {
         this.camera,
         this.pauseButton,
         this.input,
-        this.pausePanel
+        this.pausePanel,
+        this.levelEndPanel
       ]);
       if (this.debugPanel) {
         this.engine.remove(this.debugPanel);
@@ -179,6 +195,9 @@ $(window).on("load", function() {
       this.engine.start();
 
       return this;
+    },
+    nextLevel: function() {
+      console.log("next level...");
     }
   });
   

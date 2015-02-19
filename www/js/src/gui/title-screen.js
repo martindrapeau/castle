@@ -61,28 +61,6 @@
     }
   });
 
-  Backbone.Panel = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
-      x: 160,
-      y: 720,
-      width: 640,
-      height: 140,
-      backgroundColor: "transparent",
-      img: "#gui", imgX: 0, imgY: 472, imgWidth: 640, imgHeight: 480, imgMargin: 0,
-      text: "",
-      textPadding: 24,
-      textContextAttributes: {
-        fillStyle: "#F67D00",
-        font: "40px arcade",
-        textBaseline: "middle",
-        fontWeight: "normal",
-        textAlign: "center"
-      },
-      easing: "easeOutCubic",
-      easingTime: 600
-    })
-  });
-
   Backbone.Credits = Backbone.Panel.extend({
     defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
       text: "Credits"
@@ -106,103 +84,6 @@
       */
     }
   });
-
-  Backbone.PausePanel = Backbone.Panel.extend({
-    defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
-      name: "pausePanel",
-      x: 320, y:720, width: 320, height: 240,
-      text: "Pause",
-      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
-    }),
-    initialize: function(attributes, options) {
-      Backbone.Panel.prototype.initialize.apply(this, arguments);
-      this.pauseButton = options.pauseButton;
-      this.world = options.world;
-      this.input = options.input;
-      this.showGui = options.showGui;
-      this.levelInOutScene = options.levelInOutScene;
-
-      this.resumeButton = new Backbone.Button({
-        width: 70, height: 70,
-        backgroundColor: "transparent",
-        img: "#gui", imgX: 140, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
-      });
-      this.resumeButton.on("tap", this.resume, this);
-
-      this.homeButton = new Backbone.Button({
-        width: 70, height: 70,
-        backgroundColor: "transparent",
-        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
-      });
-      this.homeButton.on("tap", this.exit, this);
-
-      this.listenTo(this.pauseButton, "tap", this.show);
-    },
-    onAttach: function() {
-      Backbone.Panel.prototype.onAttach.apply(this, arguments);
-      this.resumeButton.engine = this.engine;
-      this.homeButton.engine = this.engine;
-      this.resumeButton.trigger("attach");
-      this.homeButton.trigger("attach");
-    },
-    onDetach: function() {
-      Backbone.Panel.prototype.onDetach.apply(this, arguments);
-      this.resumeButton.trigger("detach");
-      this.homeButton.trigger("detach");
-      this.resumeButton.engine = undefined;
-      this.homeButton.engine = undefined;
-    },
-    onDraw: function(context) {
-      var x = this.get("x"),
-          y = this.get("y");
-
-      this.resumeButton.set({x: x + 80, y: y + 180}, {silent: true}).draw(context);
-      this.homeButton.set({x: x + 170, y: y + 180}, {silent: true}).draw(context);
-      
-      return this;
-    },
-    show: function() {
-      this.world.set("state", "pause");
-
-      this.resumeButton.trigger("detach");
-      this.homeButton.trigger("detach");
-      this.pauseButton.trigger("detach");
-      this.input.trigger("detach");
-
-      this.moveTo(this.get("x"), 200, function() {
-        this.resumeButton.trigger("attach");
-        this.homeButton.trigger("attach");
-      });
-      return this;
-    },
-    resume: function() {
-      this.resumeButton.trigger("detach");
-      this.homeButton.trigger("detach");
-
-      this.moveTo(this.get("x"), 720, function() {
-        this.world.set("state", "play");
-        this.pauseButton.trigger("attach");
-        this.input.trigger("attach");
-      });
-
-      return this;
-    },
-    exit: function() {
-      var panel = this;
-
-      this.engine.add(this.levelInOutScene);
-      this.levelInOutScene.exit().once("detach", function() {
-        panel.engine.remove(this.levelInOutScene);
-        panel.pauseButton.trigger("attach");
-        panel.input.trigger("attach");
-        panel.set({y: 720});
-        panel.showGui();
-      });
-
-      return this;
-    }
-  });
-
 
 	Backbone.Gui = Backbone.Scene.extend({
     defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
