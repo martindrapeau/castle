@@ -42,18 +42,17 @@
     }),
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
-      this.world = options.world;
+      this.saved = options.saved;
     },
     onAttach: function() {
       Backbone.Button.prototype.onAttach.apply(this, arguments);
-      this.set("text", "Level " + this.world.get("level"));
-      this.hero = this.world.sprites.findWhere({hero: true});
+      this.set("text", "Level " + (this.saved.level !== undefined ? this.saved.level : "?"));
     },
     onDraw: function(context) {
       var x = this.get("x"),
           y = this.get("y"),
-          coins = this.hero ? this.hero.get("coins") : "?",
-          time = this.world ? this.world.getHumanTime() : "?";
+          coins = this.saved.coins !== undefined ? this.saved.coins : "?",
+          time = this.saved.time !== undefined ? _.ms2time(this.saved.time) : "?";
       context.font = "30px arcade";
       context.fillStyle = "#FFF";
       context.fillText(coins, x+80, y+105);
@@ -85,7 +84,7 @@
     }
   });
 
-	Backbone.Gui = Backbone.Scene.extend({
+	Backbone.TitleScreenGui = Backbone.Scene.extend({
     defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
       img: "#title-screen",
       imgWidth: 960,
@@ -118,13 +117,13 @@
         y: 300,
         text: "New Game "
       });
-      this.newGame.on("tap", _.partial(this.play, "new"), this);
+      this.newGame.on("tap", _.partial(this.play, "newGame"), this);
 
-      this.resume = new Backbone.PullOutButton({
+      this.continueGame = new Backbone.PullOutButton({
         y: 420,
-        text: "Resume "
+        text: "Continue "
       });
-      this.resume.on("tap", _.partial(this.play, "resume"), this);
+      this.continueGame.on("tap", _.partial(this.play, "continueGame"), this);
 
       this.showCredits = new Backbone.PullOutButton({
         y: 540,
@@ -132,7 +131,7 @@
       });
 
       this.savedGame = new Backbone.SavedGame({}, {
-        world: this.world
+        saved: this.saved
       });
 
       this.credits = new Backbone.Credits();
@@ -145,14 +144,14 @@
       this.touchStart.set("opacity", 1);
       this.newGame.textMetrics = undefined;
       this.showCredits.textMetrics = undefined;
-      this.resume.textMetrics = undefined;
+      this.continueGame.textMetrics = undefined;
     },
     onAttach: function() {
       Backbone.Scene.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
       this.set("opacity", 1);
 
-      this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.resume, this.savedGame]);
+      this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.continueGame, this.savedGame]);
 
       if (!this.ready)
         setTimeout(this.postInitialize.bind(this), 200);
@@ -161,7 +160,7 @@
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.savedGame, this.resume]);
+      this.engine.remove([this.banner, this.touchStart, this.loading, this.newGame, this.showCredits, this.credits, this.savedGame, this.continueGame]);
     },
     onTouchStart: function(e) {
       // Animate some stuff
@@ -174,8 +173,8 @@
     showButtons: function() {
       this.newGame.moveTo(-this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2, this.newGame.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
-      if (this.state.saved) {
-        this.resume.moveTo(-this.resume.get("width") + this.resume.textMetrics.width + this.resume.get("textPadding")*2, this.resume.get("y"));
+      if (!_.isEmpty(this.saved)) {
+        this.continueGame.moveTo(-this.continueGame.get("width") + this.continueGame.textMetrics.width + this.continueGame.get("textPadding")*2, this.continueGame.get("y"));
         this.savedGame.moveTo(720, this.savedGame.get("y"));
       }
       this.loading.set("opacity", 0);
@@ -183,7 +182,7 @@
     hideButtons: function() {
       this.newGame.moveTo(-this.newGame.get("width"), this.newGame.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width"), this.showCredits.get("y"));
-      this.resume.moveTo(-this.resume.get("width"), this.resume.get("y"));
+      this.continueGame.moveTo(-this.continueGame.get("width"), this.continueGame.get("y"));
       this.savedGame.moveTo(960, this.savedGame.get("y"));
     },
     showPanel: function(panel) {
@@ -200,7 +199,7 @@
     },
     play: function(event) {
       var delay = 400;
-      if (event == "new") {
+      if (event == "newGame") {
         this.loading.fadeIn();
         delay = 600;
       }
@@ -208,7 +207,7 @@
       var gui = this;
       this.hideButtons();
       setTimeout(function() {
-        gui.trigger(event);
+        gui.engine.trigger(event);
         gui.loading.set("opacity", 0);
       }, delay);
     }

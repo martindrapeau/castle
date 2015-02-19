@@ -53,7 +53,6 @@
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
 
-      this.accumTime = this.get("time");
       this.on("change:state", this.onStateChange, this);
       this.onStateChange();
     },
@@ -267,6 +266,8 @@
       });
 
       this.requestBackgroundRedraw = true;
+
+      this.accumTime = this.get("time");
 
       return this;
     },

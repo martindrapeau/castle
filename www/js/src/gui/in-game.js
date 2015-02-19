@@ -77,7 +77,7 @@
         backgroundColor: "transparent",
         img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
       });
-      this.homeButton.on("tap", this.exit, this);
+      this.homeButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
 
       this.resumeButton = new Backbone.Button({
         width: 70, height: 70,
@@ -137,8 +137,11 @@
 
       return this;
     },
-    exit: function() {
+    action: function(event) {
       var panel = this;
+
+      this.homeButton.trigger("detach");
+      this.resumeButton.trigger("detach");
 
       this.engine.add(this.levelInOutScene);
       this.levelInOutScene.exit().once("detach", function() {
@@ -146,7 +149,7 @@
         panel.pauseButton.trigger("attach");
         panel.input.trigger("attach");
         panel.set({y: 720});
-        panel.showGui();
+        panel.engine.trigger(event);
       });
 
       return this;
@@ -172,46 +175,33 @@
       this.pauseButton = options.pauseButton;
       this.world = options.world;
       this.input = options.input;
-      this.showGui = options.showGui;
-      this.nextLevel = options.nextLevel;
       this.levelInOutScene = options.levelInOutScene;
-
-      this.restartButton = new Backbone.Button({
-        width: 70, height: 70,
-        backgroundColor: "transparent",
-        img: "#gui", imgX: 70, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
-      });
-      this.restartButton.on("tap", this.restart, this);
 
       this.nextButton = new Backbone.Button({
         width: 70, height: 70,
         backgroundColor: "transparent",
         img: "#gui", imgX: 280, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
       });
-      this.nextButton.on("tap", this.next, this);
+      this.nextButton.on("tap", _.partial(this.action, "continueGame"), this);
 
       this.homeButton = new Backbone.Button({
         width: 70, height: 70,
         backgroundColor: "transparent",
         img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
       });
-      this.homeButton.on("tap", this.exit, this);
+      this.homeButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
     },
     onAttach: function() {
       Backbone.Panel.prototype.onAttach.apply(this, arguments);
-      this.restartButton.engine = this.engine;
       this.homeButton.engine = this.engine;
       this.nextButton.engine = this.engine;
-      this.restartButton.trigger("attach");
       this.homeButton.trigger("attach");
       this.nextButton.trigger("attach");
     },
     onDetach: function() {
       Backbone.Panel.prototype.onDetach.apply(this, arguments);
-      this.restartButton.trigger("detach");
       this.homeButton.trigger("detach");
       this.nextButton.trigger("detach");
-      this.restartButton.engine = undefined;
       this.homeButton.engine = undefined;
       this.nextButton.engine = undefined;
     },
@@ -219,49 +209,30 @@
       var x = this.get("x"),
           y = this.get("y");
 
-      this.restartButton.set({x: x + 70, y: y + 330}, {silent: true}).draw(context);
-      this.homeButton.set({x: x + 147, y: y + 330}, {silent: true}).draw(context);
-      this.nextButton.set({x: x + 223, y: y + 330}, {silent: true}).draw(context);
+      this.homeButton.set({x: x + 87, y: y + 330}, {silent: true}).draw(context);
+      this.nextButton.set({x: x + 209, y: y + 330}, {silent: true}).draw(context);
       
       return this;
     },
     show: function() {
       this.world.set("state", "pause");
 
-      this.restartButton.trigger("detach");
+      this.engine.trigger("levelComplete");
+
       this.homeButton.trigger("detach");
       this.nextButton.trigger("detach");
       this.pauseButton.trigger("detach");
       this.input.trigger("detach");
 
       this.moveTo(this.get("x"), 100, function() {
-        this.restartButton.trigger("attach");
         this.homeButton.trigger("attach");
         this.nextButton.trigger("attach");
       });
       return this;
     },
-    restart: function() {
-
-    },
-    exit: function() {
+    action: function(event) {
       var panel = this;
 
-      this.engine.add(this.levelInOutScene);
-      this.levelInOutScene.exit().once("detach", function() {
-        panel.engine.remove(this.levelInOutScene);
-        panel.pauseButton.trigger("attach");
-        panel.input.trigger("attach");
-        panel.set({y: 720});
-        panel.showGui();
-      });
-
-      return this;
-    },
-    next: function() {
-      var panel = this;
-
-      this.restartButton.trigger("detach");
       this.homeButton.trigger("detach");
       this.nextButton.trigger("detach");
 
@@ -271,7 +242,7 @@
         panel.pauseButton.trigger("attach");
         panel.input.trigger("attach");
         panel.set({y: 720});
-        panel.nextLevel();
+        panel.engine.trigger(event);
       });
 
       return this;

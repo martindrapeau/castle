@@ -36,7 +36,7 @@
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
       options || (options = {});
-      this.state = options.state;
+      this.saved = options.saved;
       this.world = options.world;
       _.bindAll(this, "enter", "exit");
     },
