@@ -66,11 +66,13 @@
       return _.pick(this.attributes, this.shallowAttributes);
     },
     onAttach: function() {
-      var engine = this.engine;
+      var world = this,
+          engine = this.engine;
       this.on("change:viewportLeft change:viewportRight change:viewportTop change:viewportBottom", this.updateViewport);
       this.updateViewport();
       this.sprites.each(function(sprite) {
         sprite.engine = engine;
+        sprite.world = world;
         sprite.trigger("attach", engine);
       });
       this.listenTo(this.engine, "tap", this.onTap);
@@ -80,6 +82,7 @@
       this.stopListening(this.engine);
       this.sprites.each(function(sprite) {
         sprite.engine = undefined;
+        sprite.world = undefined;
         sprite.trigger("detach");
       });
       this.off("change:viewportLeft change:viewportRight change:viewportTop change:viewportBottom", this.updateViewport);
@@ -258,6 +261,7 @@
         newSprite = world.add(newSprite);
         if (world.engine) {
           newSprite.engine = world.engine;
+          newSprite.world = world;
           newSprite.trigger("attach");
         }
 
@@ -800,6 +804,7 @@
         this.camera.setOptions({world: this, subject: newSprite});
 
       newSprite.engine = this.engine;
+      newSprite.world = this;
       newSprite.trigger("attach", this.engine);
 
       return newSprite;

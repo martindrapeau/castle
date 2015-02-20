@@ -126,7 +126,7 @@ $(window).on("load", function() {
       this.listenTo(this.engine, "newGame", _.partial(this.play, true));
       this.listenTo(this.engine, "continueGame", this.play);
       this.listenTo(this.engine, "nextLevel", this.nextLevel);
-      this.listenTo(this.engine, "levelComplete", this.levelComplete);
+      this.listenTo(this.engine, "saveLevelComplete", this.saveLevelComplete);
 
       // Start everything
       this.showTitleScreen();
@@ -200,7 +200,7 @@ $(window).on("load", function() {
 
       return this;
     },
-    levelComplete: function() {
+    saveLevelComplete: function() {
       this.saveGame();
 
       var levelIndex = this.world.get("level");

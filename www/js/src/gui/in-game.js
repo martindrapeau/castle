@@ -213,10 +213,14 @@
         click: "next"
       }
     },
+    initialize: function(attributes, options) {
+      Backbone.InGamePanel.prototype.initialize.apply(this, arguments);
+      this.listenTo(this.world, "levelComplete", this.show);
+    },
     show: function() {
       this.world.set("state", "pause");
 
-      this.engine.trigger("levelComplete");
+      this.engine.trigger("saveLevelComplete");
 
       this.detachButtons();
       this.pauseButton.trigger("detach");

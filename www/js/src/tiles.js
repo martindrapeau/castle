@@ -59,6 +59,17 @@
   extendSprite(Backbone.Tile, "f-sign1", {collision: false, zIndex: 1}, {idle: {sequences: [96]}});
   extendSprite(Backbone.Tile, "f-sign2", {collision: false, zIndex: 1}, {idle: {sequences: [97]}});
 
+  Backbone.FSign2.prototype.update = function(dt) {
+    if (!Backbone.Tile.prototype.update.apply(this, arguments)) return false;
+
+    if (this.world) {
+      var character = this.world.findAt(this.attributes.x, this.attributes.y, "character", this, true);
+      if (character && character.get("hero")) this.world.trigger("levelComplete");
+    }
+
+    return true;
+  }
+
   extendSprite(Backbone.Tile, "f-fence1", {collision: false, zIndex: 1}, {idle: {sequences: [100]}});
   extendSprite(Backbone.Tile, "f-fence2", {collision: false, zIndex: 1}, {idle: {sequences: [101]}});
 
