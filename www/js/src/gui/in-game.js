@@ -10,7 +10,7 @@
         textAlign: "center"
       },
       easing: "easeInCubic",
-      easingTime: 400
+      easingTime: 600
     }),
     enter: function() {
       var scene = this;

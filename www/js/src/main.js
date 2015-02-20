@@ -140,19 +140,16 @@ $(window).on("load", function() {
         this.debugPanel.clear();
       }
 
-      var startScene = this.levelInOutScene;
       if (newGame || !this.saved) {
         this.world.set(Backbone.levels[0]);
         this.world.spawnSprites();
-        this.saveGame();
-        startScene = this.leveStartScene;
       } else {
         this.world.set(Backbone.levels[this.saved.levelIndex]);
-        this.world.spawnSprites();
         this.world.set({
           pause: true,
           time: this.saved.time
         });
+        this.world.spawnSprites();
         var hero = this.world.sprites.findWhere({hero: true});
         hero.set({
           health: this.saved.health,
@@ -168,13 +165,13 @@ $(window).on("load", function() {
         this.input,
         this.pausePanel,
         this.levelEndPanel,
-        startScene
+        this.leveStartScene
       ]);
       if (this.debugPanel) this.engine.add(this.debugPanel);
       this.engine.set("clearOnDraw", false);
       this.engine.start();
 
-      startScene.enter();
+      this.leveStartScene.enter();
 
       return this;
     },
@@ -206,9 +203,12 @@ $(window).on("load", function() {
     levelComplete: function() {
       this.saveGame();
 
-      var levelIndex = this.saved.index + 1;
-      if (levelIndex >= Backbone.levels.length) index = 0;
+      var levelIndex = this.world.get("level");
+      if (levelIndex >= Backbone.levels.length) levelIndex = 0;
+
       this.saved.levelIndex = levelIndex;
+      this.saved.level = Backbone.levels[levelIndex].level;
+      this.saved.levelName = Backbone.levels[levelIndex].name;
 
       return this;
     },
