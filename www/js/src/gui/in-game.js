@@ -56,92 +56,76 @@
       
       return this;
     }
-   });
+  });
 
-  Backbone.PausePanel = Backbone.Panel.extend({
-    defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
-      x: 320, y: 720, width: 320, height: 240,
-      text: "Pause",
-      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
-    }),
+  Backbone.InGamePanel = Backbone.Panel.extend({
+    buttons: {
+      home: {
+        offsetX: 80, offsetY: 180,
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        click: "home"
+      }
+    },
     initialize: function(attributes, options) {
       Backbone.Panel.prototype.initialize.apply(this, arguments);
       this.pauseButton = options.pauseButton;
       this.world = options.world;
       this.input = options.input;
-      this.showGui = options.showGui;
       this.levelInOutScene = options.levelInOutScene;
 
-      this.homeButton = new Backbone.Button({
-        width: 70, height: 70,
-        backgroundColor: "transparent",
-        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
+      var panel = this;
+      _.each(this.buttons, function(button, name) {
+        button.instance = new Backbone.Button(button);
+        var callback = typeof button.click == "function" ? button.click : panel[button.click];
+        button.instance.on("tap", callback, panel);
       });
-      this.homeButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
-
-      this.resumeButton = new Backbone.Button({
-        width: 70, height: 70,
-        backgroundColor: "transparent",
-        img: "#gui", imgX: 140, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
-      });
-      this.resumeButton.on("tap", this.resume, this);
-
-      this.listenTo(this.pauseButton, "tap", this.show);
     },
     onAttach: function() {
       Backbone.Panel.prototype.onAttach.apply(this, arguments);
-      this.homeButton.engine = this.engine;
-      this.resumeButton.engine = this.engine;
-      this.homeButton.trigger("attach");
-      this.resumeButton.trigger("attach");
+      this.attachButtons();
     },
     onDetach: function() {
       Backbone.Panel.prototype.onDetach.apply(this, arguments);
-      this.homeButton.trigger("detach");
-      this.resumeButton.trigger("detach");
-      this.homeButton.engine = undefined;
-      this.resumeButton.engine = undefined;
+      this.detachButtons();
+    },
+    attachButtons: function() {
+      for (b in this.buttons)
+        if (this.buttons.hasOwnProperty(b)) {
+          this.buttons[b].instance.engine = this.engine;
+          this.buttons[b].instance.trigger("attach");
+        }
+    },
+    detachButtons: function() {
+      for (b in this.buttons)
+        if (this.buttons.hasOwnProperty(b)) {
+          this.buttons[b].instance.trigger("detach");
+          this.buttons[b].instance.engine = undefined;
+        }
     },
     onDraw: function(context) {
       var x = this.get("x"),
           y = this.get("y");
 
-      this.homeButton.set({x: x + 80, y: y + 180}, {silent: true}).draw(context);
-      this.resumeButton.set({x: x + 170, y: y + 180}, {silent: true}).draw(context);
+      for (b in this.buttons)
+        if (this.buttons.hasOwnProperty(b))
+          this.buttons[b].instance
+            .set({
+              x: x + this.buttons[b].offsetX,
+              y: y + this.buttons[b].offsetY
+            }, {silent: true})
+            .draw(context);
       
       return this;
     },
-    show: function() {
-      this.world.set("state", "pause");
-
-      this.homeButton.trigger("detach");
-      this.resumeButton.trigger("detach");
-      this.pauseButton.trigger("detach");
-      this.input.trigger("detach");
-
-      this.moveTo(this.get("x"), 200, function() {
-        this.resumeButton.trigger("attach");
-        this.homeButton.trigger("attach");
-      });
-      return this;
-    },
-    resume: function() {
-      this.homeButton.trigger("detach");
-      this.resumeButton.trigger("detach");
-
-      this.moveTo(this.get("x"), 720, function() {
-        this.world.set("state", "play");
-        this.pauseButton.trigger("attach");
-        this.input.trigger("attach");
-      });
-
-      return this;
+    home: function() {
+      return this.action("showTitleScreen");
     },
     action: function(event) {
       var panel = this;
 
-      this.homeButton.trigger("detach");
-      this.resumeButton.trigger("detach");
+      this.detachButtons();
 
       this.engine.add(this.levelInOutScene);
       this.levelInOutScene.exit().once("detach", function() {
@@ -154,11 +138,54 @@
 
       return this;
     }
+  })
+
+  Backbone.PausePanel = Backbone.InGamePanel.extend({
+    defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
+      x: 320, y: 720, width: 320, height: 240,
+      text: "Pause",
+      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
+    }),
+    buttons: _.extend({}, Backbone.InGamePanel.prototype.buttons, {
+      resume: {
+        offsetX: 170, offsetY: 180,
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 140, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        click: "resume"
+      }
+    }),
+    initialize: function(attributes, options) {
+      Backbone.InGamePanel.prototype.initialize.apply(this, arguments);
+      this.listenTo(this.pauseButton, "tap", this.show);
+    },
+    show: function() {
+      this.world.set("state", "pause");
+
+      this.detachButtons();
+      this.pauseButton.trigger("detach");
+      this.input.trigger("detach");
+
+      this.moveTo(this.get("x"), 200, function() {
+        this.attachButtons();
+      });
+      return this;
+    },
+    resume: function() {
+      this.detachButtons();
+
+      this.moveTo(this.get("x"), 720, function() {
+        this.world.set("state", "play");
+        this.pauseButton.trigger("attach");
+        this.input.trigger("attach");
+      });
+
+      return this;
+    }
   });
 
-
-  Backbone.LevelEndPanel = Backbone.Panel.extend({
-    defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
+  Backbone.LevelEndPanel = Backbone.InGamePanel.extend({
+    defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
       x: 320, y: 720, width: 366, height: 305,
       text: "Complete!",
       textContextAttributes: {
@@ -170,82 +197,38 @@
       },
       img: "#gui", imgX: 0, imgY: 1322, imgWidth: 366, imgHeight: 375, imgMargin: 0
     }),
-    initialize: function(attributes, options) {
-      Backbone.Panel.prototype.initialize.apply(this, arguments);
-      this.pauseButton = options.pauseButton;
-      this.world = options.world;
-      this.input = options.input;
-      this.levelInOutScene = options.levelInOutScene;
-
-      this.nextButton = new Backbone.Button({
+    buttons: {
+      home: {
+        offsetX: 87, offsetY: 330,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 280, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
-      });
-      this.nextButton.on("tap", _.partial(this.action, "continueGame"), this);
-
-      this.homeButton = new Backbone.Button({
+        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        click: "home"
+      },
+      resume: {
+        offsetX: 209, offsetY: 330,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
-      });
-      this.homeButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
-    },
-    onAttach: function() {
-      Backbone.Panel.prototype.onAttach.apply(this, arguments);
-      this.homeButton.engine = this.engine;
-      this.nextButton.engine = this.engine;
-      this.homeButton.trigger("attach");
-      this.nextButton.trigger("attach");
-    },
-    onDetach: function() {
-      Backbone.Panel.prototype.onDetach.apply(this, arguments);
-      this.homeButton.trigger("detach");
-      this.nextButton.trigger("detach");
-      this.homeButton.engine = undefined;
-      this.nextButton.engine = undefined;
-    },
-    onDraw: function(context) {
-      var x = this.get("x"),
-          y = this.get("y");
-
-      this.homeButton.set({x: x + 87, y: y + 330}, {silent: true}).draw(context);
-      this.nextButton.set({x: x + 209, y: y + 330}, {silent: true}).draw(context);
-      
-      return this;
+        img: "#gui", imgX: 280, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        click: "next"
+      }
     },
     show: function() {
       this.world.set("state", "pause");
 
       this.engine.trigger("levelComplete");
 
-      this.homeButton.trigger("detach");
-      this.nextButton.trigger("detach");
+      this.detachButtons();
       this.pauseButton.trigger("detach");
       this.input.trigger("detach");
 
       this.moveTo(this.get("x"), 100, function() {
-        this.homeButton.trigger("attach");
-        this.nextButton.trigger("attach");
+        this.attachButtons();
       });
       return this;
     },
-    action: function(event) {
-      var panel = this;
-
-      this.homeButton.trigger("detach");
-      this.nextButton.trigger("detach");
-
-      this.engine.add(this.levelInOutScene);
-      this.levelInOutScene.exit().once("detach", function() {
-        panel.engine.remove(this.levelInOutScene);
-        panel.pauseButton.trigger("attach");
-        panel.input.trigger("attach");
-        panel.set({y: 720});
-        panel.engine.trigger(event);
-      });
-
-      return this;
+    next: function() {
+      this.action("continueGame");
     }
   });
 
