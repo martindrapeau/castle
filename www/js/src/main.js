@@ -133,12 +133,8 @@ $(window).on("load", function() {
     },
     play: function(newGame) {
       this.engine.stop();
-      this.engine.remove(this.titleScreenGui);
-
-      if (this.debugPanel) {
-        this.engine.remove(this.debugPanel);
-        this.debugPanel.clear();
-      }
+      this.engine.reset();
+      if (this.debugPanel) this.debugPanel.clear();
 
       if (newGame || !this.saved) {
         this.world.set(Backbone.levels[0]);
@@ -179,19 +175,8 @@ $(window).on("load", function() {
       this.engine.stop();
       this.world.set("state", "pause");
 
-      this.engine.remove([
-        this.world,
-        this.display,
-        this.camera,
-        this.pauseButton,
-        this.input,
-        this.pausePanel,
-        this.levelEndPanel
-      ]);
-      if (this.debugPanel) {
-        this.engine.remove(this.debugPanel);
-        this.debugPanel.clear();
-      }
+      this.engine.reset();
+      if (this.debugPanel) this.debugPanel.clear();
 
       this.engine.add(this.titleScreenGui);
       if (this.debugPanel) this.engine.add(this.debugPanel);

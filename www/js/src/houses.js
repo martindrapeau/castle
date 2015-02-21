@@ -100,8 +100,6 @@
       this.on("removeWorld", this.onRemove);
     },
     onAdd: function() {
-      console.log("onAdd", this.get("name"));
-
       _.each(this.spritesInWorld || this.outsideSprites, this.world.add);
       this.listenTo(this.world, "tap", function(e) {
         if (this.overlaps({x: e.worldX, y: e.worldY})) this.tryOpenClose();
@@ -112,8 +110,6 @@
       return this;
     },
     onRemove:  function() {
-      console.log("onRemove", this.get("name"));
-
       this.stopListening();
       this.spritesInWorld = _.union(
         _.reduce(this.insideSprites, function(sprites, sprite) {
@@ -359,7 +355,6 @@
           text: "Key ?" 
         });
         this.world.add(callout);
-        console.log(callout);
       } else {
         character.set({key: false});
         this.open(character);

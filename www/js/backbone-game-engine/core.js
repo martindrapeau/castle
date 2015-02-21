@@ -293,7 +293,15 @@
       this.sprites.on("remove", function(sprite) {
         sprite.trigger("detach", engine);
         delete sprite._draw;
-        sprite.engine = engine;
+        sprite.engine = undefined;
+      });
+      this.sprites.on("reset", function(sprites, options) {
+        if (options && options.previousModels)
+          _.each(options.previousModels, function(sprite) {
+            sprite.trigger("detach", engine);
+            delete sprite._draw;
+            sprite.engine = undefined;
+          });
       });
 
       // Touch (triggers tap event)
@@ -321,6 +329,9 @@
     },
     remove: function() {
       return this.sprites.remove.apply(this.sprites, arguments);
+    },
+    reset: function() {
+      return this.sprites.reset.apply(this.sprites, arguments);
     },
     isRunning: function() {
       return !!this.timerId;

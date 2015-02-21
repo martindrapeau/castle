@@ -213,11 +213,28 @@
         click: "next"
       }
     },
-    initialize: function(attributes, options) {
-      Backbone.InGamePanel.prototype.initialize.apply(this, arguments);
-      this.listenTo(this.world, "levelComplete", this.show);
+    onAttach: function() {
+      Backbone.InGamePanel.prototype.onAttach.apply(this, arguments);
+      this.hero = this.world.sprites.findWhere({hero:true});
+      this.sign = this.world.sprites.findWhere({name: "f-sign2"});
+      this.shown = false;
+    },
+    onDetach: function() {
+      Backbone.InGamePanel.prototype.onDetach.apply(this, arguments);
+      this.hero = undefined;
+      this.sign = undefined;
+      this.shown = false;
+    },
+    update: function(dt) {
+
+      if (this.hero && this.sign && !this.shown &&
+          this.hero.getLeft(true) > this.sign.getLeft(true))
+        this.show();
+    
+      return Backbone.Panel.prototype.update.apply(this, arguments);
     },
     show: function() {
+      this.shown = true;
       this.world.set("state", "pause");
 
       this.engine.trigger("saveLevelComplete");
