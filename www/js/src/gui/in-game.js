@@ -249,7 +249,7 @@
       return this;
     },
     next: function() {
-      this.action("continueGame");
+      this.action("play");
     }
   });
 
