@@ -17,6 +17,7 @@ $(window).on("load", function() {
 
       // Game state
       this.saved = {};
+      //this.saved = {"date":1424585169087,"health":8,"coins":3,"level":2,"levelName":"The forest","levelIndex":1,"time":46298};
 
       // Create our sprite sheets and attach them to existing sprite classes
       this.spriteSheets = new Backbone.SpriteSheetCollection(Backbone.spriteSheetDefinitions).attachToSpriteClasses();
@@ -97,9 +98,16 @@ $(window).on("load", function() {
         levelInOutScene: this.levelInOutScene
       });
 
-      // Our title screen
+      // Our screens
       this.titleScreenGui = new Backbone.TitleScreenGui({
         id: "titleScreenGui",
+      }, {
+        saved: this.saved,
+        world: this.world
+      });
+
+      this.levelScreenGui = new Backbone.LevelScreenGui({
+        id: "levelScreenGui",
       }, {
         saved: this.saved,
         world: this.world
@@ -123,6 +131,7 @@ $(window).on("load", function() {
 
       // Events
       this.listenTo(this.engine, "showTitleScreen", this.showTitleScreen);
+      this.listenTo(this.engine, "showLevelScreen", this.showLevelScreen);
       this.listenTo(this.engine, "newGame", _.partial(this.play, true));
       this.listenTo(this.engine, "continueGame", this.play);
       this.listenTo(this.engine, "nextLevel", this.nextLevel);
@@ -136,7 +145,7 @@ $(window).on("load", function() {
       this.engine.reset();
       if (this.debugPanel) this.debugPanel.clear();
 
-      if (newGame || !this.saved) {
+      if (newGame || _.isEmpty(this.saved)) {
         this.world.set(Backbone.levels[0]);
         this.world.spawnSprites();
       } else {
@@ -179,6 +188,20 @@ $(window).on("load", function() {
       if (this.debugPanel) this.debugPanel.clear();
 
       this.engine.add(this.titleScreenGui);
+      if (this.debugPanel) this.engine.add(this.debugPanel);
+      this.engine.set("clearOnDraw", true);
+      this.engine.start();
+
+      return this;
+    },
+    showLevelScreen: function() {
+      this.engine.stop();
+      this.world.set("state", "pause");
+
+      this.engine.reset();
+      if (this.debugPanel) this.debugPanel.clear();
+
+      this.engine.add(this.levelScreenGui);
       if (this.debugPanel) this.engine.add(this.debugPanel);
       this.engine.set("clearOnDraw", true);
       this.engine.start();
