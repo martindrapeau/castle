@@ -38,6 +38,7 @@
       options || (options = {});
       this.saved = options.saved;
       this.world = options.world;
+      this.levels = options.levels;
       _.bindAll(this, "enter", "exit");
     },
     enter: function() {

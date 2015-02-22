@@ -9,6 +9,7 @@
       backgroundColor: "transparent",
       img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0
     }),
+    idAttribute: "level",
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
       this.imgForState();
@@ -58,21 +59,22 @@
       });
       this.backButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
 
-      this.levels = new Backbone.LevelViewCollection();
+      this.views = new Backbone.LevelViewCollection();
 
-      var levelIndex = 0, level;
+      var level = this.levels.first(),
+          i = level ? level.id : 1;
       for (var y = 110; y <= 470; y += 360)
         for (var x = 117; x < 885; x += 192) {
-          level = levelIndex < Backbone.levels.length ? Backbone.levels[levelIndex] : null;
-          this.levels.add({
-            id: levelIndex,
-            level: level ? level.name : "",
-            state: this._calculateState(levelIndex, level),
+          this.views.add({
+            level: level ? level.id : i,
+            name: level ? level.get("name") : "",
+            state: this._calculateState(level),
             x: x,
             y: y
           });
 
-          levelIndex += 1;
+          level = level ? this.levels.at(this.levels.indexOf(level) + 1) : null;
+          i = level ? level.id : (i + 1);
         }
 
     },
@@ -82,7 +84,7 @@
       this.set("opacity", 0);
 
       this.engine.add(this.backButton);
-      this.engine.add(this.levels.models);
+      this.engine.add(this.views.models);
       this.updateLevelStates();
 
       this.fadeIn();
@@ -90,24 +92,19 @@
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
       this.engine.remove(this.backButton);
-      this.engine.remove(this.levels.models);
+      this.engine.remove(this.views.models);
     },
-    _calculateState: function(levelIndex, level) {
-      var state = level == null ? "future" : "locked";
-      if (_.isEmpty(this.saved)) {
-        if (levelIndex == 0) state = "unlocked";
-      } else if (!_.isEmpty(this.saved)) {
-        if (levelIndex <= this.saved.levelIndex) state = "played";
-        if (levelIndex == this.saved.levelIndex + 1) state = "unlocked";
-      }
-      return state;
+    _calculateState: function(level) {
+      if (!level) return "future";
+      if (this.saved.get(level.id)) return "played";
+      if (this.saved.getNextLevel().id == level.id) return "unlocked";
+      return "locked";
     },
     updateLevelStates: function() {
       var gui = this;
-      this.levels.each(function(viewModel) {
-        level = viewModel.id < Backbone.levels.length ? Backbone.levels[viewModel.id] : null;
-        viewModel.set({
-          state: gui._calculateState(viewModel.id, level)
+      this.views.each(function(view) {
+        view.set({
+          state: gui._calculateState(gui.levels.get(view.id))
         });
       });
     },
@@ -118,8 +115,8 @@
           options = {silent: true};
 
       this.backButton.set(attrs, options);
-      for (var i = 0; i < this.levels.models.length; i++)
-        this.levels.models[i].set(attrs, options);
+      for (var i = 0; i < this.views.models.length; i++)
+        this.views.models[i].set(attrs, options);
 
       return true;
     },

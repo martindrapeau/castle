@@ -23,7 +23,7 @@
   Backbone.SavedGame = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: 960,
-      y: 400,
+      y: 300,
       width: 333,
       height: 80,
       backgroundColor: "transparent",
@@ -46,13 +46,14 @@
     },
     onAttach: function() {
       Backbone.Button.prototype.onAttach.apply(this, arguments);
-      this.set("text", "Level " + (this.saved.level !== undefined ? this.saved.level : "?"));
+      this.set("text", "Level " + (this.saved.size() > 0 ? this.saved.last().get("level") : "?"));
     },
     onDraw: function(context) {
       var x = this.get("x"),
           y = this.get("y"),
-          coins = this.saved.coins !== undefined ? this.saved.coins : "?",
-          time = this.saved.time !== undefined ? _.ms2time(this.saved.time) : "?";
+          lastState = this.saved.size() > 0 ? this.saved.last() : null,
+          coins = lastState ? lastState.get("coins") : "?",
+          time = lastState ? _.ms2time(lastState.get("time")) : "?";
       context.font = "30px arcade";
       context.fillStyle = "#FFF";
       context.fillText(coins, x+80, y+105);
@@ -114,31 +115,42 @@
       });
 
       this.newGame = new Backbone.PullOutButton({
-        y: 260,
+        y: 300,
         text: "New Game "
       });
       this.newGame.on("tap", _.partial(this.action, "newGame"), this);
 
-      this.continueGame = new Backbone.PullOutButton({
-        y: 380,
-        text: "Continue "
-      });
-      this.continueGame.on("tap", _.partial(this.action, "continueGame"), this);
-
       this.levelButton = new Backbone.PullOutButton({
-        y: 500,
+        y: 420,
         text: "Levels "
       });
       this.levelButton.on("tap", _.partial(this.action, "showLevelScreen"), this);
 
       this.showCredits = new Backbone.PullOutButton({
-        y: 620,
+        y: 540,
         text: "Credits "
       });
 
-      this.savedGame = new Backbone.SavedGame({}, {
+      this.continueGame = new Backbone.PullOutButton({
+        x: 960,
+        y: 300,
+        text: "Continue ",
+        textContextAttributes: {
+          fillStyle: "#F67D00",
+          font: "34px arcade",
+          textBaseline: "middle",
+          fontWeight: "normal",
+          textAlign: "left"
+        }
+      });
+      this.continueGame.on("tap", _.partial(this.action, "continueGame"), this);
+
+      this.savedGame = new Backbone.SavedGame({
+        y: 420
+      }, {
         saved: this.saved
       });
+
 
       this.credits = new Backbone.Credits();
       this.showCredits.on("tap", _.partial(this.showPanel, this.credits), this);
@@ -182,8 +194,8 @@
       this.newGame.moveTo(-this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2, this.newGame.get("y"));
       this.levelButton.moveTo(-this.levelButton.get("width") + this.levelButton.textMetrics.width + this.levelButton.get("textPadding")*2, this.levelButton.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
-      if (!_.isEmpty(this.saved)) {
-        this.continueGame.moveTo(-this.continueGame.get("width") + this.continueGame.textMetrics.width + this.continueGame.get("textPadding")*2, this.continueGame.get("y"));
+      if (this.saved.size() > 0) {
+        this.continueGame.moveTo(960 - this.continueGame.textMetrics.width - this.continueGame.get("textPadding")*2, this.continueGame.get("y"));
         this.savedGame.moveTo(720, this.savedGame.get("y"));
       }
     },
@@ -191,7 +203,7 @@
       this.newGame.moveTo(-this.newGame.get("width"), this.newGame.get("y"));
       this.levelButton.moveTo(-this.levelButton.get("width"), this.levelButton.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width"), this.showCredits.get("y"));
-      this.continueGame.moveTo(-this.continueGame.get("width"), this.continueGame.get("y"));
+      this.continueGame.moveTo(960, this.continueGame.get("y"));
       this.savedGame.moveTo(960, this.savedGame.get("y"));
     },
     showPanel: function(panel) {

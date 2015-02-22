@@ -9,15 +9,39 @@ $(window).on("load", function() {
       spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
 
+  Backbone.Level = Backbone.Model.extend({
+    idAttribute: "level",
+    comparator: "level"
+  });
+  Backbone.LevelCollection = Backbone.Collection.extend({
+    model: Backbone.Level
+  });
+  Backbone.SavedState = Backbone.Model.extend({
+    idAttribute: "level",
+    comparator: "level"
+  });
+  Backbone.SavedStateCollection = Backbone.Collection.extend({
+    model: Backbone.Level,
+    initialize: function(models, options) {
+      this.levels = options.levels
+    },
+    getNextLevel: function() {
+      var state = this.last();
+      if (!state) return this.levels.first();
+      var lastPlayed = this.levels.get(state.id),
+          nextLevel = this.levels.at(this.levels.indexOf(lastPlayed) + 1);
+      return nextLevel || this.levels.first();
+    }
+  });
+
 
   Backbone.Controller = Backbone.Model.extend({
     initialize: function(attributes, options) {
       options || (options = {});
       var controller = this;
 
-      // Game state
-      this.saved = {};
-      //this.saved = {"date":1424585169087,"health":8,"coins":3,"level":2,"levelName":"The forest","levelIndex":1,"time":46298};
+      this.levels = new Backbone.LevelCollection(_levels);
+      this.saved = new Backbone.SavedStateCollection(null, {levels: this.levels});
 
       // Create our sprite sheets and attach them to existing sprite classes
       this.spriteSheets = new Backbone.SpriteSheetCollection(Backbone.spriteSheetDefinitions).attachToSpriteClasses();
@@ -103,14 +127,16 @@ $(window).on("load", function() {
         id: "titleScreenGui",
       }, {
         saved: this.saved,
-        world: this.world
+        world: this.world,
+        levels: this.levels
       });
 
       this.levelScreenGui = new Backbone.LevelScreenGui({
         id: "levelScreenGui",
       }, {
         saved: this.saved,
-        world: this.world
+        world: this.world,
+        levels: this.levels
       });
 
 
@@ -145,20 +171,22 @@ $(window).on("load", function() {
       this.engine.reset();
       if (this.debugPanel) this.debugPanel.clear();
 
-      if (newGame || _.isEmpty(this.saved)) {
-        this.world.set(Backbone.levels[0]);
+      if (newGame || this.saved.size() == 0) {
+        this.world.set(this.levels.first().toJSON());
         this.world.spawnSprites();
       } else {
-        this.world.set(Backbone.levels[this.saved.levelIndex]);
+        var lastState = this.saved.last(),
+            nextLevel = this.saved.getNextLevel();
+        this.world.set(nextLevel.toJSON());
         this.world.set({
           pause: true,
-          time: this.saved.time
+          time: lastState.get("time")
         });
         this.world.spawnSprites();
         var hero = this.world.sprites.findWhere({hero: true});
         hero.set({
-          health: this.saved.health,
-          coins: this.saved.coins
+          health: lastState.get("health"),
+          coins: lastState.get("coins")
         });
       }
 
@@ -209,29 +237,19 @@ $(window).on("load", function() {
       return this;
     },
     saveLevelComplete: function() {
-      this.saveGame();
-
-      var levelIndex = this.world.get("level");
-      if (levelIndex >= Backbone.levels.length) levelIndex = 0;
-
-      this.saved.levelIndex = levelIndex;
-      this.saved.level = Backbone.levels[levelIndex].level;
-      this.saved.levelName = Backbone.levels[levelIndex].name;
-
-      return this;
+      return this.saveGame();
     },
     saveGame: function() {
       var hero = this.world.sprites.findWhere({hero: true});
 
-      _.extend(this.saved, {
+      this.saved.add({
         date: _.now(),
         health: hero.get("health"),
         coins: hero.get("coins"),
         level: this.world.get("level"),
         levelName: this.world.get("name"),
-        levelIndex: this.world.get("level") - 1,
         time: this.world.get("time")
-      });
+      }, {merge: true});
 
       return this;
     }
