@@ -114,11 +114,11 @@
         easingTime: 300
       });
 
-      this.newGame = new Backbone.PullOutButton({
+      this.play = new Backbone.PullOutButton({
         y: 300,
         text: "New Game "
       });
-      this.newGame.on("tap", _.partial(this.action, "newGame"), this);
+      this.play.on("tap", _.partial(this.action, "play"), this);
 
       this.levelButton = new Backbone.PullOutButton({
         y: 420,
@@ -131,22 +131,8 @@
         text: "Credits "
       });
 
-      this.continueGame = new Backbone.PullOutButton({
-        x: 960,
-        y: 300,
-        text: "Continue ",
-        textContextAttributes: {
-          fillStyle: "#F67D00",
-          font: "34px arcade",
-          textBaseline: "middle",
-          fontWeight: "normal",
-          textAlign: "left"
-        }
-      });
-      this.continueGame.on("tap", _.partial(this.action, "continueGame"), this);
-
       this.savedGame = new Backbone.SavedGame({
-        y: 420
+        y: 300
       }, {
         saved: this.saved
       });
@@ -160,8 +146,7 @@
 
       // Hack to avoid FOUT
       this.touchStart.set("opacity", 1);
-      this.newGame.textMetrics = undefined;
-      this.continueGame.textMetrics = undefined;
+      this.play.textMetrics = undefined;
       this.levelButton.textMetrics = undefined;
       this.showCredits.textMetrics = undefined;
     },
@@ -171,7 +156,9 @@
       this.set("opacity", 1);
       this.loading.set("x", 720);
 
-      this.engine.add([this.banner, this.touchStart, this.loading, this.newGame, this.levelButton, this.showCredits, this.credits, this.continueGame, this.savedGame]);
+      this.play.set("text", this.saved.size() > 0 ? "Continue " : "New Game ");
+
+      this.engine.add([this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame]);
 
       if (!this.ready)
         setTimeout(this.postInitialize.bind(this), 200);
@@ -180,7 +167,7 @@
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove([this.banner, this.touchStart, this.loading, this.newGame, this.levelButton, this.showCredits, this.credits, this.savedGame, this.continueGame]);
+      this.engine.remove([this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame]);
     },
     onTouchStart: function(e) {
       // Animate some stuff
@@ -191,19 +178,16 @@
       this.showButtons();
     },
     showButtons: function() {
-      this.newGame.moveTo(-this.newGame.get("width") + this.newGame.textMetrics.width + this.newGame.get("textPadding")*2, this.newGame.get("y"));
+      this.play.moveTo(-this.play.get("width") + this.play.textMetrics.width + this.play.get("textPadding")*2, this.play.get("y"));
       this.levelButton.moveTo(-this.levelButton.get("width") + this.levelButton.textMetrics.width + this.levelButton.get("textPadding")*2, this.levelButton.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
-      if (this.saved.size() > 0) {
-        this.continueGame.moveTo(960 - this.continueGame.textMetrics.width - this.continueGame.get("textPadding")*2, this.continueGame.get("y"));
+      if (this.saved.size() > 0)
         this.savedGame.moveTo(720, this.savedGame.get("y"));
-      }
     },
     hideButtons: function() {
-      this.newGame.moveTo(-this.newGame.get("width"), this.newGame.get("y"));
+      this.play.moveTo(-this.play.get("width"), this.play.get("y"));
       this.levelButton.moveTo(-this.levelButton.get("width"), this.levelButton.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width"), this.showCredits.get("y"));
-      this.continueGame.moveTo(960, this.continueGame.get("y"));
       this.savedGame.moveTo(960, this.savedGame.get("y"));
     },
     showPanel: function(panel) {
@@ -227,8 +211,7 @@
       this.banner.set(attrs, options);
       this.touchStart.set(attrs, options);
       this.loading.set(attrs, options);
-      this.newGame.set(attrs, options);
-      this.continueGame.set(attrs, options);
+      this.play.set(attrs, options);
       this.showCredits.set(attrs, options);
       this.credits.set(attrs, options);
       this.levelButton.set(attrs, options);
@@ -237,8 +220,7 @@
       return true;
     },
     action: function(event) {
-      if (event == "newGame")
-        this.loading.set("x", 400);
+      if (event == "play") this.loading.set("x", 400);
 
       var gui = this;
       this.hideButtons();

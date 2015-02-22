@@ -31,6 +31,10 @@ $(window).on("load", function() {
       var lastPlayed = this.levels.get(state.id),
           nextLevel = this.levels.at(this.levels.indexOf(lastPlayed) + 1);
       return nextLevel || this.levels.first();
+    },
+    getPreviousState: function(level) {
+      var prev = this.levels.at(this.levels.indexOf(level) - 1);
+      return prev ? this.get(prev.id) : null;
     }
   });
 
@@ -158,35 +162,32 @@ $(window).on("load", function() {
       // Events
       this.listenTo(this.engine, "showTitleScreen", this.showTitleScreen);
       this.listenTo(this.engine, "showLevelScreen", this.showLevelScreen);
-      this.listenTo(this.engine, "newGame", _.partial(this.play, true));
-      this.listenTo(this.engine, "continueGame", this.play);
+      this.listenTo(this.engine, "play", this.play);
       this.listenTo(this.engine, "nextLevel", this.nextLevel);
       this.listenTo(this.engine, "saveLevelComplete", this.saveLevelComplete);
 
       // Start everything
       this.showTitleScreen();
     },
-    play: function(newGame) {
+    play: function(levelId) {
       this.engine.stop();
       this.engine.reset();
       if (this.debugPanel) this.debugPanel.clear();
 
-      if (newGame || this.saved.size() == 0) {
-        this.world.set(this.levels.first().toJSON());
-        this.world.spawnSprites();
-      } else {
-        var lastState = this.saved.last(),
-            nextLevel = this.saved.getNextLevel();
-        this.world.set(nextLevel.toJSON());
-        this.world.set({
-          pause: true,
-          time: lastState.get("time")
-        });
-        this.world.spawnSprites();
+      var level = levelId ? this.levels.get(levelId) : this.saved.getNextLevel(),
+          state = this.saved.getPreviousState(level);
+
+      this.world.set(level.toJSON());
+      this.world.set({
+        pause: true,
+        time: state ? state.get("time") : 0
+      });
+      this.world.spawnSprites();
+      if (state) {
         var hero = this.world.sprites.findWhere({hero: true});
         hero.set({
-          health: lastState.get("health"),
-          coins: lastState.get("coins")
+          health: state.get("health"),
+          coins: state.get("coins")
         });
       }
 

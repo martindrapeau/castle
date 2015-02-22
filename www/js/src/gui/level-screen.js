@@ -62,16 +62,18 @@
       this.views = new Backbone.LevelViewCollection();
 
       var level = this.levels.first(),
-          i = level ? level.id : 1;
+          i = level ? level.id : 1,
+          view;
       for (var y = 110; y <= 470; y += 360)
         for (var x = 117; x < 885; x += 192) {
-          this.views.add({
+          view = this.views.add({
             level: level ? level.id : i,
             name: level ? level.get("name") : "",
             state: this._calculateState(level),
             x: x,
             y: y
           });
+          view.on("tap", _.partial(this.play, view), this);
 
           level = level ? this.levels.at(this.levels.indexOf(level) + 1) : null;
           i = level ? level.id : (i + 1);
@@ -124,6 +126,13 @@
       var gui = this;
       this.fadeOut(function() {
         gui.engine.trigger(event);
+      });
+    },
+    play: function(level) {
+      if (!level || level.get("state") == "locked" || level.get("state") == "future") return this;
+      var gui = this;
+      this.fadeOut(function() {
+        gui.engine.trigger("play", level.id);
       });
     }
   });
