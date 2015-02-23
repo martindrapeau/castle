@@ -486,6 +486,7 @@
       // Text
       text:  undefined,
       textPadding: 0,
+      textLineHeight: 30,
       textContextAttributes: undefined,
       // Animations
       easingTime: 1000,
@@ -611,7 +612,7 @@
           y = b.y,
           padding = this.get("textPadding"),
           textContextAttributes = this.get("textContextAttributes");
-      if (text) {
+      if (text !== undefined && text !== null && ""+text !== "") {
         if (typeof textContextAttributes == "object")
           for (var attr in textContextAttributes)
             if (textContextAttributes.hasOwnProperty(attr))
@@ -629,19 +630,32 @@
             x += b.width/2;
             break;
         }
+        var lines = (""+text).split("\n");
         switch (context.textBaseline) {
           case "top":
             y += padding;
           case "bottom":
-            y += b.height - padding;
+            y += b.height - padding - (lines.length-1)*b.textLineHeight;
             break;
           case "middle":
-            y += b.height/2;
+            y += b.height/2 - (lines.length-1)*b.textLineHeight/2;
             break;
         }
-        context.fillText(text, x, y);
-        if (!this.textMetrics)
-          this.textMetrics = context.measureText(text);
+        if (lines.length == 1) {
+          context.fillText(text, x, y);
+          if (!this.textMetrics) this.textMetrics = context.measureText(text);
+        } else {
+          var textMetrics;
+          for (var i = 0; i < lines.length; i++) {
+            context.fillText(lines[i], x, y);
+            y += b.textLineHeight;
+            if (!this.textMetrics) {
+              var temp = context.measureText(lines[i]);
+              if (!textMetrics || temp.width > textMetrics.width) textMetrics = temp;
+            }
+          }
+          if (textMetrics) this.textMetrics = textMetrics;
+        }
       }
 
       if (typeof this.onDraw == "function") this.onDraw(context);

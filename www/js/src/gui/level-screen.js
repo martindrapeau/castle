@@ -7,31 +7,53 @@
       state: "locked", // locked, unlocked, played, future
       width: 150, height: 140,
       backgroundColor: "transparent",
-      img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0
+      img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0,
+      text: "",
+      textContextAttributes: {
+        fillStyle: "#FFFFFF",
+        font: "18px arcade",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "center"
+      },
     }),
     idAttribute: "level",
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
-      this.imgForState();
-      this.on("change:state", this.imgForState);
+      this.updateInfo();
+      this.on("change:state", this.updateInfo);
     },
-    imgForState: function() {
-      var imgX = this.attributes.imgX;
+    updateInfo: function() {
+      var attrs = {
+        imgX: 0,
+        text: "",
+        textContextAttributes: _.clone(this.get("textContextAttributes"))
+      };
+
       switch (this.attributes.state) {
         case "locked":
-          imgX = 300;
+          attrs.imgX = 300;
           break;
         case "unlocked":
-          imgX = 150;
+          attrs.imgX = 150;
           break;
         case "future":
-          imgX = 450;
+          attrs.imgX = 450;
+          attrs.text = "Comming\nSoon";
+          attrs.textContextAttributes.textBaseline = "middle";
           break;
-        default:
-          imgX = 0;
+        case "played":
+          attrs.imgX = 0;
+          attrs.text = this.get("coins");
+          attrs.height = 198;
+          attrs.textPadding = 65;
+          attrs.textContextAttributes.font = "24px arcade";
+          attrs.textContextAttributes.textAlign = "left";
+          attrs.textContextAttributes.textBaseline = "bottom";
           break;
       }
-      this.set("imgX", imgX);
+
+      this.set(attrs);
       return this;
     }
   });
@@ -105,8 +127,11 @@
     updateLevelStates: function() {
       var gui = this;
       this.views.each(function(view) {
+        var state = gui.saved.get(view.id);
         view.set({
-          state: gui._calculateState(gui.levels.get(view.id))
+          state: gui._calculateState(gui.levels.get(view.id)),
+          coins: state ? state.get("coins") : 0,
+          time: state ? state.get("time") : 0
         });
       });
     },
