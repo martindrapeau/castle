@@ -698,8 +698,7 @@
       if (this.get("opacity") == 0) return;
       if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
           e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height) {
-        this.trigger("tap", e);
-        this.pressed();
+        this.pressed(_.partial(this.trigger, "tap", e));
       }
     },
     overlaps: Backbone.Sprite.prototype.overlaps,
