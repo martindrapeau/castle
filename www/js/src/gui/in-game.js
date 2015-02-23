@@ -84,6 +84,7 @@
     },
     onAttach: function() {
       Backbone.Panel.prototype.onAttach.apply(this, arguments);
+      this.stopListening(this.engine);
       this.attachButtons();
     },
     onDetach: function() {
@@ -103,6 +104,12 @@
           this.buttons[b].instance.trigger("detach");
           this.buttons[b].instance.engine = undefined;
         }
+    },
+    onUpdate: function(dt) {
+      for (b in this.buttons)
+        if (this.buttons.hasOwnProperty(b))
+          this.buttons[b].instance.update(dt);
+      return this;
     },
     onDraw: function(context) {
       var x = this.get("x"),
@@ -125,10 +132,9 @@
     action: function(event) {
       var panel = this;
 
-      this.detachButtons();
-
       this.engine.add(this.levelInOutScene);
       this.levelInOutScene.exit().once("detach", function() {
+        panel.detachButtons();
         panel.engine.remove(this.levelInOutScene);
         panel.pauseButton.trigger("attach");
         panel.input.trigger("attach");
@@ -172,9 +178,8 @@
       return this;
     },
     resume: function() {
-      this.detachButtons();
-
       this.moveTo(this.get("x"), 720, function() {
+        this.detachButtons();
         this.world.set("state", "play");
         this.pauseButton.trigger("attach");
         this.input.trigger("attach");

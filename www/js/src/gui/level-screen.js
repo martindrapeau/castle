@@ -9,8 +9,9 @@
       backgroundColor: "transparent",
       img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0,
       text: "",
+      textLineHeight: 20,
       textContextAttributes: {
-        fillStyle: "#FFFFFF",
+        fillStyle: "#FFF",
         font: "18px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
@@ -39,8 +40,10 @@
           break;
         case "future":
           attrs.imgX = 450;
+          attrs.height = 160;
+          attrs.textContextAttributes.fillStyle = "#999";
           attrs.text = "Comming\nSoon";
-          attrs.textContextAttributes.textBaseline = "middle";
+          attrs.textContextAttributes.textBaseline = "bottom";
           break;
         case "played":
           attrs.imgX = 0;

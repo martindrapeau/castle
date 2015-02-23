@@ -467,6 +467,7 @@
 
   // Button class; a button with an optional image.
   // Triggers the tap event when pressed.
+  var fontRe = /(\d+)px/;
   Backbone.Button = Backbone.Model.extend({
     defaults: {
       x: 0,
@@ -491,7 +492,8 @@
       // Animations
       easingTime: 1000,
       easing: "linear",
-      opacity: 1
+      opacity: 1,
+      scale: 1
     },
     initialize: function() {
       this.on("attach", this.onAttach);
@@ -531,6 +533,13 @@
       this.startTime = _.now();
       this.callback = callback;
       this.set("opacity", 1);
+      return this;
+    },
+    pressed: function(callback) {
+      this.animation = "pressed";
+      this.startTime = _.now();
+      this.callback = callback
+      this.set("scale", 1);
       return this;
     },
     update: function(dt) {
@@ -582,8 +591,23 @@
             this.callback = undefined;
           }
           break;
+
+        case "pressed":
+          easing = "linear";
+          easingTime = 200;
+          if (now < this.startTime + easingTime) {
+            this.set("scale", 1.05 - Math.abs(Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime)-0.5)/10 );
+          } else {
+            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
+            this.set({scale: 1}, {silent: true});
+            this.animation = undefined;
+            this.startTime = undefined;
+            this.callback = undefined;
+          }
+          break;
       }
 
+      if (typeof this.onUpdate == "function") this.onUpdate(dt);
       return true;
     },
     draw: function(context) {
@@ -593,24 +617,26 @@
       context.save();
 
       context.globalAlpha = b.opacity;
+      var offsetX = (1-b.scale) * b.width/2,
+          offsetY = (1-b.scale) * b.height/2;
 
       if (b.backgroundColor && b.backgroundColor != "transparent") {
         if (b.borderRadius)
-          drawRoundRect(context, b.x, b.y, b.width, b.height, b.borderRadius, b.backgroundColor, false);
+          drawRoundRect(context, b.x+offsetX, b.y+offsetY, b.width*b.scale, b.height*b.scale, b.borderRadius, b.backgroundColor, false);
         else
-          drawRect(context, b.x, b.y, b.width, b.height, b.backgroundColor, false)
+          drawRect(context, b.x+offsetX, b.y+offsetY, b.width*b.scale, b.height*b.scale, b.backgroundColor, false);
       }
 
       if (this.img)
         context.drawImage(this.img,
           b.imgX, b.imgY, b.imgWidth, b.imgHeight,
-          b.x + b.imgMargin, b.y + b.imgMargin, b.imgWidth, b.imgHeight
+          b.x + b.imgMargin + offsetX, b.y + b.imgMargin + offsetY, b.imgWidth*b.scale, b.imgHeight*b.scale
         );
 
       var text = this.get("text"),
           x = b.x,
           y = b.y,
-          padding = this.get("textPadding"),
+          padding = this.get("textPadding") * b.scale,
           textContextAttributes = this.get("textContextAttributes");
       if (text !== undefined && text !== null && ""+text !== "") {
         if (typeof textContextAttributes == "object")
@@ -620,11 +646,11 @@
         switch (context.textAlign) {
           case "left":
           case "start":
-            x += padding;
+            x += padding + offsetX;
             break;
           case "right":
           case "end":
-            x += b.width - padding;
+            x += b.width - padding - offsetX;
             break;
           case "center":
             x += b.width/2;
@@ -633,13 +659,18 @@
         var lines = (""+text).split("\n");
         switch (context.textBaseline) {
           case "top":
-            y += padding;
+            y += padding + offsetY;
           case "bottom":
-            y += b.height - padding - (lines.length-1)*b.textLineHeight;
+            y += b.height - padding - (lines.length-1)*b.textLineHeight - offsetY;
             break;
           case "middle":
             y += b.height/2 - (lines.length-1)*b.textLineHeight/2;
             break;
+        }
+        if (b.scale != 1 && b.textContextAttributes.font) {
+          var matches = b.textContextAttributes.font.match(fontRe);
+          if (matches.length == 2)
+            context.font = b.textContextAttributes.font.replace(fontRe, matches[1]*b.scale+"px");
         }
         if (lines.length == 1) {
           context.fillText(text, x, y);
@@ -658,17 +689,18 @@
         }
       }
 
-      if (typeof this.onDraw == "function") this.onDraw(context);
-
       context.restore();
 
+      if (typeof this.onDraw == "function") this.onDraw(context);
       return this;
     },
     onTap: function(e) {
       if (this.get("opacity") == 0) return;
       if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
-          e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height)
+          e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height) {
         this.trigger("tap", e);
+        this.pressed();
+      }
     },
     overlaps: Backbone.Sprite.prototype.overlaps,
     spawnImg: Backbone.SpriteSheet.prototype.spawnImg
