@@ -321,14 +321,17 @@
       var attrs = {};
 
       for (var i = 0; i < this.buttons.length; i++) {
-        var button = this.buttons[i].instance;
+        var button = this.buttons[i].instance,
+            touched = false;
         for (var t = 0; t < this._ongoingTouches.length; t++) {
-          var x = this._ongoingTouches[t].pageX - this.canvas.offsetLeft,
-              y = this._ongoingTouches[t].pageY - this.canvas.offsetTop,
-              touched = button.overlaps(x, y);
-          attrs[button.id] = touched;
-          button.set("pressed", touched);
+          touched = button.overlaps(
+            this._ongoingTouches[t].pageX - this.engine.canvas.offsetLeft,
+            this._ongoingTouches[t].pageY - this.engine.canvas.offsetTop
+          );
+          if (touched) break;
         }
+        attrs[button.id] = touched;
+        button.set("pressed", touched);
       }
 
       this.set(attrs);
