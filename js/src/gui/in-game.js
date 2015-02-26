@@ -84,7 +84,6 @@
     },
     onAttach: function() {
       Backbone.Panel.prototype.onAttach.apply(this, arguments);
-      this.stopListening(this.engine);
       this.attachButtons();
     },
     onDetach: function() {

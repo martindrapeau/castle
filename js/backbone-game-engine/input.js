@@ -176,7 +176,7 @@
     }],
     initialize: function(attributes, options) {
       options || (options = {});
-      this.ongoingTouches = [];
+      this._ongoingTouches = [];
 
       _.bindAll(this, "rightPressed", "leftPressed", "buttonBPressed", "buttonAPressed");
 
@@ -322,9 +322,9 @@
 
       for (var i = 0; i < this.buttons.length; i++) {
         var button = this.buttons[i].instance;
-        for (var t = 0; t < ongoingTouches.length; t++) {
-          var x = ongoingTouches[t].pageX - this.canvas.offsetLeft,
-              y = ongoingTouches[t].pageY - this.canvas.offsetTop,
+        for (var t = 0; t < this._ongoingTouches.length; t++) {
+          var x = this._ongoingTouches[t].pageX - this.canvas.offsetLeft,
+              y = this._ongoingTouches[t].pageY - this.canvas.offsetTop,
               touched = button.overlaps(x, y);
           attrs[button.id] = touched;
           button.set("pressed", touched);
@@ -344,7 +344,7 @@
         }];
 
       for (var i = 0; i < touches.length; i++)
-        ongoingTouches.push(this.copyTouch(touches[i]));
+        this._ongoingTouches.push(this._copyTouch(touches[i]));
       this.detectTouched();
     },
     onTouchMove: function(e) {
@@ -356,8 +356,8 @@
         }];
 
       for (var i = 0; i < touches.length; i++) {
-        var idx = this.ongoingTouchIndexById(touches[i].identifier);
-        if (idx >= 0) ongoingTouches.splice(idx, 1, this.copyTouch(touches[i]));
+        var idx = this._ongoingTouchIndexById(touches[i].identifier);
+        if (idx >= 0) this._ongoingTouches.splice(idx, 1, this._copyTouch(touches[i]));
       }
 
       this.detectTouched();
@@ -371,8 +371,8 @@
         }];
 
       for (var i=0; i < touches.length; i++) {
-        var idx = this.ongoingTouchIndexById(touches[i].identifier);
-        if (idx >= 0) ongoingTouches.splice(idx, 1);
+        var idx = this._ongoingTouchIndexById(touches[i].identifier);
+        if (idx >= 0) this._ongoingTouches.splice(idx, 1);
       }
 
       this.detectTouched();
@@ -433,16 +433,16 @@
     },
     // Touch event helpers.
     // Source: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Touch_events
-    copyTouch: function(touch) {
+    _copyTouch: function(touch) {
       return {
         identifier: touch.identifier,
         pageX: touch.pageX,
         pageY: touch.pageY
       };
     },
-    ongoingTouchIndexById: function(idToFind) {
-      for (var i = 0; i < this.ongoingTouches.length; i++) {
-        var id = thisongoingTouches[i].identifier;
+    _ongoingTouchIndexById: function(idToFind) {
+      for (var i = 0; i < this._ongoingTouches.length; i++) {
+        var id = this._ongoingTouches[i].identifier;
         if (id == idToFind) return i;
       }
       return -1;

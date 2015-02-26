@@ -41,6 +41,10 @@
       this.levels = options.levels;
       _.bindAll(this, "enter", "exit");
     },
+    onAttach: function() {
+      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      this.stopListening(this.engine);
+    },
     enter: function() {
       this.set("opacity", 0);
       this.fadeIn();
@@ -76,6 +80,10 @@
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "show");
+    },
+    onAttach: function() {
+      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      this.stopListening(this.engine);
     },
     show: function() {
       this.moveTo(this.get("x"), 200);
