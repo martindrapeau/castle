@@ -55,8 +55,7 @@ $(window).on("load", function() {
 
       // User input (turn off touchpad to start)
       this.input = new Backbone.Input({
-        id: "input",
-        drawTouchpad: true
+        id: "input"
       });
 
       // Camera
@@ -191,7 +190,7 @@ $(window).on("load", function() {
         });
       }
 
-      this.engine.add([
+      this.engine.add(_.compact([
         this.world,
         this.display,
         this.camera,
@@ -199,9 +198,9 @@ $(window).on("load", function() {
         this.input,
         this.pausePanel,
         this.levelEndPanel,
-        this.leveStartScene
-      ]);
-      if (this.debugPanel) this.engine.add(this.debugPanel);
+        this.leveStartScene,
+        this.debugPanel
+      ]));
       this.engine.set("clearOnDraw", false);
       this.engine.start();
 

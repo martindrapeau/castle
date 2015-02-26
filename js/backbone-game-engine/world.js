@@ -470,13 +470,13 @@
       this.spriteOptions.offsetX = this.attributes.x;
       this.spriteOptions.offsetY = this.attributes.y;
 
-      context.save();
+      /*context.save();
       context.rect(
         this.attributes.viewportLeft,
         this.attributes.viewportTop,
         context.canvas.width - this.attributes.viewportRight,
         context.canvas.height - this.attributes.viewportBottom);
-      context.clip();
+      context.clip();*/
 
       context.drawImage(this.backgroundCanvas,
         this.attributes.viewportLeft, this.attributes.viewportTop, this.viewport.width, this.viewport.height,
@@ -505,7 +505,7 @@
           sprite.draw.call(sprite, context, this.spriteOptions);
       }
 
-      context.restore();
+      //context.restore();
 
       if (this.debugPanel) this.debugPanel.set({
         dynamicDrawn: count,

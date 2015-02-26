@@ -55,7 +55,7 @@
           width = this.get("width"),
           height = this.get("height"),
           pressed = this.get("pressed");
-      drawRect(context, x, y, width, height, "rgba(64, 64, 64, 0.5)");
+      //drawRect(context, x, y, width, height, "rgba(64, 64, 64, 0.5)");
       context.save();
       context.beginPath();
       context.moveTo(x+130, y+20);
@@ -81,7 +81,7 @@
           width = this.get("width"),
           height = this.get("height"),
           pressed = this.get("pressed");
-      drawRect(context, x, y, width, height, "rgba(128, 128, 128, 0.5)");
+      //drawRect(context, x, y, width, height, "rgba(128, 128, 128, 0.5)");
       context.save();
       context.beginPath();
       context.moveTo(x+30, y+20);
@@ -107,7 +107,7 @@
           width = this.get("width"),
           height = this.get("height"),
           pressed = this.get("pressed");
-      drawRect(context, x, y, width, height, "rgba(255, 255, 255, 0.5)");
+      //drawRect(context, x, y, width, height, "rgba(255, 255, 255, 0.5)");
       context.save();
       context.beginPath();
       context.arc(x+80, y+80, 60, 0, 2*Math.PI, false);
@@ -129,7 +129,7 @@
           width = this.get("width"),
           height = this.get("height"),
           pressed = this.get("pressed");
-      drawRect(context, x, y, width, height, "rgba(192, 192, 192, 0.5)");
+      //drawRect(context, x, y, width, height, "rgba(192, 192, 192, 0.5)");
       context.save();
       context.beginPath();
       context.arc(x+80, y+80, 60, 0, 2*Math.PI, false);
