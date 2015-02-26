@@ -166,7 +166,7 @@
           doorX = this.door.get("x") + this.door.get("width")/2,
           distance = doorX - charX,
           cur = this.character.getStateInfo(),
-          attrs = {ignoreInput: true};
+          attrs = {ignoreInput: true, houseId: this};
       if (charX < doorX) {
         attrs.state = this.character.buildState("jump", "right");
         attrs.nextState = this.character.buildState("release", "right");
@@ -192,7 +192,7 @@
           this.set("state", "open2");
           world.setTimeout(this.onStep, 700);
           world.setTimeout(function() {
-            world.remove(character);
+            character.set("visible", false);
           }, 400);
           break;
 
@@ -204,8 +204,7 @@
 
         case "open3":
           this.set("state", "inside");
-          world.add(character);
-          character.set({ignoreInput: false, velocity:  0});
+          character.set({visible: true, ignoreInput: false, velocity:  0});
           _.each(this.insideSprites, world.add);
           this.listenTo(world.sprites, "remove", function(sprite) {
             house.insideSprites = _.without(house.insideSprites, sprite);
@@ -213,13 +212,12 @@
           this.listenTo(world.sprites, "add", function(sprite) {
             house.insideSprites.push(sprite);
           });
-          this.character = undefined;
           world.requestBackgroundRedraw = true;
           break;
 
         case "close1":
           this.stopListening(world.sprites);
-          world.remove(character);
+          character.set({visible:false, ignoreInput: true, velocity:  0});
           _.each(this.insideSprites, world.remove);
           this.door.set({state: "open-close"});
           world.add(this.door);
@@ -230,8 +228,7 @@
 
         case "close2":
           character.set("y", character.get("y") - 16);
-          world.add(character);
-          character.set({ignoreInput: false, velocity:  0});
+          character.set({visible: true, ignoreInput: false, velocity:  0, houseId: undefined});
           _.each(house.outsideSprites, world.add);
           this.character = undefined;
           this.set("state", "idle");

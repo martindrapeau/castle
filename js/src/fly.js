@@ -191,7 +191,7 @@
       if (cur.mov == "ko" || cur.mov2 == "hurt") return this;
 
       var hero = this.world.sprites.findWhere({hero: true});
-      if (!hero && cur.mov != "idle") {
+      if (!hero || hero.isInsideHouse()) {
         this.set({
           state: this.buildState("idle", cur.dir),
           velocity: 0,

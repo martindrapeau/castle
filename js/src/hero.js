@@ -222,7 +222,8 @@
       coins: 0,
       key: false,
       potion: null,
-      ignoreInput: false
+      ignoreInput: false,
+      houseId: undefined
     }),
     animations: animations,
     saveAttributes: _.union(
@@ -233,7 +234,7 @@
       options || (options = {});
       Backbone.Character.prototype.initialize.apply(this, arguments);
 
-      _.bindAll(this, "midAttack");
+      _.bindAll(this, "midAttack", "isInsideHouse");
 
       this.input = options.input;
     },
@@ -345,7 +346,7 @@
       var cur = this.getStateInfo();
       if (cur.mov2 != "attack") return this;
 
-      var x = this.get("x") + this.get("width") * (cur.dir == "right" ? 1.2 : -0.2),
+      var x = this.get("x") + this.get("width") * (cur.dir == "right" ? 1 : 0),
           y1 = this.get("y") + this.get("height")*0.50,
           y2 = this.get("y") + this.get("height")*0.75,
           sprites = _.union(this.world.filterAt(x, y1, "character", this), this.world.filterAt(x, y2, "character", this));
@@ -410,7 +411,7 @@
               }
               break;
             case "a-death":
-              if (cur.mov2 != "hurt") {
+              if (cur.mov2 != "hurt" && cur.mov2 != "attack") {
                 this.cancelUpdate = true;
                 this.set({health: Math.max(this.get("health") - 4, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
               }
@@ -773,6 +774,9 @@
         this.debugPanel.set({hero: this.attributes.state});
 
       return true;
+    },
+    isInsideHouse: function() {
+      return !!this.get("houseId");
     }
   });
 

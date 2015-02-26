@@ -36,6 +36,7 @@
       static: false,
       collision: false,
 
+      visible: true,
       persist: true
     },
     animations: {
@@ -98,6 +99,8 @@
     },
     draw: function(context, options) {
       options || (options = {});
+      if (this.get("visible") === false) return this;
+      
       var animation = this.getAnimation(),
           sequenceIndex = this.get("sequenceIndex") || 0;
       if (!animation || animation.sequences.length == 0) return;

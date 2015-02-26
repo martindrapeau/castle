@@ -95,12 +95,12 @@
       var opo = dir == "left" ? "right" : "left";
       if (sprite.get("hero")) {
         sprite.trigger("hit", this, opo);
-        return this.knockout(sprite, "left");
+        return this.knockout(sprite, "left", dir2);
       }
 
       return this;
     },
-    knockout: function(sprite, dir) {
+    knockout: function(sprite, dir, dir2) {
       this.set({
         state: "ko",
         yVelocity: -this.animations["ko"].yVelocity/2,
@@ -149,6 +149,17 @@
   buildArtifact("a-dollar", [24]);
   buildArtifact("a-clock", [23]);
 
+  Backbone.ADeath.prototype.knockout = function(sprite, dir, dir2) {
+    if (dir2 != "attack") return Artifact.prototype.knockout.apply(this, arguments);
+    var explosion = new Backbone.Explosion({
+      x: this.get("x"),
+      y: this.get("y")
+    });
+    this.world.add(explosion);
+    this.world.remove(this);
+    return this;
+  };
+
 
   // Breakable tiles
   var BreakableTile = Backbone.Object.extend({
@@ -157,7 +168,7 @@
       width: 64,
       height: 64,
       isBreakableTile: true,
-      health: 3,
+      health: 2,
       artifact: null
     }),
     initialize: function(attributes, options) {
