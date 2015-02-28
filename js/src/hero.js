@@ -215,7 +215,6 @@
       yAcceleration: 0,
       collision: true,
       dead: false,
-      buttonBMode: "attack", // run or attack
       health: 8,
       healthMax: 8,
       attackDamage: 1,
@@ -268,7 +267,7 @@
           opoIntent = dirIntent == "right" ? "left" : "right",
           dirPressed = this.input ? this.input[dirIntent+"Pressed"]() : false,
           opoPressed = this.input ? this.input[opoIntent+"Pressed"]() : false,
-          run = this.get("buttonBMode") == "run" && this.input ? this.input.buttonBPressed() : false,
+          run = this.input ? this.input.buttonBPressed() : false,
           velocity = this.get("velocity"),
           attrs = {};
 
@@ -318,26 +317,27 @@
     buttonBToggled: function() {
       if (this.get("ignoreInput")) return this;
 
-      var mode = this.get("buttonBMode"),
-          cur = this.getStateInfo(),
+      var cur = this.getStateInfo(),
           pressed = this.input ? this.input.buttonBPressed() : false;
       
       if (cur.mov == "ko" || cur.mov == "dead" || cur.mov2 == "hurt") return this;
 
-      if (mode == "run") {
-        if (pressed && cur.mov == "walk")
-          this.set("state",  this.buildState("run", cur.mov2, cur.dir));
-        else if (!pressed && cur.mov == "run")
-          this.set("state",  this.buildState("walk", cur.mov2, cur.dir));
+      if (pressed && cur.mov == "walk") {
+        cur.mov = "run";
+        this.set("state",  this.buildState(cur.mov, cur.mov2, cur.dir));
+        this.cancelUpdate = true;
+      } else if (!pressed && cur.mov == "run") {
+        cur.mov = "walk";
+        this.set("state",  this.buildState(cur.mov, cur.mov2, cur.dir));
+        this.cancelUpdate = true;
+      }
 
-      } else if (mode == "attack") {
-        if (pressed && cur.mov2 != "attack") {
-          this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
-          this.cancelUpdate = true;
-          this.world.setTimeout(this.midAttack, 200);
-        } else if (!pressed && cur.mov2 == "attack") {
-          this.endAttack();
-        }
+      if (pressed && cur.mov2 != "attack") {
+        this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
+        this.world.setTimeout(this.midAttack, 200);
+        this.cancelUpdate = true;
+      } else if (!pressed && cur.mov2 == "attack") {
+        this.endAttack();
       }
 
       return this;
@@ -505,7 +505,6 @@
 
       // Velocity and state
       var hero = this,
-          mode = this.get("buttonBMode"),
           dead = this.get("dead"),
           input = !this.get("ignoreInput") ? this.input : null,
           velocity = this.get("velocity") || 0,
@@ -656,9 +655,9 @@
           updateHeroTopBottom();
           attrs.state = nextState;
           if (nex.move == "walk" || nex.move == "run")
-            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", cur.mov2, nex.dir);
+            attrs.nextState = hero.buildState(input && input.buttonBPressed() ? "run" : "walk", cur.mov2, nex.dir);
           else if (nex.mov == "skid")
-            attrs.nextState = hero.buildState(mode == "run" && input && input.buttonBPressed() ? "run" : "walk", cur.mov2, nex.opo);
+            attrs.nextState = hero.buildState(input && input.buttonBPressed() ? "run" : "walk", cur.mov2, nex.opo);
           else if(nex.mov == "release")
             attrs.nextState = hero.buildState("idle", cur.mov2, nex.dir);
           else if (nex.mov == "dead") {
