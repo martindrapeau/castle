@@ -13,14 +13,14 @@
     tileColumns: 14,
     tileRows: 9
   }, {
-    id: "enemies",
-    img: "#enemies",
+    id: "bat",
+    img: "#bat",
     x: 0,
     y: 0,
     tileWidth: 128,
     tileHeight: 128,
-    tileColumns: 12,
-    tileRows: 10
+    tileColumns: 4,
+    tileRows: 2
   }, {
     id: "tiles",
     img: "#tiles",

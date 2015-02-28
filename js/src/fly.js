@@ -42,8 +42,10 @@
     "fly-left": {
       sequences: [0, 1, 2, 3, 4, 5, 6, 7],
       delay: sequenceDelay,
-      velocity: -flyVelocity,
+      velocity: flyVelocity,
       acceleration: flyAcceleration,
+      yVelocity: flyVelocity,
+      yAcceleration: flyAcceleration,
       scaleX: -1,
       scaleY: 1
     },
@@ -52,6 +54,8 @@
       delay: sequenceDelay,
       velocity: flyVelocity,
       acceleration: flyAcceleration,
+      yVelocity: flyVelocity,
+      yAcceleration: flyAcceleration,
       scaleX: 1,
       scaleY: 1
     },
@@ -318,13 +322,13 @@
 
       // Handle acceleration
       if (cur.mov == "fly") {
-        var targetVelocity = this.get("dX") * flyVelocity;
-        if (velocity < targetVelocity) velocity += flyAcceleration * (dt/1000);
+        var targetVelocity = this.get("dX") * animation.velocity;
+        if (velocity < targetVelocity) velocity += animation.acceleration * (dt/1000);
         if (velocity >= targetVelocity) velocity = targetVelocity;
         attrs.velocity = velocity;
 
-        var targetYVelocity = this.get("dY") * flyVelocity/2;
-        if (yVelocity < targetYVelocity) yVelocity += flyAcceleration * (dt/1000);
+        var targetYVelocity = this.get("dY") * animation.yVelocity/2;
+        if (yVelocity < targetYVelocity) yVelocity += animation.yAcceleration * (dt/1000);
         if (yVelocity >= targetYVelocity) yVelocity = targetYVelocity;
         attrs.yVelocity = yVelocity;
       }
