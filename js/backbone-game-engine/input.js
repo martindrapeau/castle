@@ -16,12 +16,17 @@
       right: undefined,
       top: undefined,
       bottom: undefined,
-      backgroundColor: "transparent"
+      backgroundColor: "transparent",
+      pressed: false
     }),
     onAttach: function() {
       Backbone.Button.prototype.onAttach.apply(this, arguments);
       this.stopListening();
       this.calculatePosition();
+    },
+    onDetach: function() {
+      Backbone.Button.prototype.onDetach.apply(this, arguments);
+      this.set("pressed", false);
     },
     calculatePosition: function() {
       // Set x and y based on relative position references
@@ -256,6 +261,7 @@
     },
     onDetach: function() {
       $(document).off(".Input");
+      this._ongoingTouches = [];
       this.set({
         left: false,
         right: false,

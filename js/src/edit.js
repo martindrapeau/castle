@@ -20,7 +20,9 @@ $(window).on("load", function() {
       this.debugPanel = new Backbone.DebugPanel({}, {color: "#fff"});
 
       // User input (turn off touchpad to start)
-      this.input = new Backbone.Input();
+      this.input = new Backbone.Input({
+        drawTouchpad: true
+      });
 
       // Camera
       this.camera = new Backbone.Camera({
