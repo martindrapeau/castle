@@ -157,7 +157,7 @@
       });
     },
     play: function(level) {
-      if (!level || level.get("state") == "locked" || level.get("state") == "future") return this;
+      if (!level || /*level.get("state") == "locked" ||*/ level.get("state") == "future") return this;
       var gui = this;
       this.fadeOut(function() {
         gui.engine.trigger("play", level.id);

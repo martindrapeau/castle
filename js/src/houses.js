@@ -161,7 +161,7 @@
       this.character = character;
       this.onStep();
     },
-    positionCharacter: function() {
+    enterCharacter: function() {
       var charX = this.character.get("x") + this.character.get("width")/2,
           doorX = this.door.get("x") + this.door.get("width")/2,
           distance = doorX - charX,
@@ -178,6 +178,9 @@
       attrs.yVelocity = this.character.animations["jump-right"].yStartVelocity*0.4;
       this.character.set(attrs);
     },
+    exitCharacter: function() {
+      this.character.set("x", this.door.get("x") + this.door.get("width")/2 - this.character.get("width")/2);
+    },
     onStep: function() {
       var house = this,
           state = this.get("state"),
@@ -186,7 +189,7 @@
 
       switch (state) {
         case "open1":
-          this.positionCharacter();
+          this.enterCharacter();
           this.door.set({state: "open-close"});
           world.add(this.door);
           this.set("state", "open2");
@@ -216,6 +219,7 @@
           break;
 
         case "close1":
+          this.exitCharacter();
           this.stopListening(world.sprites);
           character.set({visible:false, ignoreInput: true, velocity:  0});
           _.each(this.insideSprites, world.remove);
