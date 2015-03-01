@@ -134,6 +134,7 @@
 
       if (_.isNumber(scaleX) || _.isNumber(scaleY)) context.restore();
 
+      if (typeof this.onDraw == "function") this.onDraw(context, options);
       return this;
     },
     getAnimation: function(state) {
@@ -515,33 +516,33 @@
       this.stopListening(this.engine);
     },
     moveTo: function(x, y, callback) {
-      this.animation = "move";
-      this.startTime = _.now();
-      this.startX = this.get("x");
-      this.startY = this.get("y");
-      this.targetX = x;
-      this.targetY = y;
-      this.callback = callback;
+      this._animation = "move";
+      this._startTime = _.now();
+      this._startX = this.get("x");
+      this._startY = this.get("y");
+      this._targetX = x;
+      this._targetY = y;
+      this._callback = callback;
       return this;
     },
     fadeIn: function(callback) {
-      this.animation = "fadeIn";
-      this.startTime = _.now();
-      this.callback = callback;
+      this._animation = "fadeIn";
+      this._startTime = _.now();
+      this._callback = callback;
       this.set("opacity", 0);
       return this;
     },
     fadeOut: function(callback) {
-      this.animation = "fadeOut";
-      this.startTime = _.now();
-      this.callback = callback;
+      this._animation = "fadeOut";
+      this._startTime = _.now();
+      this._callback = callback;
       this.set("opacity", 1);
       return this;
     },
     pressed: function(callback) {
-      this.animation = "pressed";
-      this.startTime = _.now();
-      this.callback = callback
+      this._animation = "pressed";
+      this._startTime = _.now();
+      this._callback = callback
       this.set("scale", 1);
       return this;
     },
@@ -550,62 +551,62 @@
           easingTime = this.get("easingTime"),
           easing = this.get("easing");
 
-      switch (this.animation) {
+      switch (this._animation) {
         case "move":
-          if (now < this.startTime + easingTime) {
-            var factor = Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime);
+          if (now < this._startTime + easingTime) {
+            var factor = Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime);
             this.set({
-              x: this.startX + factor * (this.targetX - this.startX),
-              y: this.startY + factor * (this.targetY - this.startY)
+              x: this._startX + factor * (this._targetX - this._startX),
+              y: this._startY + factor * (this._targetY - this._startY)
             });
           } else {
-            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
-            this.set({x: this.targetX, y: this.targetY}, {silent: true});
-            this.animation = undefined;
-            this.startTime = undefined;
-            this.startX = undefined;
-            this.startY = undefined;
-            this.targetX = undefined;
-            this.targetY = undefined;
-            this.callback = undefined;
+            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
+            this.set({x: this._targetX, y: this._targetY}, {silent: true});
+            this._animation = undefined;
+            this._startTime = undefined;
+            this._startX = undefined;
+            this._startY = undefined;
+            this._targetX = undefined;
+            this._targetY = undefined;
+            this._callback = undefined;
           }
           break;
 
         case "fadeIn":
-          if (now < this.startTime + easingTime) {
-            this.set("opacity", Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
+          if (now < this._startTime + easingTime) {
+            this.set("opacity", Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime));
           } else {
-            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
+            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
             this.set({opacity: 1}, {silent: true});
-            this.animation = undefined;
-            this.startTime = undefined;
-            this.callback = undefined;
+            this._animation = undefined;
+            this._startTime = undefined;
+            this._callback = undefined;
           }
           break;
 
         case "fadeOut":
-          if (now < this.startTime + easingTime) {
-            this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime));
+          if (now < this._startTime + easingTime) {
+            this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime));
           } else {
-            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
+            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
             this.set({opacity: 0}, {silent: true});
-            this.animation = undefined;
-            this.startTime = undefined;
-            this.callback = undefined;
+            this._animation = undefined;
+            this._startTime = undefined;
+            this._callback = undefined;
           }
           break;
 
         case "pressed":
           easing = "linear";
           easingTime = 200;
-          if (now < this.startTime + easingTime) {
-            this.set("scale", 1.05 - Math.abs(Backbone.EasingFunctions[easing]((now - this.startTime) / easingTime)-0.5)/10 );
+          if (now < this._startTime + easingTime) {
+            this.set("scale", 1.05 - Math.abs(Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime)-0.5)/10 );
           } else {
-            if (typeof this.callback == "function") _.defer(this.callback.bind(this));
+            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
             this.set({scale: 1}, {silent: true});
-            this.animation = undefined;
-            this.startTime = undefined;
-            this.callback = undefined;
+            this._animation = undefined;
+            this._startTime = undefined;
+            this._callback = undefined;
           }
           break;
       }

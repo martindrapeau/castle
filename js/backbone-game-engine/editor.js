@@ -35,6 +35,7 @@
       this.get("x"), this.get("y"), width, height
     );
 
+    if (typeof this.onDraw == "function") this.onDraw(context, options);
     return this;
   };
 

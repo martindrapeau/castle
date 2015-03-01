@@ -169,7 +169,10 @@
       height: 64,
       isBreakableTile: true,
       health: 2,
-      artifact: null
+      artifact: null,
+      showContent: false,
+      easing: "easeInOutCubic",
+      easingTime: 400
     }),
     initialize: function(attributes, options) {
       Backbone.Object.prototype.initialize.apply(this, arguments);
@@ -218,6 +221,62 @@
         this.world.add(this.explosion);
         this.world.remove(this);
       }
+    },
+    showContent: function(callback) {
+      this._animation = "showContent";
+      this._startTime = _.now();
+      this._callback = callback;
+      return this;
+    },
+    hideContent: function(callback) {
+      this._animation = "hideContent";
+      this._startTime = _.now();
+      this._callback = callback;
+      return this;
+    },
+    onDraw: function(context, options) {
+      if (!this._animation && !this.attributes.showContent) return this;
+      var x = this.get("x") + (options.offsetX || 0) + this.get("width")/2,
+          y = this.get("y") + (options.offsetY || 0) + this.get("height")/2,
+          now = _.now(),
+          factor = 1;
+
+      if (this._animation) {
+        if (now < this._startTime + this.attributes.easingTime) {
+          factor = Backbone.EasingFunctions[this.attributes.easing]((now - this._startTime) / this.attributes.easingTime);
+          if (this._animation == "hideContent") factor = 1 - factor;
+        } else {
+          this.set("showContent", this._animation == "showContent");
+          if (typeof this._callback == "function") _.defer(this._callback.bind(this));
+          this._animation = undefined;
+          this._startTime = undefined;
+          this._callback = undefined;
+          if (this.attributes.showContent == false) return this;
+        }
+      }
+
+      context.save();
+      context.beginPath();
+      context.arc(x, y, 24*factor, 0, 2*Math.PI, false);
+      context.fillStyle = "#111";
+      context.fill();
+      context.clip();
+      for (var i = 0; i < this.artifacts.length; i++) {
+        var sprite = this.artifacts[i],
+            animation = sprite.getAnimation(),
+            sequence = animation.sequences[0]
+            frameIndex = _.isNumber(sequence) ? sequence : sequence.frame,
+            frame = sprite.spriteSheet.frames[frameIndex];
+
+        context.drawImage(
+          sprite.spriteSheet.img,
+          frame.x, frame.y, frame.width, frame.height,
+          x - frame.width/2, y - frame.height/2, frame.width, frame.height
+        );
+      }
+      context.restore();
+
+      return this;
     }
   });
 

@@ -92,6 +92,12 @@ $(window).on("load", function() {
         world: this.world,
         debugPanel: this.debugPanel
       });
+      this.editor.sprites.each(function(sprite) {
+        if (sprite.get("isBreakableTile") &&
+            sprite.get("showContent") === false &&
+            sprite.get("artifact"))
+          sprite.set("showContent", true);
+      });
 
       // Controls
       $(document).on("keypress.Controller", function(e) {
@@ -117,13 +123,25 @@ $(window).on("load", function() {
         this.engine.remove(this.input);
         this.engine.add(this.editor);
         this.toggleButton.set({imgX: 32});
+        this.toggleBreakableTileContent(true);
       } else {
         // Play
         context.clearRect(0, 0, canvas.width, canvas.height);
         this.engine.remove(this.editor);
         this.engine.add(this.input);
         this.toggleButton.set({imgX: 0});
+        this.toggleBreakableTileContent(false);
       }
+    },
+    toggleBreakableTileContent: function(showContent) {
+      this.world.sprites.each(function(sprite) {
+        if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+          if (showContent)
+            sprite.showContent();
+          else
+            sprite.hideContent();
+          //sprite.set("showContent", showContent);
+      });
     }
   });
   
