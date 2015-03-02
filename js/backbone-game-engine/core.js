@@ -614,9 +614,13 @@
       if (typeof this.onUpdate == "function") this.onUpdate(dt);
       return true;
     },
-    draw: function(context) {
+    draw: function(context, options) {
       var b = this.toJSON();
       if (b.opacity == 0) return this;
+
+      options || (options = {});
+      b.x += options.offsetX || 0;
+      b.y += options.offsetY || 0;
 
       context.save();
 
@@ -637,65 +641,71 @@
           b.x + b.imgMargin + offsetX, b.y + b.imgMargin + offsetY, b.imgWidth*b.scale, b.imgHeight*b.scale
         );
 
-      var text = this.get("text"),
-          x = b.x,
-          y = b.y,
-          padding = this.get("textPadding") * b.scale,
-          textContextAttributes = this.get("textContextAttributes");
-      if (text !== undefined && text !== null && ""+text !== "") {
-        if (typeof textContextAttributes == "object")
-          for (var attr in textContextAttributes)
-            if (textContextAttributes.hasOwnProperty(attr))
-              context[attr] = textContextAttributes[attr];
-        switch (context.textAlign) {
-          case "left":
-          case "start":
-            x += padding + offsetX;
-            break;
-          case "right":
-          case "end":
-            x += b.width - padding - offsetX;
-            break;
-          case "center":
-            x += b.width/2;
-            break;
-        }
-        var lines = (""+text).split("\n");
-        switch (context.textBaseline) {
-          case "top":
-            y += padding + offsetY;
-          case "bottom":
-            y += b.height - padding - (lines.length-1)*b.textLineHeight - offsetY;
-            break;
-          case "middle":
-            y += b.height/2 - (lines.length-1)*b.textLineHeight/2;
-            break;
-        }
-        if (b.scale != 1 && b.textContextAttributes.font) {
-          var matches = b.textContextAttributes.font.match(fontRe);
-          if (matches.length == 2)
-            context.font = b.textContextAttributes.font.replace(fontRe, matches[1]*b.scale+"px");
-        }
-        if (lines.length == 1) {
-          context.fillText(text, x, y);
-          if (!this.textMetrics) this.textMetrics = context.measureText(text);
-        } else {
-          var textMetrics;
-          for (var i = 0; i < lines.length; i++) {
-            context.fillText(lines[i], x, y);
-            y += b.textLineHeight;
-            if (!this.textMetrics) {
-              var temp = context.measureText(lines[i]);
-              if (!textMetrics || temp.width > textMetrics.width) textMetrics = temp;
-            }
-          }
-          if (textMetrics) this.textMetrics = textMetrics;
-        }
-      }
+      if (b.text !== undefined && b.text !== null && ""+b.text !== "")
+        this.drawText(b, context, options);
+
+      if (typeof this.onDraw == "function")
+        this.onDraw(context, options);
 
       context.restore();
 
-      if (typeof this.onDraw == "function") this.onDraw(context);
+      return this;
+    },
+    drawText: function(b, context, options) {
+      var x = b.x,
+          y = b.y,
+          offsetX = (1-b.scale) * b.width/2,
+          offsetY = (1-b.scale) * b.height/2,
+          padding = b.textPadding * b.scale;
+
+      if (typeof b.textContextAttributes == "object")
+        for (var attr in b.textContextAttributes)
+          if (b.textContextAttributes.hasOwnProperty(attr))
+            context[attr] = b.textContextAttributes[attr];
+      switch (context.textAlign) {
+        case "left":
+        case "start":
+          x += padding + offsetX;
+          break;
+        case "right":
+        case "end":
+          x += b.width - padding - offsetX;
+          break;
+        case "center":
+          x += b.width/2;
+          break;
+      }
+      var lines = (""+b.text).split("\n");
+      switch (context.textBaseline) {
+        case "top":
+          y += padding + offsetY;
+        case "bottom":
+          y += b.height - padding - (lines.length-1)*b.textLineHeight - offsetY;
+          break;
+        case "middle":
+          y += b.height/2 - (lines.length-1)*b.textLineHeight/2;
+          break;
+      }
+      if (b.scale != 1 && b.textContextAttributes.font) {
+        var matches = b.textContextAttributes.font.match(fontRe);
+        if (matches.length == 2)
+          context.font = b.textContextAttributes.font.replace(fontRe, matches[1]*b.scale+"px");
+      }
+      if (lines.length == 1) {
+        context.fillText(b.text, x, y);
+        if (!this.textMetrics) this.textMetrics = context.measureText(b.text);
+      } else {
+        var textMetrics;
+        for (var i = 0; i < lines.length; i++) {
+          context.fillText(lines[i], x, y);
+          y += b.textLineHeight;
+          if (!this.textMetrics) {
+            var temp = context.measureText(lines[i]);
+            if (!textMetrics || temp.width > textMetrics.width) textMetrics = temp;
+          }
+        }
+        if (textMetrics) this.textMetrics = textMetrics;
+      }
       return this;
     },
     onTap: function(e) {

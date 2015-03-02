@@ -5,22 +5,35 @@
       level: 1,
       name: "",
       state: "locked", // locked, unlocked, played, future
-      width: 150, height: 140,
+      width: 150, height: 160,
       backgroundColor: "transparent",
       img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0,
       text: "",
       textLineHeight: 20,
       textContextAttributes: {
-        fillStyle: "#FFF",
+        fillStyle: "#F67D00",
         font: "18px arcade",
-        textBaseline: "middle",
+        textBaseline: "bottom",
         fontWeight: "normal",
         textAlign: "center"
-      },
+      }
     }),
     idAttribute: "level",
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
+      this.scoreTextAttributes = {
+        height: 198,
+        textPadding: 65,
+        text: "",
+        textLineHeight: 20,
+        textContextAttributes: {
+          fillStyle: "#FFF",
+          font: "24px arcade",
+          textBaseline: "bottom",
+          fontWeight: "normal",
+          textAlign: "left"
+        }
+      };
       this.updateInfo();
       this.on("change:state", this.updateInfo);
     },
@@ -30,6 +43,8 @@
         text: "",
         textContextAttributes: _.clone(this.get("textContextAttributes"))
       };
+      attrs.textContextAttributes.fillStyle = "#F67D00";
+      attrs.text = this.get("name");
 
       switch (this.attributes.state) {
         case "locked":
@@ -40,23 +55,29 @@
           break;
         case "future":
           attrs.imgX = 450;
-          attrs.height = 160;
           attrs.textContextAttributes.fillStyle = "#999";
           attrs.text = "Comming\nSoon";
-          attrs.textContextAttributes.textBaseline = "bottom";
           break;
         case "played":
           attrs.imgX = 0;
-          attrs.text = this.get("coins");
-          attrs.height = 198;
-          attrs.textPadding = 65;
-          attrs.textContextAttributes.font = "24px arcade";
-          attrs.textContextAttributes.textAlign = "left";
-          attrs.textContextAttributes.textBaseline = "bottom";
+          this.scoreTextAttributes.text = this.get("coins");
           break;
       }
 
       this.set(attrs);
+      return this;
+    },
+    onDraw: function(context, options) {
+      if (this.attributes.state != "played") return this;
+
+      var b = _.extend(this.toJSON(), this.scoreTextAttributes);
+
+      options || (options = {});
+      b.x += options.offsetX || 0;
+      b.y += options.offsetY || 0;
+
+      this.drawText(b, context, options);
+
       return this;
     }
   });
