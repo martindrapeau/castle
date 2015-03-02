@@ -313,7 +313,7 @@
 
       return this;
     },
-    // Run or attack
+    // Attack and run
     buttonBToggled: function() {
       if (this.get("ignoreInput")) return this;
 
@@ -333,7 +333,12 @@
       }
 
       if (pressed && cur.mov2 != "attack") {
-        this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
+        var nextState = this.get("nextState");
+        if (nextState) {
+          var nex = this.getStateInfo(nextState);
+          nextState = this.buildState(nex.mov, "attack", nex.dir);
+        }
+        this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), {nextState: nextState}, this.endAttack);
         this.world.setTimeout(this.midAttack, 200);
         this.cancelUpdate = true;
       } else if (!pressed && cur.mov2 == "attack") {

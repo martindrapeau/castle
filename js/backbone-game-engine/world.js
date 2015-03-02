@@ -23,8 +23,7 @@
       backgroundColor: "rgba(66, 66, 255, 1)",
       sprites: [], // Copy for persistence only. Use the direct member sprites which is a collection.
       state: "play", // play or pause
-      time: 0, // Time played in ms
-      puzzle: false
+      time: 0 // Time played in ms
     },
     shallowAttributes: [
       "x", "y", "width", "height", "tileWidth", "tileHeight", "backgroundColor",
@@ -92,20 +91,9 @@
       if (state == "pause") {
         this.accumTime += (now - (this.startTime || now));
         this.set("time", this.accumTime);
-        if (this.get("puzzle")) this.toggleBreakableTileContent(true);
       } else if (state == "play") {
         this.startTime = now;
-        if (this.get("puzzle")) this.toggleBreakableTileContent(false);
       }
-    },
-    toggleBreakableTileContent: function(showContent) {
-      this.sprites.each(function(sprite) {
-        if (sprite.get("isBreakableTile") && sprite.get("artifact"))
-          if (showContent)
-            sprite.showContent();
-          else
-            sprite.hideContent();
-      });
     },
     getHumanTime: function() {
       return _.ms2time(this.attributes.time);

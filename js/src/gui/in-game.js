@@ -18,14 +18,35 @@
       this.world.set("state", "pause");
       this.set("text", "Level " + this.world.get("level") + " - " + this.world.get("name"));
 
+      if (this.world.get("puzzle"))
+        this.world.sprites.each(function(sprite) {
+          if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+            sprite.set("showContent", true);
+        });
+
       setTimeout(function() {
         scene.fadeOut(function() {
-          scene.world.set("state", "play");
-          scene.engine.remove(scene);
+          if (scene.world.get("puzzle")) {
+            scene.showPuzzleInstructions();
+          } else {
+            scene.world.set("state", "play");
+            scene.engine.remove(scene);
+          }
         });
       }, 2000);
 
       return this;
+    },
+    showPuzzleInstructions: function() {
+      var scene = this;
+      setTimeout(function() {
+        scene.world.sprites.each(function(sprite) {
+          if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+            sprite.hideContent();
+        });
+        scene.world.set("state", "play");
+        scene.engine.remove(scene);
+      }, 2000);
     }
   });
 
