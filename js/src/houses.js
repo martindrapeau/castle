@@ -341,7 +341,8 @@
       this.door.set("x", this.get("x") + this.get("outDoorX"));
   };
   Wall.prototype.tryOpenClose = function() {
-    var character = this.getHeroOverlappingCharacter("hero1");
+    //var character = this.getHeroOverlappingCharacter("hero1");
+    var character = this.world.sprites.findWhere({hero:true});
     if (!character) return;
 
     var state = this.get("state");

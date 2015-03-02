@@ -18,12 +18,6 @@
       this.world.set("state", "pause");
       this.set("text", "Level " + this.world.get("level") + " - " + this.world.get("name"));
 
-      if (this.world.get("puzzle"))
-        this.world.sprites.each(function(sprite) {
-          if (sprite.get("isBreakableTile") && sprite.get("artifact"))
-            sprite.set("showContent", true);
-        });
-
       setTimeout(function() {
         scene.fadeOut(function() {
           if (scene.world.get("puzzle")) {
@@ -38,15 +32,31 @@
       return this;
     },
     showPuzzleInstructions: function() {
-      var scene = this;
-      setTimeout(function() {
-        scene.world.sprites.each(function(sprite) {
+      var scene = this,
+          targetX = - this.world.width() + this.world.viewport.width,
+          targetY = this.world.get("y"),
+          wall = this.world.sprites.findWhere({name: "h-wall"});
+
+      if (this.world.get("puzzle"))
+        this.world.sprites.each(function(sprite) {
           if (sprite.get("isBreakableTile") && sprite.get("artifact"))
-            sprite.hideContent();
+            sprite.showContent();
         });
-        scene.world.set("state", "play");
-        scene.engine.remove(scene);
-      }, 2000);
+
+      this.world.pan(targetX, targetY, function() {
+        wall.tryOpenClose.call(wall);
+        setTimeout(function() {
+          scene.world.pan(0, targetY, function() {
+            scene.world.sprites.each(function(sprite) {
+              if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+                sprite.hideContent();
+            });
+            scene.world.set("state", "play");
+            scene.engine.remove(scene);
+          }, "easeInQuad", 2000);
+        }, 3000);
+      }, "easeInQuad", 2000);
+
     }
   });
 

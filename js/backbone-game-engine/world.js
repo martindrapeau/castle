@@ -399,6 +399,9 @@
       return true;
     },
     draw: function(context) {
+      if (this._pan && this._pan.startTime)
+        this._animatePan(context);
+
       if (this.drawBackground) {
         this.drawStaticSprites(this.backgroundContext);
         this.drawBackground = false;
@@ -837,6 +840,45 @@
 
       this.sprites.remove(toRemove);
 
+      return this;
+    },
+    pan: function(targetX, targetY, callback, easing, easingTime) {
+      if (this.get("state") == "play") throw "Cannot pan world in play.";
+      this._pan || (this._pan = {});
+      this._pan.startTime = _.now();
+      this._pan.startX = this.get("x");
+      this._pan.startY = this.get("y");
+      this._pan.targetX = targetX;
+      this._pan.targetY = targetY;
+      this._pan.easing = easing || "easeOutQuint";
+      this._pan.easingTime = easingTime || 1000;
+      this._pan.callback = callback;
+      return this;
+    },
+    _animatePan: function() {
+      var now = _.now();
+
+      if (now < this._pan.startTime + this._pan.easingTime) {
+        var factor = Backbone.EasingFunctions[this._pan.easing]((now - this._pan.startTime) / this._pan.easingTime);
+        this.set({
+          x: this._pan.startX + factor * (this._pan.targetX - this._pan.startX),
+          y: this._pan.startY + factor * (this._pan.targetY - this._pan.startY)
+        });
+      } else {
+        this._endPan(true);
+      }
+    },
+    _endPan: function(trigger) {
+      if (trigger && typeof this._pan.callback == "function")
+        _.defer(this._pan.callback.bind(this));
+      if (this._pan.targetX || this._pan.targetY)
+        this.set({x: this._pan.targetX, y: this._pan.targetY});
+      this._pan.startTime = undefined;
+      this._pan.startX = undefined;
+      this._pan.startY = undefined;
+      this._pan.targetX = undefined;
+      this._pan.targetY = undefined;
+      this._pan.callback = undefined;
       return this;
     }
   });
