@@ -145,7 +145,7 @@
     _calculateState: function(level) {
       if (!level) return "future";
       if (this.saved.get(level.id)) return "played";
-      if (this.saved.getNextLevel().id == level.id) return "unlocked";
+      if (this.saved.getNextLevel().id == level.id || true) return "unlocked";
       return "locked";
     },
     updateLevelStates: function() {
@@ -178,7 +178,7 @@
       });
     },
     play: function(level) {
-      if (!level || /*level.get("state") == "locked" ||*/ level.get("state") == "future") return this;
+      if (!level || level.get("state") == "locked" || level.get("state") == "future") return this;
       var gui = this;
       this.fadeOut(function() {
         gui.engine.trigger("play", level.id);

@@ -88,7 +88,8 @@ $(window).on("load", function() {
         id: "leveStartScene"
       }, {
         saved: this.saved,
-        world: this.world
+        world: this.world,
+        input: this.input
       });
 
       this.levelInOutScene = new Backbone.LevelInOutScene({
@@ -106,6 +107,17 @@ $(window).on("load", function() {
 
       this.pausePanel = new Backbone.PausePanel({
         id: "pausePanel"
+      }, {
+        pauseButton: this.pauseButton,
+        world: this.world,
+        input: this.input,
+        showTitleScreen: this.showTitleScreen,
+        levelInOutScene: this.levelInOutScene
+      });
+      this.leveStartScene.pauseButton = this.pauseButton;
+
+      this.diedPanel = new Backbone.DiedPanel({
+        id: "diedPanel"
       }, {
         pauseButton: this.pauseButton,
         world: this.world,
@@ -197,6 +209,7 @@ $(window).on("load", function() {
         this.pauseButton,
         this.input,
         this.pausePanel,
+        this.diedPanel,
         this.levelEndPanel,
         this.leveStartScene,
         this.debugPanel

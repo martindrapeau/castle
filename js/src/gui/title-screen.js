@@ -56,6 +56,9 @@
           time = lastState ? _.ms2time(lastState.get("time")) : "?";
       context.font = "30px arcade";
       context.fillStyle = "#FFF";
+      context.textBaseline = this.attributes.textContextAttributes.textBaseline;
+      context.fontWeight = this.attributes.textContextAttributes.fontWeight;
+      context.textAlign = this.attributes.textContextAttributes.textAlign;
       context.fillText(coins, x+80, y+105);
       context.fillText(time, x+80, y+170);
     }
