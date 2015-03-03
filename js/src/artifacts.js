@@ -141,13 +141,11 @@
 
   buildArtifact("a-coin", [5, 6, 7, 8]);
   buildArtifact("a-death", [11]);
-  buildArtifact("a-health", [12]);
   buildArtifact("a-key", [18]);
   buildArtifact("a-blue-potion", [14]);
   buildArtifact("a-red-potion", [15]);
   buildArtifact("a-green-potion", [16]);
-  buildArtifact("a-dollar", [24]);
-  buildArtifact("a-clock", [23]);
+  buildArtifact("a-health", [12]);
 
   Backbone.ADeath.prototype.knockout = function(sprite, dir, dir2) {
     if (dir2 != "attack") return Artifact.prototype.knockout.apply(this, arguments);
@@ -168,7 +166,7 @@
       width: 64,
       height: 64,
       isBreakableTile: true,
-      health: 2,
+      health: 1,
       artifact: null,
       showContent: false,
       easing: "easeInOutCubic",
@@ -300,18 +298,20 @@
   buildBreakableTile("a-crate", 77);
   buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
-  buildBreakableTile("a-crate-health", 77, {artifact: "a-health"});
   buildBreakableTile("a-crate-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-crate-death", 77, {artifact: "a-death"});
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
-  buildBreakableTile("a-barrel-health", 76, {artifact: "a-health"});
+  buildBreakableTile("a-barrel-key", 76, {artifact: "a-key"});
   buildBreakableTile("a-barrel-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
   buildBreakableTile("a-hay", 102);
   buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
-  buildBreakableTile("a-hay-health", 102, {artifact: "a-health"});
-  buildBreakableTile("a-hay-red-potion", 77, {artifact: "a-red-potion"});
+  buildBreakableTile("a-hay-key", 102, {artifact: "a-key"});
+  buildBreakableTile("a-hay-red-potion", 102, {artifact: "a-red-potion"});
+  buildBreakableTile("a-hay-death", 102, {artifact: "a-death"});
   
+  buildArtifact("a-dollar", [24]);
+  buildArtifact("a-clock", [23]);
   
 }).call(this);
