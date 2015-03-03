@@ -66,25 +66,60 @@
 
   Backbone.Credits = Backbone.Panel.extend({
     defaults: _.extend({}, Backbone.Panel.prototype.defaults, {
-      text: "Credits"
+      text: "",
+      textContextAttributes: {
+        fillStyle: "#F67D00",
+        font: "40px arcade",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "center"
+      }
     }),
-    onDraw: function(context) {
-      var x = this.get("x"),
-          y = this.get("y");
+    onDraw: function(context, options) {
+      var b = this.toJSON(),
+          y = b.y;
 
-      // TO DO...
-      /*
-        --Credits--
+      // Titles
+      b.textContextAttributes.font = "30px arcade";
+      b.textContextAttributes.fillStyle = "#F67D00";
 
-        Graphics: pzUH, TikusJenaka, kemotaku, simirk, dxc, Saranai
-        Music: Edvard Grieg
-        Testing: Lodovic, Emilia
-        Coding: Martin
+      b.text = "Graphics";
+      b.y = y;
+      this.drawText(b, context, options);
 
-        Built with Backbone Game Engine
+      b.text = "Testing";
+      b.y = y + 130;
+      this.drawText(b, context, options);
 
-        A Game by Martin Drapeau
-      */
+      b.text = "Story & Coding";
+      b.y = y + 230;
+      this.drawText(b, context, options);
+
+      // Content
+      b.textContextAttributes.font = "24px arcade";
+      b.textContextAttributes.fillStyle = "#DDD";
+
+      b.text = "pzUH, TikusJenaka, kemotaku,";
+      b.y = y + 40;
+      this.drawText(b, context, options);
+
+      b.text = "simirk, dxc, Saranai";
+      b.y = y + 70;
+      this.drawText(b, context, options);
+
+      b.text = "Ludovic & Émilia";
+      b.y = y + 170;
+      this.drawText(b, context, options);
+
+      b.text = "Martin";
+      b.y = y + 270;
+      this.drawText(b, context, options);
+
+      b.textContextAttributes.fillStyle = "#BBB";
+      b.text = "Built with Backbone Game Engine";
+      b.y = y + 340;
+      this.drawText(b, context, options);
+
     }
   });
 
