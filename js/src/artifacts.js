@@ -181,7 +181,7 @@
         this.artifacts.push(new Backbone[_.classify(this.attributes.artifact)]());
     },
     hit: function(sprite, dir, dir2) {
-      if (dir == "bottom") {
+      if (dir == "bottom" && !sprite.get("hero")) {
         // Absorb the sprite
         this.artifacts.push(sprite);
         this.world.remove(sprite);

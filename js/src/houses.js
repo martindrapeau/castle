@@ -340,9 +340,8 @@
     if (this.get("state") == "inside")
       this.door.set("x", this.get("x") + this.get("outDoorX"));
   };
-  Wall.prototype.tryOpenClose = function() {
-    //var character = this.getHeroOverlappingCharacter("hero1");
-    var character = this.world.sprites.findWhere({hero:true});
+  Wall.prototype.tryOpenClose = function(notRequireOverlap) {
+    var character = notRequireOverlap ? this.world.sprites.findWhere({name: "hero1"}) : this.getHeroOverlappingCharacter("hero1");
     if (!character) return;
 
     var state = this.get("state");

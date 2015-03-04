@@ -47,7 +47,7 @@
         });
 
       this.world.pan(targetX, targetY, function() {
-        wall.tryOpenClose.call(wall);
+        wall.tryOpenClose.call(wall, true);
         setTimeout(function() {
           scene.world.pan(0, targetY, function() {
             scene.world.sprites.each(function(sprite) {
