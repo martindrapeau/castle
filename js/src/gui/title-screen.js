@@ -81,7 +81,7 @@
 
       // Titles
       b.textContextAttributes.font = "30px arcade";
-      b.textContextAttributes.fillStyle = "#F67D00";
+      b.textContextAttributes.fillStyle = "#FFC221";
 
       b.text = "Graphics";
       b.y = y;
@@ -97,7 +97,7 @@
 
       // Content
       b.textContextAttributes.font = "24px arcade";
-      b.textContextAttributes.fillStyle = "#DDD";
+      b.textContextAttributes.fillStyle = "#F67D00";
 
       b.text = "pzUH, TikusJenaka, kemotaku,";
       b.y = y + 40;
@@ -115,7 +115,7 @@
       b.y = y + 270;
       this.drawText(b, context, options);
 
-      b.textContextAttributes.fillStyle = "#BBB";
+      b.textContextAttributes.fillStyle = "#DDD";
       b.text = "Built with Backbone Game Engine";
       b.y = y + 340;
       this.drawText(b, context, options);
