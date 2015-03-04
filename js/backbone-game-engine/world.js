@@ -44,6 +44,7 @@
       );
 
       this.sprites = new Backbone.Collection();
+      this.quadTree = QuadTree(0, 0, this.width(), this.height());
       this.setupSpriteLayers();
       this.spawnSprites();
 
@@ -134,6 +135,25 @@
       dynamicSprites.lookup = {};
       dynamicSprites.maxSpriteWidth = dynamicSprites.maxSpriteHeight = 0;
 
+      this.quadTree.clear();
+
+      function addQto(sprite) {
+        sprite._qto || (sprite._qto = {id: sprite.id});
+        sprite._qto.x = sprite.getLeft();
+        sprite._qto.y = sprite.getTop();
+        sprite._qto.w = sprite.getRight() - sprite._qto.x;
+        sprite._qto.h = sprite.getBottom() - sprite._qto.y;
+        world.quadTree.put(sprite._qto);
+      }
+      function removeQto(sprite) {
+        world.quadTree.remove(sprite._qto, "id");
+        sprite._qto.id = undefined;
+        sprite._qto.x = undefined;
+        sprite._qto.y = undefined;
+        sprite._qto.w = undefined;
+        sprite._qto.h = undefined;
+      }
+
       function add(sprite, collection) {
         collection.add(sprite);
         index = world.getWorldIndex(sprite);
@@ -142,6 +162,7 @@
         sprite.set("lookupIndex", index);
         collection.maxSpriteWidth = Math.max(collection.maxSpriteWidth, sprite.attributes.width);
         collection.maxSpriteHeight = Math.max(collection.maxSpriteHeight, sprite.attributes.width);
+        addQto(sprite);
       }
 
       function update(sprite, collection) {
@@ -157,6 +178,8 @@
         sprite.set("lookupIndex", newIndex);
         collection.maxSpriteWidth = Math.max(collection.maxSpriteWidth, sprite.attributes.width);
         collection.maxSpriteHeight = Math.max(collection.maxSpriteHeight, sprite.attributes.width);
+        removeQto(sprite);
+        addQto(sprite);
       }
 
       function remove(sprite, collection) {
@@ -167,6 +190,7 @@
         }
         sprite.unset("lookupIndex");
         collection.remove(sprite);
+        removeQto(sprite);
       }
 
       this.listenTo(this.dynamicSprites, "change:x change:y", function(sprite) {

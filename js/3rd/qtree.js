@@ -300,6 +300,9 @@ function QuadTree(x, y, w, h, options) {
         remove: function(obj, attr) {
             return remove(root, obj, attr);
         },
+        clear: function() {
+            root = createnode(x, y, w, h);
+        },
         stringify: function() {
             var strobj = {
                 x: x, y: y, w: w, h: h,
