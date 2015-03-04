@@ -37,6 +37,9 @@
           targetY = this.world.get("y"),
           wall = this.world.sprites.findWhere({name: "h-wall"});
 
+      this.pauseButton.trigger("detach");
+      this.input.trigger("detach");
+
       if (this.world.get("puzzle"))
         this.world.sprites.each(function(sprite) {
           if (sprite.get("isBreakableTile") && sprite.get("artifact"))
@@ -52,6 +55,8 @@
                 sprite.hideContent();
             });
             scene.world.set("state", "play");
+            scene.pauseButton.trigger("attach");
+            scene.input.trigger("attach");
             scene.engine.remove(scene);
           }, "easeInQuad", 2000);
         }, 3000);
@@ -159,7 +164,7 @@
     home: function() {
       return this.action("showTitleScreen");
     },
-    action: function(event) {
+    action: function(event, arg1) {
       var panel = this;
 
       this.engine.add(this.levelInOutScene);
@@ -169,12 +174,15 @@
         panel.pauseButton.trigger("attach");
         panel.input.trigger("attach");
         panel.set({y: 720});
-        panel.engine.trigger(event);
+        if (arg1)
+          panel.engine.trigger(event, arg1);
+        else
+          panel.engine.trigger(event);
       });
 
       return this;
     }
-  })
+  });
 
   Backbone.PausePanel = Backbone.InGamePanel.extend({
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
@@ -182,7 +190,8 @@
       text: "Pause",
       img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
     }),
-    buttons: _.extend({}, Backbone.InGamePanel.prototype.buttons, {
+    buttons: {
+      home: _.clone(Backbone.InGamePanel.prototype.buttons.home),
       resume: {
         offsetX: 170, offsetY: 180,
         width: 70, height: 70,
@@ -190,7 +199,7 @@
         img: "#gui", imgX: 140, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
         click: "resume"
       }
-    }),
+    },
     initialize: function(attributes, options) {
       Backbone.InGamePanel.prototype.initialize.apply(this, arguments);
       this.listenTo(this.pauseButton, "tap", this.show);
@@ -219,6 +228,56 @@
     }
   });
 
+  Backbone.DiedPanel = Backbone.InGamePanel.extend({
+    defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
+      x: 320, y: 720, width: 320, height: 240,
+      text: "R.I.P.",
+      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
+    }),
+    buttons: {
+      home: _.clone(Backbone.InGamePanel.prototype.buttons.home),
+      replay: {
+        offsetX: 170, offsetY: 180,
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 70, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        click: "replay"
+      }
+    },
+    onAttach: function() {
+      Backbone.InGamePanel.prototype.onAttach.apply(this, arguments);
+      this.hero = this.world.sprites.findWhere({hero:true});
+    },
+    onDetach: function() {
+      Backbone.InGamePanel.prototype.onDetach.apply(this, arguments);
+      this.hero = undefined;
+      this.shown = false;
+    },
+    onUpdate: function(dt) {
+      if (!this.shown && this.hero && this.hero.get("dead")) {
+        this.shown = true;
+        this.pauseButton.trigger("detach");
+        this.input.trigger("detach");
+        setTimeout(this.show.bind(this), 2000);
+      }
+    
+      return Backbone.InGamePanel.prototype.onUpdate.apply(this, arguments);
+    },
+    show: function() {
+      this.world.set("state", "pause");
+
+      this.detachButtons();
+
+      this.moveTo(this.get("x"), 200, function() {
+        this.attachButtons();
+      });
+      return this;
+    },
+    replay: function() {
+      return this.action("play", this.world.get("level"));
+    }
+  });
+
   Backbone.LevelEndPanel = Backbone.InGamePanel.extend({
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
       x: 320, y: 720, width: 366, height: 305,
@@ -233,13 +292,9 @@
       img: "#gui", imgX: 0, imgY: 1322, imgWidth: 366, imgHeight: 375, imgMargin: 0
     }),
     buttons: {
-      home: {
+      home: _.extend({}, Backbone.InGamePanel.prototype.buttons.home, {
         offsetX: 87, offsetY: 330,
-        width: 70, height: 70,
-        backgroundColor: "transparent",
-        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
-        click: "home"
-      },
+      }),
       resume: {
         offsetX: 209, offsetY: 330,
         width: 70, height: 70,
@@ -248,25 +303,55 @@
         click: "next"
       }
     },
+    initialize: function(attributes, options) {
+      Backbone.InGamePanel.prototype.initialize.apply(this, arguments);
+
+      this.coin = new Backbone.ADollar();
+      this.clock = new Backbone.AClock();
+    },
     onAttach: function() {
       Backbone.InGamePanel.prototype.onAttach.apply(this, arguments);
       this.hero = this.world.sprites.findWhere({hero:true});
       this.sign = this.world.sprites.findWhere({name: "f-sign2"});
-      this.shown = false;
     },
     onDetach: function() {
       Backbone.InGamePanel.prototype.onDetach.apply(this, arguments);
       this.hero = undefined;
       this.sign = undefined;
       this.shown = false;
+      this.scoreShown = false;
     },
-    update: function(dt) {
-
+    onUpdate: function(dt) {
       if (this.hero && this.sign && !this.shown &&
           this.hero.getLeft(true) > this.sign.getLeft(true))
         this.show();
-    
-      return Backbone.Panel.prototype.update.apply(this, arguments);
+
+      var x = this.get("x"),
+          y = this.get("y");
+      this.coin.set({x: x + 80, y: y + 198});
+      this.clock.set({x: x + 78, y: y + 256});
+
+      return Backbone.InGamePanel.prototype.onUpdate.apply(this, arguments);
+    },
+    onDraw: function(context, options) {
+      Backbone.InGamePanel.prototype.onDraw.apply(this, arguments);
+      if (this.scoreShown) {
+        var x = this.get("x"),
+            y = this.get("y"),
+            coins = this.hero.get("coins"),
+            time = this.world.getHumanTime();
+
+        this.coin.draw.apply(this.coin, arguments);
+        this.clock.draw.apply(this.clock, arguments);
+
+        context.font = "30px arcade";
+        context.fillStyle = "#FFF";
+        context.textBaseline = "middle";
+        context.fontWeight = "normal";
+        context.textAlign = "left";
+        context.fillText(coins, x+140, y+230);
+        context.fillText(time, x+140, y+288);
+      }
     },
     show: function() {
       this.shown = true;
@@ -280,11 +365,17 @@
 
       this.moveTo(this.get("x"), 100, function() {
         this.attachButtons();
+        this.showScore();
       });
       return this;
     },
+    showScore: function() {
+      this.scoreShown = true;
+
+      return this;
+    },
     next: function() {
-      this.action("play");
+      return this.action("play");
     }
   });
 

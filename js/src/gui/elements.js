@@ -39,6 +39,8 @@
       this.saved = options.saved;
       this.world = options.world;
       this.levels = options.levels;
+      this.pauseButton = options.pauseButton;
+      this.input = options.input;
       _.bindAll(this, "enter", "exit");
     },
     onAttach: function() {

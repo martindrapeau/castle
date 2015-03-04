@@ -249,7 +249,8 @@
   Backbone.Engine = Backbone.Model.extend({
     defaults: {
       version: 0.2,
-      clearOnDraw: false
+      clearOnDraw: false,
+      tapDetectionDelay: 100 // in ms
     },
     initialize: function(attributes, options) {
       options || (options = {});
@@ -428,7 +429,7 @@
           e.canvasY = pointer.pageY - engine.canvas.offsetTop + engine.canvas.scrollTop;
           engine.trigger("tap", e);
         }
-      }, 200);
+      }, this.attributes.tapDetectionDelay);
     },
     onTouchEnd: function(e) {
       e.preventDefault();
