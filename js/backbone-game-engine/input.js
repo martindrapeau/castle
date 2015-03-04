@@ -9,6 +9,9 @@
    *
    */
 
+  var keyboardImg = new Image();
+  keyboardImg.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAAwCAYAAABHTnUeAAACYklEQVR42u3dS5KCQBAEUNx5LJbcYs42t2DJsViOizFCnQH6U9Wd2ZW5JuQVmtAoEd4mRQmcW2+AovSMCqCEjgqghM5hAbZt++qNe808z9852zP7me1s/n8LgDZAyiCj+JntjP4/BUAd4GqQEfzMdla/CgDkZ7az+lUAID+zndWvAgD5me2sfhUAyM9sZ/WrAEB+ZjurXwUA8jPbWf0qAJCf2c7qVwGA/Mx2Vr8KAORntrP6VQAgf6798VpFhsd+zO0W/itX7vYpfvMCPJGlB7lkCEu/d1SAc/+RLWfbHL9pAV6RoxXAqtgqwPUMnz6LD/+R36QAVsDSIWr9uTPWzNb6HsDyvfE69mdGb39VAc7OQCMXoGbGlgWwPjF5Hvuj9X3tuv/KX1SAlEtvhAKUzNqqAB5X5ZYFONmHqT+rAKVrztSkDIdYACu/ld1rSep97K+OsUeBQxag5xzeBfC8H2tx8jl6b7wK7LIEut/v07qu1eDUIaz9tUEqgOVSVAVIxFqBU4co9edkWZZp3/fTbXovgby/jQu/BMqBj1YA9JvgFu9B+JvgnCEiFADla9BWJyB9DZqQ51Jh5AIg/RA2wtWX9oewHulZAIube4RHIX73ZWov8R/NQPcoRMvoYbi31yp2IBRguIfhWkQFeHutYgdiAYZ4HNo7KgCmndWvAgD5me2sfhUAyM9sZ/WrAEB+ZjurXwUA8jPbWf0qAJCf2c7qVwGA/Mx2Vr8KAORntrP6VQAgP7Od1a8CAPmZ7ax+/UkemJ/ZzujX36QC+pntbH79UbYSOiqAEjoqgBI6KoASOj+RrUxeKnOx4gAAAABJRU5ErkJggg==";
+
   Backbone.InputButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       // Relative position references
@@ -285,11 +288,15 @@
 
     // Engine core functions
     update: function(dt) {
-      return this.hasTouchpad();
+      return true;
     },
-    draw: function(context) {
-      for (var i = 0; i < this.buttons.length; i++)
-        this.buttons[i].instance.draw(context);
+    draw: function(context, options) {
+      if (this.hasTouchpad()) {
+        for (var i = 0; i < this.buttons.length; i++)
+          this.buttons[i].instance.draw(context);
+      } else{
+        context.drawImage(keyboardImg, 8, context.canvas.height - 56);
+      }
 
       return this;
     },
