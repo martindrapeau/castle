@@ -9,6 +9,31 @@
    *
    */
 
+  var times = {}, start = _.now();
+  function reportTime(time, prop, total) {
+    console.log(prop + ": " + time + "(" + Math.round(time*10000/total)/100 + "%)");
+  }
+  window.reportTimes = function() {
+    var total = _.now()-start,
+        idle = total;
+    _.each(times, function(time, prop) {
+      reportTime(time, prop, total);
+      idle -= time;
+    });
+    reportTime(idle, "idle", total);
+    reportTime(total, "total", total);
+  }
+
+  function wrapWithTime(that, fn, prop) {
+    times[prop] = 0;
+    return function() {
+      var now = _.now(),
+          result = Backbone.World.prototype[fn].apply(that, arguments);
+      times[prop] += _.now()-now;
+      return result;
+    };
+  }
+
   // Backbone.World is Backbone model which contains a collection of sprites.
   Backbone.World = Backbone.Model.extend({
     defaults: {
@@ -39,9 +64,13 @@
       
       _.bindAll(this,
         "save", "getWorldIndex", "getWorldCol", "getWorldRow", "cloneAtPosition",
-        "findAt", "filterAt", "spawnSprites", "height", "width", "add", "remove",
-        "setTimeout", "clearTimeout", "getHumanTime"
+        "spawnSprites", "height", "width", "add", "remove", "setTimeout", "clearTimeout", "getHumanTime"
       );
+
+      this._findOrFilter = wrapWithTime(this, "_findOrFilter", "ctime");
+      this.findCollisions = wrapWithTime(this, "findCollisions", "ctime");
+      this.update = wrapWithTime(this, "update", "utime");
+      this.draw = wrapWithTime(this, "draw", "dtime");
 
       this.sprites = new Backbone.Collection();
       this.setupSpriteLayers();
