@@ -66,15 +66,16 @@
       this.onStateChange();
     },
     reportTimes: function(fn) {
-      var total = this.attributes.time,
-          other = total;
+      var total = this.attributes.time;
       function reportTime(time, fn) {
         console.log(fn + ": " + Math.round(time*10000/total)/100 + "% " + time + "ms");
-        other -= time;
       }
       _.each(this._times, reportTime);
-      reportTime(other, "other");
       reportTime(total, "total");
+
+      // Report collision detection as % of update
+      var time = this._times["findAt"] + this._times["filterAt"] + this._times["findCollisions"];
+      console.log("collision/update: " + Math.round(time*10000/this._times["update"])/100 + "% " + time + "ms");
     },
     wrapTime: function(fn) {
       var world = this,
