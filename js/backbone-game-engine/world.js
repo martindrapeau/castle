@@ -138,7 +138,8 @@
       this.quadTree.clear();
 
       function addQto(sprite) {
-        sprite._qto || (sprite._qto = {id: sprite.id});
+        sprite._qto || (sprite._qto = {});
+        sprite._qto.id = sprite.id;
         sprite._qto.x = sprite.getLeft();
         sprite._qto.y = sprite.getTop();
         sprite._qto.w = sprite.getRight() - sprite._qto.x;
@@ -572,16 +573,16 @@
     },
     _findOrFilter: function(fn, x, y, type, exclude, collision) {
       var id = exclude && exclude.id ? exclude.id : null,
-          col = this.getWorldCol(x),
-          row = this.getWorldRow(y),
-          index, c, r, s,
+          /*col = this.getWorldCol(x),
+          row = this.getWorldRow(y),*/
+          index, /*c, r, s,*/
           result = [];
 
       function test(sprite) {
         return (sprite.id && sprite.id != id) &&
           (!type || sprite.get("type") == type) &&
-          (collision === undefined || sprite.attributes.collision === collision) &&
-          sprite.overlaps.call(sprite, x, y);
+          (collision === undefined || sprite.attributes.collision === collision) /*&&
+          sprite.overlaps.call(sprite, x, y);*/
       }
 
       if (type == "tile") {
@@ -592,6 +593,16 @@
         return fn == "find" ? null : result;
       }
 
+      var matches = this.quadTree.get({x: x, y: y, w: 0, h: 0}),
+          sprite, i;
+      for (i = 0; i < matches.length; i++) {
+        sprite = this.sprites.get(matches[i].id);
+        if (test(sprite)) result.push(sprite);
+      }
+      return fn == "find" ? result[0] || null : result;
+
+
+      /*
       // Look in dynamic sprites first (lookup by index)
       for (c = col-2; c <= col+2; c++)
         for (r = row-2; r <= row+2; r++) {
@@ -615,7 +626,7 @@
               return this.staticSprites.lookup[index][s];
             else
               result.push(this.staticSprites.lookup[index][s]);
-
+      */
       return fn == "find" ? null : result;
     },
     // Detects collisions on sprites for a set of named coordinates. Works on moving
