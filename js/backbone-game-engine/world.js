@@ -9,31 +9,6 @@
    *
    */
 
-  var times = {}, start = _.now();
-  function reportTime(time, prop, total) {
-    console.log(prop + ": " + time + "(" + Math.round(time*10000/total)/100 + "%)");
-  }
-  window.reportTimes = function() {
-    var total = _.now()-start,
-        idle = total;
-    _.each(times, function(time, prop) {
-      reportTime(time, prop, total);
-      idle -= time;
-    });
-    reportTime(idle, "idle", total);
-    reportTime(total, "total", total);
-  }
-
-  function wrapWithTime(that, fn, prop) {
-    times[prop] = 0;
-    return function() {
-      var now = _.now(),
-          result = Backbone.World.prototype[fn].apply(that, arguments);
-      times[prop] += _.now()-now;
-      return result;
-    };
-  }
-
   // Backbone.World is Backbone model which contains a collection of sprites.
   Backbone.World = Backbone.Model.extend({
     defaults: {
@@ -63,14 +38,19 @@
       this.debugPanel = options.debugPanel;
       
       _.bindAll(this,
+        "wrapTime",
         "save", "getWorldIndex", "getWorldCol", "getWorldRow", "cloneAtPosition",
         "spawnSprites", "height", "width", "add", "remove", "setTimeout", "clearTimeout", "getHumanTime"
       );
 
-      this._findOrFilter = wrapWithTime(this, "_findOrFilter", "ctime");
-      this.findCollisions = wrapWithTime(this, "findCollisions", "ctime");
-      this.update = wrapWithTime(this, "update", "utime");
-      this.draw = wrapWithTime(this, "draw", "dtime");
+      this._times = {};
+      this.wrapTime("filterAt");
+      this.wrapTime("findAt");
+      this.wrapTime("findCollisions");
+      this.wrapTime("draw");
+      this.wrapTime("update");
+      this.wrapTime("drawDynamicSprites");
+      this.wrapTime("drawStaticSprites");
 
       this.sprites = new Backbone.Collection();
       this.setupSpriteLayers();
@@ -84,6 +64,28 @@
 
       this.on("change:state", this.onStateChange, this);
       this.onStateChange();
+    },
+    reportTimes: function(fn) {
+      var total = this.attributes.time,
+          other = total;
+      function reportTime(time, fn) {
+        console.log(fn + ": " + Math.round(time*10000/total)/100 + "% " + time + "ms");
+        other -= time;
+      }
+      _.each(this._times, reportTime);
+      reportTime(other, "other");
+      reportTime(total, "total");
+    },
+    wrapTime: function(fn) {
+      var world = this,
+          origFn = this[fn];
+      this._times[fn] = 0;
+      this[fn] = function() {
+        var now = _.now(),
+            result = origFn.apply(world, arguments);
+        if (world.attributes.state == "play") world._times[fn] += _.now() - now;
+        return result;
+      }
     },
     height: function() {
       return this.get("height") * this.get("tileHeight");
@@ -120,6 +122,7 @@
       if (state == "pause") {
         this.accumTime += (now - (this.startTime || now));
         this.set("time", this.accumTime);
+        if (this.attributes.time) this.reportTimes();
       } else if (state == "play") {
         this.startTime = now;
       }
