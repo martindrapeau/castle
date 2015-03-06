@@ -655,8 +655,13 @@
         if (cur.mov == "jump" && cur.mov2 == null) attrs.sequenceIndex = 1;
 
         if (heroBottomY >= bottomWorld) {
-          this.world.remove(this);
-          return false;
+          attrs.y = y = bottomY - tileHeight + paddingBottom;
+          attrs.velocity = velocity = 0;
+          attrs.yVelocity = yVelocity = 0;
+          if (!dead) {
+            attrs.state = this.buildState("dead", cur.dir);
+            attrs.dead = true;
+          }
         }
 
         function land(bottomY) {
