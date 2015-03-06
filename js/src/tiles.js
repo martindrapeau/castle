@@ -49,6 +49,7 @@
   extendSprite(Backbone.Tile, "f-ground7", {collision: true}, {idle: {sequences: [40]}});
   extendSprite(Backbone.Tile, "f-ground8", {collision: true}, {idle: {sequences: [41]}});
   extendSprite(Backbone.Tile, "f-water", {collision: false}, {idle: {sequences: [42]}});
+  extendSprite(Backbone.Tile, "f-water2", {collision: false}, {idle: {sequences: [65]}});
 
   extendSprite(Backbone.Tile, "f-stump1", {collision: true, paddingTop: 20, paddingLeft: 32}, {idle: {sequences: [88]}});
   extendSprite(Backbone.Tile, "f-stump2", {collision: true, paddingTop: 20, paddingRight: 32}, {idle: {sequences: [89]}});

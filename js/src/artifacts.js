@@ -303,7 +303,7 @@
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
   buildBreakableTile("a-barrel-key", 76, {artifact: "a-key"});
-  buildBreakableTile("a-barrel-red-potion", 77, {artifact: "a-red-potion"});
+  buildBreakableTile("a-barrel-red-potion", 76, {artifact: "a-red-potion"});
   buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
   buildBreakableTile("a-hay", 102);
   buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});

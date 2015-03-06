@@ -431,8 +431,10 @@
               this.set("key", true);
               break;
             case "a-red-potion":
-              this.cancelUpdate = true;
-              this.set("potion", "red");
+              if (cur.mov2 != "hurt") {
+                this.cancelUpdate = true;
+                this.set({health: Math.min(this.get("health") + 8, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
+              }
               break;
             case "a-blue-potion":
               this.cancelUpdate = true;
