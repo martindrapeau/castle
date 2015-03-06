@@ -397,6 +397,11 @@
       });
       return this;
     },
+    isAttacking: function() {
+      return this.attributes.state.indexOf("-attack") > 0 &&
+        this.attributes.sequenceIndex >= 3 &&
+        this.attributes.sequenceIndex <= 5;
+    },
     hit: function(sprite, dir, dir2) {
       var cur = this.getStateInfo();
       if (sprite.get("type") == "character") {
@@ -442,7 +447,7 @@
         }
 
         if (cur.mov2 != "hurt") {
-          if (cur.mov2 == "attack" && cur.dir == dir) {
+          if (this.isAttacking() && cur.dir == dir) {
             sprite.trigger("hit", this, cur.opo, "attack");
           } else {
             if (sprite.isAttacking()) {

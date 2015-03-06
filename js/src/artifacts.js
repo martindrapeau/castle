@@ -148,7 +148,6 @@
   buildArtifact("a-health", [12]);
 
   Backbone.ADeath.prototype.knockout = function(sprite, dir, dir2) {
-    if (dir2 != "attack") return Artifact.prototype.knockout.apply(this, arguments);
     var explosion = new Backbone.Explosion({
       x: this.get("x"),
       y: this.get("y")
@@ -183,6 +182,7 @@
     hit: function(sprite, dir, dir2) {
       if (dir == "bottom" && !sprite.get("hero")) {
         // Absorb the sprite
+        this.set({state: "bounce", sequenceIndex: 0});
         this.artifacts.push(sprite);
         this.world.remove(sprite);
         return this;
