@@ -1,6 +1,6 @@
 (function() {
 
-  var floatVelocity = 40,
+  var floatVelocity = 60,
       floatAcceleration = 100;
 
 	var Platform = Backbone.Character.extend({
@@ -85,10 +85,12 @@
           attrs.velocity = velocity;
 
           var leftTile = this.world.findAt(platLeftX, platMidY, "tile", this, true)
+              leftCharacter = this.world.findAt(platLeftX, platMidY, "character", this, true),
               worldLeft = -tileWidth,
               leftX = _.maxNotNull([
                 worldLeft,
-                leftTile ? leftTile.getRight(true) : null
+                leftTile ? leftTile.getRight(true) : null,
+                leftCharacter ? leftCharacter.getRight(true) : null
               ]);
 
           if (platLeftX <= leftX) {
@@ -104,10 +106,12 @@
           attrs.velocity = velocity;
 
           var rightTile = this.world.findAt(platRightX, platMidY, "tile", this, true)
+              rightCharacter = this.world.findAt(platRightX, platMidY, "character", this, true),
               worldRight = this.world.width(),
               rightX = _.minNotNull([
                 worldRight,
-                rightTile ? rightTile.getLeft(true) : null
+                rightTile ? rightTile.getLeft(true) : null,
+                rightCharacter ? rightCharacter.getLeft(true) : null
               ]);
 
           if (platRightX >= rightX) {
