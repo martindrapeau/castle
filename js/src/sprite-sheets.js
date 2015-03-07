@@ -40,6 +40,15 @@
     tileColumns: 2,
     tileRows: 3
   }, {
+    id: "platforms",
+    img: "#tiles",
+    x: 0,
+    y: 576,
+    tileWidth: 192,
+    tileHeight: 64,
+    tileColumns: 1,
+    tileRows: 1
+  }, {
     id: "wall",
     img: "#houses",
     x: 0,

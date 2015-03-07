@@ -624,7 +624,7 @@
           heroHeight = tileHeight - paddingTop - paddingBottom,
           heroLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           heroRightX = heroLeftX + heroWidth,
-          reaction = null;
+          relativeVelocity = 0;
 
       var heroBottomY,
           heroTopY,
@@ -696,6 +696,11 @@
           // Start falling if no obstacle below
           attrs.nextState = state;
           attrs.state = this.buildState("jump", cur.mov2, cur.dir);
+        } else if (yVelocity == 0 && heroBottomY == bottomY) {
+          if (bottomLeftCharacter && bottomLeftCharacter.get("isPlatform"))
+            relativeVelocity = bottomLeftCharacter.get("velocity");
+          else if (bottomRightCharacter && bottomRightCharacter.get("isPlatform"))
+            relativeVelocity = bottomRightCharacter.get("velocity");
         }
 
       } else {
@@ -780,7 +785,7 @@
         }
       }
 
-      if (velocity) attrs.x = x = x + Math.round(velocity * (dt/1000));
+      if (velocity || relativeVelocity) attrs.x = x = x + Math.round((velocity + relativeVelocity) * (dt/1000));
       if (yVelocity) attrs.y = y = y + Math.round(yVelocity * (dt/1000));
 
       // Set modified attributes

@@ -85,7 +85,7 @@
       return this;
     },
     hit: function(sprite, dir, dir2) {
-      return this
+      return this;
     },
     getHitReaction: function(sprite, dir, dir2) {
       return null;
