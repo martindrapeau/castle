@@ -40,6 +40,15 @@
     tileColumns: 2,
     tileRows: 3
   }, {
+    id: "barge",
+    img: "#houses",
+    x: 0,
+    y: 1600,
+    tileWidth: 315,
+    tileHeight: 90,
+    tileColumns: 1,
+    tileRows: 1
+  }, {
     id: "platforms",
     img: "#tiles",
     x: 0,

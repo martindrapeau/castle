@@ -131,6 +131,12 @@
     }
 	});
 
-  extendSprite(Platform, "h-barge");
+  extendSprite(Platform, "h-grass-platform");
+  extendSprite(Platform, "h-barge", {
+    spriteSheet: "barge",
+    width: 315,
+    height: 90,
+    paddingTop: 20
+  });
 
 }).call(this);
