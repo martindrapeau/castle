@@ -287,11 +287,14 @@
           charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
           bottomTile = this.world.findAt(charLeftX + charWidth/2, charBottomY, "tile", this, true),
+          bottomPlatform = this.world.findAt(charLeftX + charWidth/2, charBottomY, "platform", this, true),
           bottomWorld = this.world.height() + tileHeight,
+          relativeVelocity = 0,
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld,
-            bottomTile ? bottomTile.getTop(true) : null
+            bottomTile ? bottomTile.getTop(true) : null,
+            bottomPlatform ? bottomPlatform.getTop(true) : null
           ]);
 
       if (yVelocity >= 0) {
@@ -310,6 +313,10 @@
           else if (cur.mov == "ko") {
             attrs.velocity = velocity = 0;
           }
+
+          if (charBottomY == bottomY && bottomPlatform)
+            relativeVelocity = bottomPlatform.get("velocity");
+
         } else if (cur.mov != "fall" && cur.mov != "ko" && charBottomY < bottomY) {
           // Start falling if no obstacle below
           attrs.state = this.buildState("fall", null, cur.dir);
@@ -397,8 +404,8 @@
         }
       }
 
-      if (velocity) attrs.x = x = x + velocity * (dt/1000);
-      if (yVelocity) attrs.y = y = y + yVelocity * (dt/1000);
+      if (velocity || relativeVelocity) attrs.x = x = x + Math.round((velocity + relativeVelocity) * (dt/1000));
+      if (yVelocity) attrs.y = y = y + Math.round(yVelocity * (dt/1000));
 
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);

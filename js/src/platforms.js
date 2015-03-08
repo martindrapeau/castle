@@ -6,10 +6,10 @@
 	var Platform = Backbone.Character.extend({
     defaults: _.extend({}, Backbone.Character.prototype.defaults, {
       spriteSheet: "platforms",
+      type: "platform",
       width: 192,
       height: 64,
       paddingTop: 16,
-      type: "character",
       state: "float-left",
       collision: true,
       isPlatform: true
@@ -148,7 +148,7 @@
 
   extendSprite(Platform, "h-grass-platform");
 
-  extendSprite(Platform, "h-barge", _.extend(Platform.prototype.defaults, {
+  extendSprite(Platform, "h-barge", _.extend({}, Platform.prototype.defaults, {
     state: "idle-right",
     spriteSheet: "barge",
     width: 315,

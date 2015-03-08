@@ -644,6 +644,8 @@
             bottomRightTile = this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "tile", this, true),
             bottomLeftCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "character", this, true) : null,
             bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "character", this, true) : null,
+            bottomLeftPlatform = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "platform", this, true) : null,
+            bottomRightPlatform = !dead && heroBottomY > 0 ? this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "platform", this, true) : null,
             bottomWorld = this.world.height() + tileHeight,
             bottomY = _.minNotNull([
               this.get("floor"),
@@ -651,7 +653,9 @@
               bottomLeftTile ? (bottomLeftTile.getTop(true)) : null,
               bottomRightTile ? (bottomRightTile.getTop(true)) : null,
               bottomLeftCharacter ? bottomLeftCharacter.getTop(true) : null,
-              bottomRightCharacter ? bottomRightCharacter.getTop(true) : null
+              bottomRightCharacter ? bottomRightCharacter.getTop(true) : null,
+              bottomLeftPlatform ? bottomLeftPlatform.getTop(true) : null,
+              bottomRightPlatform ? bottomRightPlatform.getTop(true) : null
             ]);
 
         if (cur.mov == "jump" && cur.mov2 == null) attrs.sequenceIndex = 1;
@@ -697,10 +701,10 @@
           attrs.nextState = state;
           attrs.state = this.buildState("jump", cur.mov2, cur.dir);
         } else if (yVelocity == 0 && heroBottomY == bottomY) {
-          if (bottomLeftCharacter && bottomLeftCharacter.get("isPlatform"))
-            relativeVelocity = bottomLeftCharacter.get("velocity");
-          else if (bottomRightCharacter && bottomRightCharacter.get("isPlatform"))
-            relativeVelocity = bottomRightCharacter.get("velocity");
+          if (bottomLeftPlatform)
+            relativeVelocity = bottomLeftPlatform.get("velocity");
+          else if (bottomRightPlatform)
+            relativeVelocity = bottomRightPlatform.get("velocity");
         }
 
       } else {
