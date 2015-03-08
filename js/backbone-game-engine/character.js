@@ -403,8 +403,7 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
-      if (this.engine.debugPanel) this.engine.debugPanel.set({spider: this.get("state")})
-
+      if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return true;
     },
     toggleDirection: function(dirIntent) {

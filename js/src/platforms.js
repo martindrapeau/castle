@@ -39,6 +39,9 @@
     hit: function(sprite, dir, dir2) {
       return this;
     },
+    ai: function(dt) {
+      return this;
+    },
     update: function(dt) {
       // Movements are only possible inside a world
       if (!this.world) return true;
@@ -52,7 +55,18 @@
           state = this.get("state"),
           cur = this.getStateInfo(),
           animation = this.getAnimation(),
+          now = _.now(),
+          aiDelay = this.get("aiDelay"),
           attrs = {};
+
+      // Handle AI
+      if (!this.lastAIEvent)
+        this.lastAIEvent = now;
+      else if (now > this.lastAIEvent + aiDelay) {
+        this.ai(now - this.lastAIEvent);
+        this.lastAIEvent = now;
+        if (this.cancelUpdate) return true;
+      }
 
       attrs.sequenceIndex = this.updateSequenceIndex();
 
@@ -127,16 +141,55 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
+      if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return true;
     }
 	});
 
   extendSprite(Platform, "h-grass-platform");
-  extendSprite(Platform, "h-barge", {
+
+  extendSprite(Platform, "h-barge", _.extend(Platform.prototype.defaults, {
+    state: "idle-right",
     spriteSheet: "barge",
     width: 315,
     height: 90,
     paddingTop: 20
+  }));
+  _.extend(Backbone.HBarge.prototype, {
+    onAttach: function() {
+      Platform.prototype.onAttach.apply(this, arguments);
+      this.hero = this.world ? this.world.sprites.findWhere({hero:true}) : null;
+    },
+    onDetach: function() {
+      Platform.prototype.onDetach.apply(this, arguments);
+      this.hero = undefined;
+    },
+    ai: function(dt) {
+      if (!this.hero) return this;
+
+      var state = this.get("state"),
+          attrs = {};
+
+      if (state == "idle-right" &&
+          this.hero.getLeft(true) > this.getLeft(true) &&
+          this.hero.getRight(true) < this.getRight(true)) {
+        attrs.state = "float-right";
+        attrs.velocity = this.getAnimation(attrs.state).velocity;
+      }
+      else if (state == "float-left" && this.get("velocity") < 0) {
+        attrs.state = "idle-left";
+        attrs.velocity = 0;
+      }
+
+      if (!_.isEmpty(attrs)) {
+        this.set(attrs);
+        this.cancelUpdate = true;
+      }
+
+      return this;
+    }
   });
+
+
 
 }).call(this);

@@ -94,7 +94,7 @@
         this.lastSequenceChangeTime = now;
       }
 
-      // Tell the engine to draw (only if we are in the viewport)
+      if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return true;
     },
     draw: function(context, options) {

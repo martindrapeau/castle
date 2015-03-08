@@ -414,8 +414,8 @@
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
-      //if (this.engine.debugPanel) this.engine.debugPanel.set({state: this.get("state")})
-      return true;      
+      if (typeof this.onUpdate == "function") return this.onUpdate(dt);
+      return true;
     },
     buildCollisionMap: function(top, right, bottom, left) {
       this.collisionMap || (this.collisionMap = {
