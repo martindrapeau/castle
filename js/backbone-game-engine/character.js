@@ -467,8 +467,7 @@
         right: {x: 0, y: 0, dir: "right", sprites: [], sprite: null}
       });
 
-      var width = right - left,
-          height = bottom - top;
+      var width = right - left;
       this.collisionMap.bottom.x = left + width/2;
       this.collisionMap.bottom.y = bottom;
       this.collisionMap.top.x = left + width/2;

@@ -647,9 +647,9 @@
       for (m in map)
         if (map.hasOwnProperty(m)) {
           if (minX == undefined || map[m].x < minX) minX = map[m].x;
-          else if (maxX == undefined || map[m].x > maxX) maxX = map[m].x;
+          if (maxX == undefined || map[m].x > maxX) maxX = map[m].x;
           if (minY == undefined || map[m].y < minY) minY = map[m].y;
-          else if (maxY == undefined || map[m].y > maxY) maxY = map[m].y;
+          if (maxY == undefined || map[m].y > maxY) maxY = map[m].y;
           map[m].sprites = [];
           map[m].sprite = null;
         }

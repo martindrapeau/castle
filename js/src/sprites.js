@@ -120,20 +120,35 @@
       var collision = this.get("collision"),
           tileWidth = this.get("width"),
           tileHeight = this.get("height"),
+          paddingLeft = this.get("paddingLeft"),
+          paddingRight = this.get("paddingRight"),
           paddingTop = this.get("paddingTop"),
           paddingBottom = this.get("paddingBottom"),
+          charWidth = tileWidth - paddingLeft - paddingRight,
           charHeight = tileHeight - paddingTop - paddingBottom,
           charBottomY = Math.round(y + yVelocity * (dt/1000)) + paddingTop + charHeight,
           charTopY = charBottomY - charHeight,
-          bottomTile = state != "ko" ? this.world.findAt(x + tileWidth/2, charBottomY, "tile", this, true) : null,
-          bottomCharacater = state != "ko" ? this.world.findAt(x + tileWidth/2, charBottomY, "character", this, true) : null,
+          charLeftX = x + paddingLeft,
+          charRightX = charLeftX + charWidth,
           bottomWorld = this.world.height() + tileHeight,
+          relativeVelocity = 0,
           bottomY = _.minNotNull([
             this.get("floor"),
-            bottomWorld,
-            bottomTile ? bottomTile.getTop(true) : null,
-            bottomCharacater ? bottomCharacater.getTop(true) : null
+            bottomWorld
           ]);
+
+      this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
+      this.world.findCollisions(this.collisionMap, null, this, true);
+
+      var bottomCharacater, bottomPlatform, sprite, i;
+      for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
+        sprite = this.collisionMap.bottom.sprites[i];
+        bottomY = Math.min(bottomY, sprite.getTop(true));
+        if (sprite.get("type") == "platform") bottomPlatform = sprite;
+        if (sprite.get("type") == "character" &&
+            (!bottomCharacater || sprite.getTop(true) < bottomCharacater.getTop(true)))
+          bottomCharacater = sprite;
+      }
 
       if (yVelocity >= 0) {
         // Falling...
@@ -146,6 +161,9 @@
           if (bottomCharacater) bottomCharacater.trigger("hit", this, "top");
           if (this.cancelUpdate) return this;
 
+          if (charBottomY == bottomY && bottomPlatform)
+            relativeVelocity = bottomPlatform.get("velocity");
+          
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = bottomY - tileHeight + paddingBottom;
@@ -157,12 +175,23 @@
 
       }
 
-      if (yVelocity) attrs.y = y = y + yVelocity * (dt/1000);
+      if (relativeVelocity) attrs.x = x = x + Math.round(relativeVelocity * (dt/1000));
+      if (yVelocity) attrs.y = y = y + Math.round(yVelocity * (dt/1000));
 
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
 
+      if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return true;
+    },
+    buildCollisionMap: function(top, right, bottom, left) {
+      this.collisionMap || (this.collisionMap = {
+        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null}
+      });
+
+      var width = right - left;
+      this.collisionMap.bottom.x = left + width/2;
+      this.collisionMap.bottom.y = bottom;
     }
 
   });

@@ -626,37 +626,29 @@
           heroRightX = heroLeftX + heroWidth,
           relativeVelocity = 0;
 
-      var heroBottomY,
-          heroTopY,
-          obstacleCheckTopY,
-          obstacleCheckBottomY;
+      var heroBottomY, heroTopY,
+          bottomPlatform, sprite, i;
       function updateHeroTopBottom() {
         heroBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom;
         heroTopY = heroBottomY - heroHeight;
-        obstacleCheckTopY = heroTopY;
-        obstacleCheckBottomY = heroBottomY;
+        hero.buildCollisionMap(heroTopY, heroRightX, heroBottomY, heroLeftX);
+        hero.world.findCollisions(hero.collisionMap, null, hero, true);
       }
       updateHeroTopBottom();
 
       if (yVelocity >= 0) {
         // Standing or falling, implement gravity
-        var bottomLeftTile = this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "tile", this, true),
-            bottomRightTile = this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "tile", this, true),
-            bottomLeftCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "character", this, true) : null,
-            bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "character", this, true) : null,
-            bottomLeftPlatform = this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "platform", this, true),
-            bottomRightPlatform = this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "platform", this, true),
-            bottomWorld = this.world.height() + tileHeight,
-            bottomY = _.minNotNull([
-              this.get("floor"),
-              bottomWorld,
-              bottomLeftTile ? (bottomLeftTile.getTop(true)) : null,
-              bottomRightTile ? (bottomRightTile.getTop(true)) : null,
-              bottomLeftCharacter ? bottomLeftCharacter.getTop(true) : null,
-              bottomRightCharacter ? bottomRightCharacter.getTop(true) : null,
-              bottomLeftPlatform ? bottomLeftPlatform.getTop(true) : null,
-              bottomRightPlatform ? bottomRightPlatform.getTop(true) : null
-            ]);
+        var bottomWorld = this.world.height() + tileHeight,
+            bottomY = Math.min(this.get("floor") || bottomWorld, bottomWorld);
+        function adjustBottomY(sprite) {
+          //if (sprite.get("type") != "character" && !dead && heroBottomY > 0 )
+          bottomY = Math.min(bottomY, sprite.getTop(true));
+          if (sprite.get("type") == "platform") bottomPlatform = sprite;
+        }
+        for (i = 0; i < this.collisionMap.bottomLeft.sprites.length; i++)
+          adjustBottomY(this.collisionMap.bottomLeft.sprites[i]);
+        for (i = 0; i < this.collisionMap.bottomRight.sprites.length; i++)
+          adjustBottomY(this.collisionMap.bottomRight.sprites[i]);
 
         if (cur.mov == "jump" && cur.mov2 == null) attrs.sequenceIndex = 1;
 
@@ -687,37 +679,29 @@
         if (yVelocity > 0 && heroBottomY >= bottomY) {
           // Stop falling
           land(bottomY);
-          if (bottomLeftTile) bottomLeftTile.trigger("hit", this, "top", cur.dir);
-          if (bottomRightTile) bottomRightTile.trigger("hit", this, "top", cur.dir);
-          if (bottomLeftCharacter || bottomRightCharacter) {
-            if (bottomLeftCharacter) bottomLeftCharacter.trigger("hit", this, "top", cur.dir);
-            if (bottomRightCharacter) bottomRightCharacter.trigger("hit", this, "top", cur.dir);
-            if (this.cancelUpdate) return true;
-          }
+          for (i = 0; i < this.collisionMap.bottomLeft.sprites.length; i++)
+            this.collisionMap.bottomLeft.sprites[i].trigger("hit", this, "top", cur.dir);
+          for (i = 0; i < this.collisionMap.bottomRight.sprites.length; i++)
+            this.collisionMap.bottomRight.sprites[i].trigger("hit", this, "top", cur.dir);
+          if (this.cancelUpdate) return true;
         } else if (cur.mov != "jump" && yVelocity == 0 && heroBottomY < bottomY) {
           // Start falling if no obstacle below
           attrs.nextState = state;
           attrs.state = this.buildState("jump", cur.mov2, cur.dir);
         } else if (yVelocity == 0 && heroBottomY == bottomY) {
-          if (bottomLeftPlatform)
-            relativeVelocity = bottomLeftPlatform.get("velocity");
-          else if (bottomRightPlatform)
-            relativeVelocity = bottomRightPlatform.get("velocity");
+          if (bottomPlatform)
+            relativeVelocity = bottomPlatform.get("velocity");
         }
 
       } else {
         // Velocity is negative (going up). Stop if obstacle above.
-        var topLeftTile = !dead && heroTopY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroTopY, "tile", this, true) : null,
-            topRightTile = !dead && heroTopY > 0 ? this.world.findAt(heroRightX - heroWidth*0.40, heroTopY, "tile", this, true) : null,
-            topLeftCharacter = !dead ? this.world.findAt(heroLeftX + heroWidth*0.40, heroTopY, "character", this, true) : null,
-            topRightCharacter = !dead ? this.world.findAt(heroRightX - heroWidth*0.40, heroTopY, "character", this, true) : null,
-            topY = _.maxNotNull([
-              this.get("ceiling"),
-              topLeftTile ? topLeftTile.getBottom(true) : null,
-              topRightTile ? topRightTile.getBottom(true) : null,
-              topLeftCharacter ? topLeftCharacter.getBottom(true) : null,
-              topRightCharacter ? topRightCharacter.getBottom(true) : null
-            ]);
+        var topY = Math.max(-400, this.get("ceiling") || -400);
+        for (i = 0; i < this.collisionMap.topLeft.sprites.length; i++)
+          if (!dead && heroTopY > 0 )
+            topY = Math.max(topY, this.collisionMap.topLeft.sprites[i].getBottom(true));
+        for (i = 0; i < this.collisionMap.topRight.sprites.length; i++)
+          if (!dead && heroTopY > 0 )
+            topY = Math.max(topY, this.collisionMap.topRight.sprites[i].getBottom(true));
 
         if (cur.mov == "jump" && cur.mov2 == null) attrs.sequenceIndex = 0;
 
@@ -725,65 +709,53 @@
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = topY - paddingTop;
           updateHeroTopBottom();
-          if (topLeftTile) topLeftTile.trigger("hit", this, "bottom", cur.dir);
-          if (topRightTile) topRightTile.trigger("hit", this, "bottom", cur.dir);
-          if (topLeftCharacter || topRightCharacter) {
-            if (topLeftCharacter) topLeftCharacter.trigger("hit", this, "bottom", cur.dir);
-            if (topRightCharacter) topRightCharacter.trigger("hit", this, "bottom", cur.dir);
-            if (this.cancelUpdate) return true;
-          }
+          for (i = 0; i < this.collisionMap.topLeft.sprites.length; i++)
+            this.collisionMap.topLeft.sprites[i].trigger("hit", this, "top", cur.dir);
+          for (i = 0; i < this.collisionMap.topRight.sprites.length; i++)
+            this.collisionMap.topRight.sprites[i].trigger("hit", this, "top", cur.dir);
+          if (this.cancelUpdate) return true;
         }
       }
 
       if (velocity <= 0) {
         // Stop if obstacle left
-        var leftTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroLeftX, obstacleCheckTopY + heroHeight*0.25, "tile", this, true) : null,
-            leftBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroLeftX, obstacleCheckBottomY - heroHeight*0.25, "tile", this, true) : null,
-            leftCharacter = this.world.findAt(heroLeftX, obstacleCheckBottomY - heroHeight*0.25, "character", this, true),
-            leftX = _.maxNotNull([
-              0,
-              leftTopTile ? leftTopTile.getRight(true) : null,
-              leftBottomTile ? leftBottomTile.getRight(true) : null,
-              leftCharacter ? leftCharacter.getRight(true) : null
-            ]);
+        var leftX = 0;
+        for (i = 0; i < this.collisionMap.leftTop.sprites.length; i++)
+          if (heroTopY > 0 )
+            leftX = Math.max(leftX, this.collisionMap.leftTop.sprites[i].getRight(true));
+        for (i = 0; i < this.collisionMap.leftBottom.sprites.length; i++)
+          if (heroTopY > 0 )
+            leftX = Math.max(leftX, this.collisionMap.leftBottom.sprites[i].getRight(true));
 
         if (heroLeftX <= leftX) {
           attrs.velocity = velocity = 0;
           attrs.x = x = leftX - paddingLeft;
-
-          if (leftTopTile) leftTopTile.trigger("hit", this, "right");
-          if (leftBottomTile) leftBottomTile.trigger("hit", this, "right");
-
-          if (leftCharacter) {
-            leftCharacter.trigger("hit", this, "right");
-            if (this.cancelUpdate) return true;
-          }
+          for (i = 0; i < this.collisionMap.leftTop.sprites.length; i++)
+            this.collisionMap.leftTop.sprites[i].trigger("hit", this, "top", cur.dir);
+          for (i = 0; i < this.collisionMap.leftBottom.sprites.length; i++)
+            this.collisionMap.leftBottom.sprites[i].trigger("hit", this, "top", cur.dir);
+          if (this.cancelUpdate) return true;
         }
       }
 
       if (velocity >= 0) {
         // Stop if obstacle to the right
-        var rightTopTile = obstacleCheckTopY > 0 ? this.world.findAt(heroRightX, obstacleCheckTopY + heroHeight*0.25, "tile", this, true) : null,
-            rightBottomTile = obstacleCheckBottomY > 0 ? this.world.findAt(heroRightX, obstacleCheckBottomY - heroHeight*0.25, "tile", this, true) : null,
-            rightCharacter = this.world.findAt(heroRightX, obstacleCheckBottomY - heroHeight*0.25, "character", this, true),
-            rightX = _.minNotNull([
-              this.world.width(),
-              rightTopTile ? rightTopTile.getLeft(true) : null,
-              rightBottomTile ? rightBottomTile.getLeft(true) : null,
-              rightCharacter ? rightCharacter.getLeft(true) : null
-            ]);
+        var rightX = this.world.width();
+        for (i = 0; i < this.collisionMap.rightTop.sprites.length; i++)
+          if (heroTopY > 0 )
+            rightX = Math.min(rightX, this.collisionMap.rightTop.sprites[i].getLeft(true));
+        for (i = 0; i < this.collisionMap.rightBottom.sprites.length; i++)
+          if (heroTopY > 0 )
+            rightX = Math.min(rightX, this.collisionMap.rightBottom.sprites[i].getLeft(true));
 
         if (heroRightX >= rightX) {
           attrs.velocity = velocity = 0;
           attrs.x = x = rightX - heroWidth - paddingLeft;
-
-          if (rightTopTile) rightTopTile.trigger("hit", this, "left");
-          if (rightBottomTile) rightBottomTile.trigger("hit", this, "left");
-
-          if (rightCharacter) {
-            rightCharacter.trigger("hit", this, "left");
-            if (this.cancelUpdate) return true;
-          }
+          for (i = 0; i < this.collisionMap.rightTop.sprites.length; i++)
+            this.collisionMap.rightTop.sprites[i].trigger("hit", this, "top", cur.dir);
+          for (i = 0; i < this.collisionMap.rightBottom.sprites.length; i++)
+            this.collisionMap.rightBottom.sprites[i].trigger("hit", this, "top", cur.dir);
+          if (this.cancelUpdate) return true;
         }
       }
 
@@ -797,6 +769,30 @@
         this.debugPanel.set({hero: this.attributes.state});
 
       return true;
+    },
+    buildCollisionMap: function(top, right, bottom, left) {
+      this.collisionMap || (this.collisionMap = {
+        rightTop: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
+        rightBottom: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
+        leftTop: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        leftBottom: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        bottomLeft: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        bottomRight: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        topLeft: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
+        topRight: {x: 0, y: 0, dir: "top", sprites: [], sprite: null}
+      });
+
+      var width = right - left,
+          height = bottom - top;
+      this.collisionMap.leftTop.x = this.collisionMap.leftBottom.x = left;
+      this.collisionMap.rightTop.x = this.collisionMap.rightBottom.x = right;
+      this.collisionMap.leftTop.y = this.collisionMap.rightTop.y = top + height*0.25;
+      this.collisionMap.leftBottom.y = this.collisionMap.rightBottom.y = bottom - height*0.25;
+
+      this.collisionMap.bottomLeft.x = this.collisionMap.topLeft.x = left + width*0.40;
+      this.collisionMap.topLeft.x = this.collisionMap.bottomLeft.x = left - width*0.40;
+      this.collisionMap.bottomLeft.y = this.collisionMap.bottomRight.y = bottom;
+      this.collisionMap.topLeft.y = this.collisionMap.topRight.y = top;
     },
     isInsideHouse: function() {
       return !!this.get("houseId");

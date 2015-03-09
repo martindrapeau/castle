@@ -109,9 +109,7 @@
       });
       return this;
     },
-    update: function(dt) {
-      Backbone.Object.prototype.update.apply(this, arguments);
-
+    onUpdate: function(dt) {
       if (this.attributes.state == "ko" && this.attributes.yVelocity > 0) {
         this.world.remove(this);
         return false;
@@ -148,6 +146,11 @@
   buildArtifact("a-green-potion", [16]);
   buildArtifact("a-health", [12]);
 
+  buildArtifact("a-dollar", [24]);
+  buildArtifact("a-clock", [23]);
+  Backbone.pagedSprites.a.pop();
+  Backbone.pagedSprites.a.pop();
+
   Backbone.ADeath.prototype.knockout = function(sprite, dir, dir2) {
     var explosion = new Backbone.Explosion({
       x: this.get("x"),
@@ -163,6 +166,7 @@
   var BreakableTile = Backbone.Object.extend({
     defaults: _.extend({}, Backbone.Object.prototype.defaults, {
       spriteSheet: "tiles",
+      type: "breaktable-tile",
       width: 64,
       height: 64,
       isBreakableTile: true,
@@ -311,8 +315,5 @@
   buildBreakableTile("a-hay-key", 102, {artifact: "a-key"});
   buildBreakableTile("a-hay-red-potion", 102, {artifact: "a-red-potion"});
   buildBreakableTile("a-hay-death", 102, {artifact: "a-death"});
-  
-  buildArtifact("a-dollar", [24]);
-  buildArtifact("a-clock", [23]);
   
 }).call(this);

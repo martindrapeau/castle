@@ -9,7 +9,6 @@
    *
    */
 
-
   var drawSpriteFn = function(context, options) {
     options || (options = {});
     var animation = this.getAnimation(),
@@ -209,8 +208,7 @@
 
       // Draw sprites
       this.sprites.each(function(sprite) {
-        if (sprite.attributes.page == sp.page && (sprite.attributes.type == "tile" || sprite.attributes.type == "character"))
-          sprite.draw(context, sp);
+        if (sprite.attributes.page == sp.page) sprite.draw(context, sp);
       });
 
       // Highlight tile position (on desktop)
