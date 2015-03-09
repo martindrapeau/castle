@@ -419,26 +419,24 @@
     },
     buildCollisionMap: function(top, right, bottom, left) {
       this.collisionMap || (this.collisionMap = {
-        topLeft: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
-        topRight: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
         rightTop: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
         rightBottom: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
-        bottomLeft: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
-        bottomRight: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
         leftTop: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
-        leftBottom: {x: 0, y: 0, dir: "left", sprites: [], sprite: null}
+        leftBottom: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null}
       });
 
       var width = right - left,
           height = bottom - top;
-      this.collisionMap.topLeft.x = this.collisionMap.bottomLeft.x = left + width*0.2;
-      this.collisionMap.topRight.x = this.collisionMap.bottomRight.x = left + width*0.8;
-      this.collisionMap.topLeft.y = this.collisionMap.topRight.y = top;
-      this.collisionMap.bottomLeft.y = this.collisionMap.bottomRight.y = bottom;
       this.collisionMap.leftTop.y = this.collisionMap.rightTop.y = top + height*0.2;
       this.collisionMap.leftBottom.y = this.collisionMap.rightBottom.y = top + height*0.8;
       this.collisionMap.leftTop.x = this.collisionMap.leftBottom.x = left;
       this.collisionMap.rightTop.x = this.collisionMap.rightBottom.x = right;
+      this.collisionMap.bottom.x = left + width/2;
+      this.collisionMap.bottom.y = bottom;
+      this.collisionMap.top.x = left + width/2;
+      this.collisionMap.top.y = top;
     }
 	});
 

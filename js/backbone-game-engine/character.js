@@ -272,6 +272,7 @@
         attrs.yVelocity = yVelocity;
       }
 
+
       // Collision detection
       var collision = this.get("collision"),
           tileWidth = this.get("width"),
@@ -286,16 +287,23 @@
           charTopY = charBottomY - charHeight,
           charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
-          bottomTile = this.world.findAt(charLeftX + charWidth/2, charBottomY, "tile", this, true),
-          bottomPlatform = this.world.findAt(charLeftX + charWidth/2, charBottomY, "platform", this, true),
           bottomWorld = this.world.height() + tileHeight,
           relativeVelocity = 0,
           bottomY = _.minNotNull([
             this.get("floor"),
-            bottomWorld,
-            bottomTile ? bottomTile.getTop(true) : null,
-            bottomPlatform ? bottomPlatform.getTop(true) : null
+            bottomWorld
           ]);
+
+      this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
+      this.world.findCollisions(this.collisionMap, null, this, true);
+
+      var bottomPlatform, sprite, i;
+      for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
+        sprite = this.collisionMap.bottom.sprites[i];
+        if (cur.mov != "ko" || sprite.get("type") != "character")
+          bottomY = Math.min(bottomY, sprite.getTop(true));
+        if (sprite.get("type") == "platform") bottomPlatform = sprite;
+      }
 
       if (yVelocity >= 0) {
         // Walking or Falling...
@@ -329,11 +337,12 @@
 
       } else if (yVelocity < 0) {
         // Jumping
-        var topTile = this.world.findAt(charLeftX + charWidth/2, charTopY, "tile", this, true),
-            topY = _.maxNotNull([
-              -400,
-              topTile ? (topTile.get("y") + topTile.get("height")) : null
-            ]);
+        var topY = -400;
+        for (i = 0; i < this.collisionMap.top.sprites.length; i++) {
+          sprite = this.collisionMap.bottom.sprites[i];
+          if (sprite.get("type") == "tile")
+            topY = Math.max(topY, sprite.getBottom(true));
+        }
         if (charTopY < topY) {
           attrs.yVelocity = yVelocity = 0;
           charTopY = topY;
@@ -353,14 +362,17 @@
         // Walls and other obstacles
         if (velocity <= 0 && collision) {
           // Turn around if obstacle left
-          var leftTile = cur.mov != "ko" ? this.world.findAt(charLeftX, charTopY, "tile", this, true) : null,
-              leftCharacter = cur.mov != "ko" ? this.world.findAt(charLeftX, charTopY, "character", this, true) : null,
-              worldLeft = -tileWidth,
-              leftX = _.maxNotNull([
-                worldLeft,
-                leftTile ? leftTile.getRight(true) : null,
-                leftCharacter ? leftCharacter.getRight(true) : null
-              ]);
+          var worldLeft = -tileWidth,
+              leftX = worldLeft,
+              leftCharacter;
+          if (cur.mov != "ko")
+            for (i = 0; i < this.collisionMap.left.sprites.length; i++) {
+              sprite = this.collisionMap.left.sprites[i];
+              leftX = Math.max(leftX, sprite.getRight(true));
+              if (sprite.get("type") == "character" &&
+                  (!leftCharacter || sprite.getRight(true) > leftCharacter.getRight(true)))
+                leftCharacter = sprite;
+            }
 
           if (charLeftX <= leftX) {
             if (charLeftX <= worldLeft) {
@@ -379,14 +391,17 @@
 
         if (velocity >= 0 && collision) {
           // Turn around if obstacle to the right
-          var rightTile = cur.mov != "ko" ? this.world.findAt(charRightX, charTopY, "tile", this, true) : null,
-              rightCharacter = cur.mov != "ko" ? this.world.findAt(charRightX, charTopY, "character", this, true) : null,
-              worldRight = this.world.width(),
-              rightX = _.minNotNull([
-                worldRight,
-                rightTile ? rightTile.getLeft(true) : null,
-                rightCharacter ? rightCharacter.getLeft(true) : null,
-              ]);
+          var worldRight = this.world.width(),
+              rightX = worldRight,
+              rightCharacter;
+          if (cur.mov != "ko")
+            for (i = 0; i < this.collisionMap.right.sprites.length; i++) {
+              sprite = this.collisionMap.right.sprites[i];
+              rightX = Math.min(rightX, sprite.getLeft(true));
+              if (sprite.get("type") == "character" &&
+                  (!rightCharacter || sprite.getLeft(true) < rightCharacter.getLeft(true)))
+                rightCharacter = sprite;
+            }
 
           if (charRightX >= rightX) {
             if (charRightX >= worldRight) {
@@ -443,6 +458,25 @@
       if (piece2) state += (state.length ? "-" : "") + piece2;
       if (piece3) state += (state.length ? "-" : "") + piece3;
       return state;
+    },
+    buildCollisionMap: function(top, right, bottom, left) {
+      this.collisionMap || (this.collisionMap = {
+        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
+        left: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        right: {x: 0, y: 0, dir: "right", sprites: [], sprite: null}
+      });
+
+      var width = right - left,
+          height = bottom - top;
+      this.collisionMap.bottom.x = left + width/2;
+      this.collisionMap.bottom.y = bottom;
+      this.collisionMap.top.x = left + width/2;
+      this.collisionMap.top.y = top;
+      this.collisionMap.left.x = left;
+      this.collisionMap.left.y = top;
+      this.collisionMap.right.x = right;
+      this.collisionMap.right.y = top;
     }
   });
 

@@ -644,8 +644,8 @@
             bottomRightTile = this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "tile", this, true),
             bottomLeftCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "character", this, true) : null,
             bottomRightCharacter = !dead && heroBottomY > 0 ? this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "character", this, true) : null,
-            bottomLeftPlatform = !dead && heroBottomY > 0 ? this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "platform", this, true) : null,
-            bottomRightPlatform = !dead && heroBottomY > 0 ? this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "platform", this, true) : null,
+            bottomLeftPlatform = this.world.findAt(heroLeftX + heroWidth*0.40, heroBottomY, "platform", this, true),
+            bottomRightPlatform = this.world.findAt(heroRightX - heroWidth*0.40, heroBottomY, "platform", this, true),
             bottomWorld = this.world.height() + tileHeight,
             bottomY = _.minNotNull([
               this.get("floor"),
@@ -664,10 +664,8 @@
           attrs.y = y = bottomY - tileHeight + paddingBottom;
           attrs.velocity = velocity = 0;
           attrs.yVelocity = yVelocity = 0;
-          if (!dead) {
-            attrs.state = this.buildState("dead", cur.dir);
-            attrs.dead = true;
-          }
+          attrs.state = this.buildState("dead", cur.dir);
+          attrs.dead = true;
         }
 
         function land(bottomY) {

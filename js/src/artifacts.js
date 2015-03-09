@@ -77,6 +77,7 @@
   var Artifact = Backbone.Object.extend({
     defaults: _.extend({}, Backbone.Object.prototype.defaults, {
       spriteSheet: "artifacts",
+      type: "artifact",
       width: 64,
       height: 64,
       collision: true,
