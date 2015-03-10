@@ -102,7 +102,8 @@
 
           var leftX = -tileWidth;
           for (i = 0; i < this.collisionMap.left.sprites.length; i++)
-            leftX = Math.max(leftX, this.collisionMap.left.sprites[i].getRight(true));
+            if (this.collisionMap.left.sprites[i].get("type") == "tile")
+              leftX = Math.max(leftX, this.collisionMap.left.sprites[i].getRight(true));
 
           if (platLeftX <= leftX) {
             attrs.velocity = velocity = 0;
@@ -118,7 +119,8 @@
 
           var rightX = this.world.width();
           for (i = 0; i < this.collisionMap.right.sprites.length; i++)
-            rightX = Math.min(rightX, this.collisionMap.right.sprites[i].getLeft(true));
+            if (this.collisionMap.right.sprites[i].get("type") == "tile")
+              rightX = Math.min(rightX, this.collisionMap.right.sprites[i].getLeft(true));
 
           if (platRightX >= rightX) {
             attrs.velocity = velocity = 0;
