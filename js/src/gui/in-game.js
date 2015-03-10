@@ -42,7 +42,7 @@
 
       if (this.world.get("puzzle"))
         this.world.sprites.each(function(sprite) {
-          if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+          if (sprite.get("type") == "breakable-tile" && sprite.get("artifact"))
             sprite.showContent();
         });
 
@@ -51,7 +51,7 @@
         setTimeout(function() {
           scene.world.pan(0, targetY, function() {
             scene.world.sprites.each(function(sprite) {
-              if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+              if (sprite.get("type") == "breakable-tile" && sprite.get("artifact"))
                 sprite.hideContent();
             });
             scene.world.set("state", "play");

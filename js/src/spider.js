@@ -111,7 +111,7 @@
     }),
     animations: animations,
     hit: function(sprite, dir, dir2) {
-      if (dir == "top" && sprite.get("isBreakableTile")) {
+      if (dir == "top" && sprite.get("type") == "breakable-tile") {
         sprite.trigger("hit", this, "bottom");
         return this;
       }

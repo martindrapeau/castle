@@ -93,7 +93,7 @@ $(window).on("load", function() {
         debugPanel: this.debugPanel
       });
       this.editor.sprites.each(function(sprite) {
-        if (sprite.get("isBreakableTile") &&
+        if (sprite.get("type") == "breakable-tile" &&
             sprite.get("showContent") === false &&
             sprite.get("artifact"))
           sprite.set("showContent", true);
@@ -135,7 +135,7 @@ $(window).on("load", function() {
     },
     toggleBreakableTileContent: function(showContent) {
       this.world.sprites.each(function(sprite) {
-        if (sprite.get("isBreakableTile") && sprite.get("artifact"))
+        if (sprite.get("type") == "breakable-tile" && sprite.get("artifact"))
           if (showContent)
             sprite.showContent();
           else

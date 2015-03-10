@@ -28,13 +28,12 @@
   Backbone.Barrier = Backbone.Sprite.extend({
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
       name: "barrier",
-      type: "character",
+      type: "barrier",
       state: "idle",
       collision: true,
       static: false,
       width: 64,
-      height: 64,
-      isBarrier: true
+      height: 64
     }),
     update: function(dt) {
       return false;
@@ -140,14 +139,11 @@
       this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
       this.world.findCollisions(this.collisionMap, null, this, true);
 
-      var bottomCharacater, bottomPlatform, sprite, i;
+      var bottomPlatform, sprite, i;
       for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
         sprite = this.collisionMap.bottom.sprites[i];
         bottomY = Math.min(bottomY, sprite.getTop(true));
         if (sprite.get("type") == "platform") bottomPlatform = sprite;
-        if (sprite.get("type") == "character" &&
-            (!bottomCharacater || sprite.getTop(true) < bottomCharacater.getTop(true)))
-          bottomCharacater = sprite;
       }
 
       if (yVelocity >= 0) {
@@ -158,7 +154,8 @@
             return false;
           }
 
-          if (bottomCharacater) bottomCharacater.trigger("hit", this, "top");
+          for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
+            this.collisionMap.bottom.sprites[i].trigger("hit", this, "top");
           if (this.cancelUpdate) return this;
 
           if (charBottomY == bottomY && bottomPlatform)

@@ -84,11 +84,10 @@
       paddingLeft: 16,
       paddingRight: 16,
       paddingBottom: 16,
-      paddingTop: 16,
-      isArtifact: true
+      paddingTop: 16
     }),
     hit: function(sprite, dir, dir2) {
-      if (dir == "top" && sprite.get("isBreakableTile")) {
+      if (dir == "top" && sprite.get("type") == "breakable-tile") {
         sprite.trigger("hit", this, "bottom");
         return this;
       }
@@ -166,10 +165,9 @@
   var BreakableTile = Backbone.Object.extend({
     defaults: _.extend({}, Backbone.Object.prototype.defaults, {
       spriteSheet: "tiles",
-      type: "breaktable-tile",
+      type: "breakable-tile",
       width: 64,
       height: 64,
-      isBreakableTile: true,
       health: 1,
       artifact: null,
       showContent: false,

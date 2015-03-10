@@ -351,13 +351,18 @@
       var cur = this.getStateInfo();
       if (cur.mov2 != "attack") return this;
 
-      var x = this.get("x") + this.get("width") * (cur.dir == "right" ? 1 : 0),
-          y1 = this.get("y") + this.get("height")*0.50,
-          y2 = this.get("y") + this.get("height")*0.75,
-          sprites = _.union(this.world.filterAt(x, y1, "character", this), this.world.filterAt(x, y2, "character", this));
+      this.attackCollisionMap || (this.attackCollisionMap = {
+        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
+      });
 
-      for (var s = 0; s < sprites.length; s++)
-        sprites[s].trigger("hit", this, cur.dir == "left" ? "right" : "left", "attack");
+      this.attackCollisionMap.bottom.x = this.attackCollisionMap.top.x = this.get("x") + this.get("width") * (cur.dir == "right" ? 1 : 0);
+      this.attackCollisionMap.bottom.y = this.get("y") + this.get("height")*0.75;
+      this.attackCollisionMap.top.y = this.get("y") + this.get("height")*0.50;
+      this.world.findCollisions(this.attackCollisionMap, null, this, true);
+
+      var sprite = this.attackCollisionMap.top.sprite || this.attackCollisionMap.bottom.sprite;
+      if (sprite) sprite.trigger("hit", this, cur.opo, "attack");
 
       return this;
     },
@@ -403,63 +408,62 @@
         this.attributes.sequenceIndex <= 5;
     },
     hit: function(sprite, dir, dir2) {
-      var cur = this.getStateInfo();
-      if (sprite.get("type") == "character") {
+      var cur = this.getStateInfo(),
+          type = sprite.get("type");
+      
+      if (type == "barrier" || type == "breakable-tile") return this;
 
-        if (sprite.get("isBarrier") || sprite.get("isBreakableTile")) return this;
-
-        if (sprite.get("isArtifact")) {
-          switch (sprite.get("name")) {
-            case "a-coin":
+      if (type == "artifact") {
+        switch (sprite.get("name")) {
+          case "a-coin":
+            this.cancelUpdate = true;
+            this.set("coins", this.get("coins") + 1);
+            break;
+          case "a-health":
+            if (cur.mov2 != "hurt") {
               this.cancelUpdate = true;
-              this.set("coins", this.get("coins") + 1);
-              break;
-            case "a-health":
-              if (cur.mov2 != "hurt") {
-                this.cancelUpdate = true;
-                this.set({health: Math.min(this.get("health") + 2, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
-              }
-              break;
-            case "a-death":
-              if (cur.mov2 != "hurt" && cur.mov2 != "attack") {
-                this.cancelUpdate = true;
-                this.set({health: Math.max(this.get("health") - 4, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
-              }
-              break;
-            case "a-key":
-              this.cancelUpdate = true;
-              this.set("key", true);
-              break;
-            case "a-red-potion":
-              if (cur.mov2 != "hurt") {
-                this.cancelUpdate = true;
-                this.set({health: Math.min(this.get("health") + 8, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
-              }
-              break;
-            case "a-blue-potion":
-              this.cancelUpdate = true;
-              this.set("potion", "blue");
-              break;
-            case "a-green-potion":
-              this.cancelUpdate = true;
-              this.set("potion", "green");
-              break;
-          }
-          return this;
-        }
-
-        if (cur.mov2 != "hurt") {
-          if (this.isAttacking() && cur.dir == dir) {
-            sprite.trigger("hit", this, cur.opo, "attack");
-          } else {
-            if (sprite.isAttacking()) {
-              this.cancelUpdate = true;
-              var attackDamage = sprite.get("attackDamage") || 10;
-              this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+              this.set({health: Math.min(this.get("health") + 2, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
             }
-            if (sprite.get("collision") == false)
-              sprite.trigger("hit", this, cur.opo, "collision");
+            break;
+          case "a-death":
+            if (cur.mov2 != "hurt" && cur.mov2 != "attack") {
+              this.cancelUpdate = true;
+              this.set({health: Math.max(this.get("health") - 4, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+            }
+            break;
+          case "a-key":
+            this.cancelUpdate = true;
+            this.set("key", true);
+            break;
+          case "a-red-potion":
+            if (cur.mov2 != "hurt") {
+              this.cancelUpdate = true;
+              this.set({health: Math.min(this.get("health") + 8, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
+            }
+            break;
+          case "a-blue-potion":
+            this.cancelUpdate = true;
+            this.set("potion", "blue");
+            break;
+          case "a-green-potion":
+            this.cancelUpdate = true;
+            this.set("potion", "green");
+            break;
+        }
+        return this;
+      }
+
+      if (type == "character" && cur.mov2 != "hurt") {
+        if (this.isAttacking() && cur.dir == dir) {
+          sprite.trigger("hit", this, cur.opo, "attack");
+        } else {
+          if (sprite.isAttacking()) {
+            this.cancelUpdate = true;
+            var attackDamage = sprite.get("attackDamage") || 10;
+            this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
           }
+          if (sprite.get("collision") == false)
+            sprite.trigger("hit", this, cur.opo, "collision");
         }
       }
       return this;
@@ -639,7 +643,8 @@
       if (yVelocity >= 0) {
         // Standing or falling, implement gravity
         var bottomWorld = this.world.height() + tileHeight,
-            bottomY = Math.min(this.get("floor") || bottomWorld, bottomWorld);
+            floor = this.get("floor") || bottomWorld,
+            bottomY = Math.min(floor, bottomWorld);
         function adjustBottomY(sprite) {
           //if (sprite.get("type") != "character" && !dead && heroBottomY > 0 )
           bottomY = Math.min(bottomY, sprite.getTop(true));
@@ -786,11 +791,11 @@
           height = bottom - top;
       this.collisionMap.leftTop.x = this.collisionMap.leftBottom.x = left;
       this.collisionMap.rightTop.x = this.collisionMap.rightBottom.x = right;
-      this.collisionMap.leftTop.y = this.collisionMap.rightTop.y = top + height*0.25;
-      this.collisionMap.leftBottom.y = this.collisionMap.rightBottom.y = bottom - height*0.25;
+      this.collisionMap.leftTop.y = this.collisionMap.rightTop.y = top + height*0.20;
+      this.collisionMap.leftBottom.y = this.collisionMap.rightBottom.y = bottom - height*0.20;
 
       this.collisionMap.bottomLeft.x = this.collisionMap.topLeft.x = left + width*0.40;
-      this.collisionMap.topLeft.x = this.collisionMap.bottomLeft.x = left - width*0.40;
+      this.collisionMap.bottomRight.x = this.collisionMap.topRight.x = right - width*0.40;
       this.collisionMap.bottomLeft.y = this.collisionMap.bottomRight.y = bottom;
       this.collisionMap.topLeft.y = this.collisionMap.topRight.y = top;
     },

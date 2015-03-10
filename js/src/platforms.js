@@ -11,8 +11,7 @@
       height: 64,
       paddingTop: 16,
       state: "float-left",
-      collision: true,
-      isPlatform: true
+      collision: true
     }),
     animations: {
       "idle-left": {
@@ -87,9 +86,12 @@
             platHeight = tileHeight - paddingTop - paddingBottom,
             platBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
             platTopY = platBottomY - platHeight,
-            platMidY = platBottomY - platHeight/2,
             platLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
-            platRightX = platLeftX + platWidth;
+            platRightX = platLeftX + platWidth,
+            i;
+
+        this.buildCollisionMap(platTopY, platRightX, platBottomY, platLeftX);
+        this.world.findCollisions(this.collisionMap, null, this, true);
 
         if (cur.dir == "left") {
           if (velocity > animation.velocity)
@@ -98,14 +100,9 @@
             velocity = animation.velocity;
           attrs.velocity = velocity;
 
-          var leftTile = this.world.findAt(platLeftX, platMidY, "tile", this, true)
-              leftCharacter = this.world.findAt(platLeftX, platMidY, "character", this, true),
-              worldLeft = -tileWidth,
-              leftX = _.maxNotNull([
-                worldLeft,
-                leftTile ? leftTile.getRight(true) : null,
-                leftCharacter ? leftCharacter.getRight(true) : null
-              ]);
+          var leftX = -tileWidth;
+          for (i = 0; i < this.collisionMap.left.sprites.length; i++)
+            leftX = Math.max(leftX, this.collisionMap.left.sprites[i].getRight(true));
 
           if (platLeftX <= leftX) {
             attrs.velocity = velocity = 0;
@@ -119,14 +116,9 @@
             velocity = animation.velocity;
           attrs.velocity = velocity;
 
-          var rightTile = this.world.findAt(platRightX, platMidY, "tile", this, true)
-              rightCharacter = this.world.findAt(platRightX, platMidY, "character", this, true),
-              worldRight = this.world.width(),
-              rightX = _.minNotNull([
-                worldRight,
-                rightTile ? rightTile.getLeft(true) : null,
-                rightCharacter ? rightCharacter.getLeft(true) : null
-              ]);
+          var rightX = this.world.width();
+          for (i = 0; i < this.collisionMap.right.sprites.length; i++)
+            rightX = Math.min(rightX, this.collisionMap.right.sprites[i].getLeft(true));
 
           if (platRightX >= rightX) {
             attrs.velocity = velocity = 0;
@@ -143,6 +135,17 @@
 
       if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return true;
+    },
+    buildCollisionMap: function(top, right, bottom, left) {
+      this.collisionMap || (this.collisionMap = {
+        left: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
+        right: {x: 0, y: 0, dir: "right", sprites: [], sprite: null}
+      });
+
+      var height = bottom - top;
+      this.collisionMap.left.x = left;
+      this.collisionMap.right.x = right;
+      this.collisionMap.left.y = this.collisionMap.right.y = top + height/2;
     }
 	});
 
