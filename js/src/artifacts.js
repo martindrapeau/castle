@@ -303,15 +303,18 @@
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
   buildBreakableTile("a-crate-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-crate-death", 77, {artifact: "a-death"});
+  buildBreakableTile("a-crate-spider", 77, {artifact: "spider"});
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
   buildBreakableTile("a-barrel-key", 76, {artifact: "a-key"});
   buildBreakableTile("a-barrel-red-potion", 76, {artifact: "a-red-potion"});
   buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
+  buildBreakableTile("a-barrel-spider", 76, {artifact: "spider"});
   buildBreakableTile("a-hay", 102);
   buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
   buildBreakableTile("a-hay-key", 102, {artifact: "a-key"});
   buildBreakableTile("a-hay-red-potion", 102, {artifact: "a-red-potion"});
   buildBreakableTile("a-hay-death", 102, {artifact: "a-death"});
+  buildBreakableTile("a-hay-spider", 102, {artifact: "spider"});
   
 }).call(this);

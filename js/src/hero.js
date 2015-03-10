@@ -276,7 +276,7 @@
       if (dirPressed) {
         // Pressed. Intent to move in that direction
         if (cur.mov == "jump") {
-            // Update next step
+            attrs.state = this.buildState("jump", cur.mov2, dirIntent);
             if (dirIntent != cur.dir && velocity)
               attrs.nextState = this.buildState("skid", cur.mov2, opoIntent);
             else
@@ -404,13 +404,13 @@
     },
     isAttacking: function() {
       return this.attributes.state.indexOf("-attack") > 0 &&
-        this.attributes.sequenceIndex >= 3 &&
+        this.attributes.sequenceIndex >= 1 &&
         this.attributes.sequenceIndex <= 5;
     },
     hit: function(sprite, dir, dir2) {
       var cur = this.getStateInfo(),
           type = sprite.get("type");
-      
+
       if (type == "barrier" || type == "breakable-tile") return this;
 
       if (type == "artifact") {

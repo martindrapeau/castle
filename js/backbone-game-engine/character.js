@@ -297,12 +297,13 @@
       this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
       this.world.findCollisions(this.collisionMap, null, this, true);
 
-      var bottomPlatform, sprite, i;
+      var bottomPlatform, sprite, i, type;
       for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
         sprite = this.collisionMap.bottom.sprites[i];
-        if (cur.mov != "ko" || sprite.get("type") != "character")
+        type = sprite.get("type")
+        if (type == "tile" || type == "platform")
           bottomY = Math.min(bottomY, sprite.getTop(true));
-        if (sprite.get("type") == "platform") bottomPlatform = sprite;
+        if (type == "platform") bottomPlatform = sprite;
       }
 
       if (yVelocity >= 0) {
@@ -312,6 +313,11 @@
             this.world.remove(this);
             return false;
           }
+
+          for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
+            if (cur.mov != "ko")
+              this.collisionMap.bottom.sprites[i].trigger("hit", this, "top");
+          if (this.cancelUpdate) return this;
 
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;

@@ -38,7 +38,7 @@ $(window).on("load", function() {
           width: 15,
           height: 9,
           backgroundImage: "#background"
-        }, window._world, {
+        }, window._levels[0], {
           viewportBottom: 180
         }), {
         input: this.input,

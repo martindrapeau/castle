@@ -613,7 +613,7 @@
                 else
                   result.push(this.dynamicSprites.lookup[index][s]);
         }
-      if (type == "character") return fn == "find" ? null: result;
+      /*if (type == "character") return fn == "find" ? null: result;
 
       // Finally in static ones
       index = col * this.attributes.height + row;
@@ -623,7 +623,7 @@
             if (fn == "find")
               return this.staticSprites.lookup[index][s];
             else
-              result.push(this.staticSprites.lookup[index][s]);
+              result.push(this.staticSprites.lookup[index][s]);*/
 
       return fn == "find" ? null : result;
     },
@@ -640,7 +640,7 @@
       if (_.size(map) == 0) return 0;
 
       var id = exclude && exclude.id ? exclude.id : null,
-          minX, minY, maxX,maxY,
+          minX, minY, maxX, maxY,
           m, c, r, index, s,
           count = 0;
 
@@ -681,19 +681,19 @@
               for (s = 0; s < map[m].sprites.length; s++)
                 switch (map[m].dir) {
                   case "left":
-                    c = map[m].sprites[s].getLeft(true);
+                    c = map[m].sprites[s].getRight(true);
                     if (c > map[m].x) map[m].sprite = map[m].sprites[s];
                     break;
                   case "right":
-                    c = map[m].sprites[s].getRight(true);
+                    c = map[m].sprites[s].getLeft(true);
                     if (c < map[m].x) map[m].sprite = map[m].sprites[s];
                     break;
                   case "top":
-                    c = map[m].sprites[s].getTop(true);
+                    c = map[m].sprites[s].getBottom(true);
                     if (c > map[m].y) map[m].sprite = map[m].sprites[s];
                     break;
                   case "bottom":
-                    c = map[m].sprites[s].getBottom(true);
+                    c = map[m].sprites[s].getTop(true);
                     if (c < map[m].y) map[m].sprite = map[m].sprites[s];
                     break;
                 }
