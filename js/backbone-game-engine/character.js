@@ -345,7 +345,7 @@
         // Jumping
         var topY = -400;
         for (i = 0; i < this.collisionMap.top.sprites.length; i++) {
-          sprite = this.collisionMap.bottom.sprites[i];
+          sprite = this.collisionMap.top.sprites[i];
           if (sprite.get("type") == "tile")
             topY = Math.max(topY, sprite.getBottom(true));
         }

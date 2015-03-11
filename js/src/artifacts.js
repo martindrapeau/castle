@@ -187,6 +187,7 @@
         // Absorb the sprite
         this.set({state: "bounce", sequenceIndex: 0});
         this.artifacts.push(sprite);
+        sprite.cancelUpdate = true;
         this.world.remove(sprite);
         return this;
       }
