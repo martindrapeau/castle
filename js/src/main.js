@@ -8,6 +8,14 @@ $(window).on("load", function() {
       tileHeight = 64,
       spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
+  if (navigator.isCocoonJS) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
+  } else {
+    // Ensure the canvas is always visible and centered
+    adjustViewport(canvas, canvas.width, canvas.height);
+  }
 
   Backbone.Level = Backbone.Model.extend({
     idAttribute: "level",
@@ -276,14 +284,5 @@ $(window).on("load", function() {
     context: context,
     controller: controller,
   });
-
-  if (navigator.isCocoonJS) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
-  } else {
-    // Ensure the canvas is always visible and centered
-    adjustViewport(canvas, canvas.width, canvas.height);
-  }
 
 });
