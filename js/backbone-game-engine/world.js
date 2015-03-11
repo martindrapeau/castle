@@ -107,6 +107,7 @@
       });
       this.listenTo(this.engine, "tap", this.onTap);
       this.listenTo(this.engine, "key", this.onKey);
+      if (this.camera) this.camera.maybePan();
     },
     onDetach: function() {
       this.stopListening(this.engine);
