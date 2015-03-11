@@ -278,7 +278,9 @@ $(window).on("load", function() {
   });
 
   if (navigator.isCocoonJS) {
-    //Cocoon.Utils.setNPOTEnabled(true);
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
   } else {
     // Ensure the canvas is always visible and centered
     adjustViewport(canvas, canvas.width, canvas.height);
