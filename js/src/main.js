@@ -17,6 +17,12 @@ $(window).on("load", function() {
     adjustViewport(canvas, canvas.width, canvas.height);
   }
 
+  _.extend(Backbone, {
+    ENV: ENV,
+    HEIGHT: canvas.height,
+    WIDTH: canvas.width
+  });
+
   Backbone.Level = Backbone.Model.extend({
     idAttribute: "level",
     comparator: "level"

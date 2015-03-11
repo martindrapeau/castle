@@ -23,7 +23,7 @@
   Backbone.SavedGame = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: 960,
-      y: 300,
+      y: 280,
       width: 333,
       height: 80,
       backgroundColor: "transparent",
@@ -147,30 +147,30 @@
       });
 
       this.loading = new Backbone.LabelButton({
-        y: 720,
+        y: Backbone.HEIGHT,
         text: "Loading...",
         easingTime: 300
       });
 
       this.play = new Backbone.PullOutButton({
-        y: 300,
+        y: Backbone.HEIGHT - 300,
         text: "New Game "
       });
       this.play.on("tap", _.partial(this.action, "play"), this);
 
       this.levelButton = new Backbone.PullOutButton({
-        y: 420,
+        y: Backbone.HEIGHT - 200,
         text: "Levels "
       });
       this.levelButton.on("tap", _.partial(this.action, "showLevelScreen"), this);
 
       this.showCredits = new Backbone.PullOutButton({
-        y: 540,
+        y: Backbone.HEIGHT - 100,
         text: "Credits "
       });
 
       this.savedGame = new Backbone.SavedGame({
-        y: 300
+        y: Backbone.HEIGHT - 300
       }, {
         saved: this.saved
       });
@@ -192,7 +192,7 @@
       Backbone.Scene.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
       this.set("opacity", 1);
-      this.loading.set("x", 720);
+      this.loading.set("x", Backbone.HEIGHT);
 
       this.play.set("text", this.saved.size() > 0 ? "Continue " : "New Game ");
 
@@ -210,7 +210,7 @@
     onTouchStart: function(e) {
       // Animate some stuff
       this.banner.moveTo(this.banner.get("x"), 50);
-      this.touchStart.moveTo(this.touchStart.get("x"), 700);
+      this.touchStart.moveTo(this.touchStart.get("x"), Backbone.HEIGHT);
       this.stopListening(this.engine);
       this.ready = true;
       this.showButtons();
@@ -230,13 +230,13 @@
     },
     showPanel: function(panel) {
       this.panel = panel;
-      this.panel.moveTo(this.panel.get("x"), 200);
+      this.panel.moveTo(this.panel.get("x"), 50);
       this.hideButtons();
       this.listenTo(this.engine, "tap", this.hidePanel);
     },
     hidePanel: function() {
       this.stopListening(this.engine);
-      this.panel.moveTo(this.panel.get("x"), 720);
+      this.panel.moveTo(this.panel.get("x"), Backbone.HEIGHT);
       this.panel = undefined;
       this.showButtons();
     },

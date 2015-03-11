@@ -98,7 +98,7 @@
       _.bindAll(this, "_calculateState");
 
       this.backButton = new Backbone.Button({
-        x: 20, y: 600,
+        x: 20, y: Backbone.HEIGHT - 100,
         width: 70, height: 70,
         backgroundColor: "transparent",
         img: "#gui", imgX: 350, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
@@ -109,8 +109,10 @@
 
       var level = this.levels.first(),
           i = level ? level.id : 1,
+          height = Backbone.HEIGHT / 2,
+          startY = height / 2 - 80,
           view;
-      for (var y = 110; y <= 470; y += 360)
+      for (var y = startY; y <= startY+height; y += height)
         for (var x = 117; x < 885; x += 192) {
           view = this.views.add({
             level: level ? level.id : i,

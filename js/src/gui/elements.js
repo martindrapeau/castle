@@ -82,13 +82,14 @@
     initialize: function(attributes, options) {
       Backbone.Button.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "show");
+      this.set("y", Backbone.HEIGHT);
     },
     onAttach: function() {
       Backbone.Button.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
     },
     show: function() {
-      this.moveTo(this.get("x"), 200);
+      this.moveTo(this.get("x"), 100);
       return this;
     }
   });
