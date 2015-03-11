@@ -9,8 +9,8 @@ $(window).on("load", function() {
       spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
   if (navigator.isCocoonJS) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = Math.round(window.innerWidth);
+    canvas.height = Math.round(window.innerHeight);
     console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
   } else {
     // Ensure the canvas is always visible and centered
