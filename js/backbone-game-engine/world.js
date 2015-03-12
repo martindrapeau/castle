@@ -635,34 +635,6 @@
       }
 
       return fn == "find" ? result[0] || null : result;
-
-      /*
-      // Look in dynamic sprites first (lookup by index)
-      for (c = col-2; c <= col+2; c++)
-        for (r = row-2; r <= row+2; r++) {
-          index = c * this.attributes.height + r;
-          if (this.dynamicSprites.lookup[index])
-            for (s = 0; s < this.dynamicSprites.lookup[index].length; s++)
-              if (test(this.dynamicSprites.lookup[index][s]))
-                if (fn == "find")
-                  return this.dynamicSprites.lookup[index][s];
-                else
-                  result.push(this.dynamicSprites.lookup[index][s]);
-        }
-      if (type == "character") return fn == "find" ? null: result;
-
-      // Finally in static ones
-      index = col * this.attributes.height + row;
-      if (this.staticSprites.lookup[index])
-        for (s = 0; s < this.staticSprites.lookup[index].length; s++)
-          if (test(this.staticSprites.lookup[index][s]))
-            if (fn == "find")
-              return this.staticSprites.lookup[index][s];
-            else
-              result.push(this.staticSprites.lookup[index][s]);
-
-      return fn == "find" ? null : result;
-      */
     },
     // Detects collisions on sprites for a set of named coordinates. Works on moving
     // and static sprites.
@@ -690,11 +662,6 @@
           map[m].sprites = [];
           map[m].sprite = null;
         }
-
-      /*var minCol = this.getWorldCol(minX) - 2,
-          minRow = this.getWorldRow(minY) - 2,
-          maxCol = this.getWorldCol(maxX) + 2,
-          maxRow = this.getWorldRow(maxY) + 2;*/
 
       function doIt(sprite) {
         if (sprite && sprite.id && sprite.id != id &&
@@ -740,29 +707,6 @@
           sprite, i;
       for (i = 0; i < matches.length; i++)
         doIt(this.sprites.get(matches[i].id));
-
-      /*
-      // Look in dynamic sprites first (lookup by index)
-      for (c = minCol; c <= maxCol; c++)
-        for (r = minRow; r <= maxRow; r++) {
-          index = c * this.attributes.height + r;
-          if (this.dynamicSprites.lookup[index])
-            for (s = 0; s < this.dynamicSprites.lookup[index].length; s++)
-              doIt(this.dynamicSprites.lookup[index][s]);
-        }
-      if (type == "character") {
-        findClosestSprites();
-        return count;
-      }
-      // Finally in static ones
-      for (c = minCol; c <= maxCol; c++)
-        for (r = minRow; r <= maxRow; r++) {
-          index = c * this.attributes.height + r;
-          if (this.staticSprites.lookup[index])
-            for (s = 0; s < this.staticSprites.lookup[index].length; s++)
-              doIt(this.staticSprites.lookup[index][s]);
-        }
-      */
 
       findClosestSprites();
       return count;
