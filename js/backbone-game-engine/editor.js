@@ -213,8 +213,10 @@
 
       // Highlight tile position (on desktop)
       if (this.mx != undefined && this.my != undefined) {
-        var x = this.mx - this.mx % sp.tileWidth + this.world.get("x"),
-            y = this.my - this.my % sp.tileHeight + this.world.get("y");
+        var tileWidth = this.world.get("tileWidth"),
+            tileHeight = this.world.get("tileHeight"),
+            x = this.mx - this.mx % tileWidth + this.world.get("x"),
+            y = this.my - this.my % tileHeight + this.world.get("y");
 
         context.save();
         context.rect(
@@ -228,7 +230,7 @@
         context.beginPath();
         context.strokeStyle = "#FF0000";
         context.setLineDash([5,2]);
-        context.rect(x, y, sp.tileWidth, sp.tileHeight);
+        context.rect(x, y, tileWidth, tileHeight);
         context.stroke();
 
         context.restore();

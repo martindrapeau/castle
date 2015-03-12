@@ -419,6 +419,10 @@
             this.cancelUpdate = true;
             this.set("coins", this.get("coins") + 1);
             break;
+          case "a-coin-bag":
+            this.cancelUpdate = true;
+            this.set("coins", this.get("coins") + 5);
+            break;
           case "a-health":
             if (cur.mov2 != "hurt") {
               this.cancelUpdate = true;

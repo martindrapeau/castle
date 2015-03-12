@@ -4,7 +4,10 @@ $(window).on("load", function() {
       context = canvas.getContext("2d"),
       tileWidth = 64,
       tileHeight = 64,
-      spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
+      spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;}),
+      editorTileSize = 48,
+      editorWidth = canvas.width - canvas.width % (editorTileSize + 2),
+      editorHeight = (editorTileSize + 2) * 3;
 
   Backbone.Controller = Backbone.Model.extend({
     initialize: function(attributes, options) {
@@ -39,7 +42,7 @@ $(window).on("load", function() {
           height: 9,
           backgroundImage: "#background"
         }, window._levels[0], {
-          viewportBottom: 180
+          viewportBottom: editorHeight
         }), {
         input: this.input,
         camera: this.camera,
@@ -81,13 +84,13 @@ $(window).on("load", function() {
 
       // The sprite picker and editor
       this.editor = new Backbone.WorldEditor({
-        x: canvas.width - ((tileWidth+2)*11 + 128 + 4),
-        y: 544,
-        width: (tileWidth+2)*11 + 128 + 4,
-        height: (tileHeight+2)*2 + 4,
+        x: 0,
+        y: canvas.height - editorHeight,
+        width: editorWidth,
+        height: editorHeight,
         spriteNames: spriteNames,
-        tileWidth: tileWidth,
-        tileHeight: tileHeight
+        tileWidth: editorTileSize,
+        tileHeight: editorTileSize
       }, {
         world: this.world,
         debugPanel: this.debugPanel

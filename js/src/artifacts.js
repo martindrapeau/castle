@@ -144,6 +144,7 @@
   buildArtifact("a-red-potion", [15]);
   buildArtifact("a-green-potion", [16]);
   buildArtifact("a-health", [12]);
+  buildArtifact("a-coin-bag", [20]);
 
   buildArtifact("a-dollar", [24]);
   buildArtifact("a-clock", [23]);
@@ -238,8 +239,9 @@
     },
     onDraw: function(context, options) {
       if (!this._animation && !this.attributes.showContent) return this;
-      var x = this.get("x") + (options.offsetX || 0) + this.get("width")/2,
-          y = this.get("y") + (options.offsetY || 0) + this.get("height")/2,
+      var x = this.get("x") + (options.offsetX || 0) + (options.tileWidth || this.get("width"))/2,
+          y = this.get("y") + (options.offsetY || 0) + (options.tileHeight || this.get("height"))/2,
+          radius = Math.round((options.tileWidth || this.get("width")) * 0.375),
           now = _.now(),
           factor = 1;
 
@@ -259,7 +261,7 @@
 
       context.save();
       context.beginPath();
-      context.arc(x, y, 24*factor, 0, 2*Math.PI, false);
+      context.arc(x, y, radius*factor, 0, 2*Math.PI, false);
       context.fillStyle = "#111";
       context.fill();
       context.clip();
@@ -303,19 +305,29 @@
   buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
   buildBreakableTile("a-crate-red-potion", 77, {artifact: "a-red-potion"});
+  buildBreakableTile("a-crate-health", 77, {artifact: "a-health"});
   buildBreakableTile("a-crate-death", 77, {artifact: "a-death"});
   buildBreakableTile("a-crate-spider", 77, {artifact: "spider"});
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
   buildBreakableTile("a-barrel-key", 76, {artifact: "a-key"});
   buildBreakableTile("a-barrel-red-potion", 76, {artifact: "a-red-potion"});
+  buildBreakableTile("a-barrel-health", 76, {artifact: "a-health"});
   buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
   buildBreakableTile("a-barrel-spider", 76, {artifact: "spider"});
   buildBreakableTile("a-hay", 102);
   buildBreakableTile("a-hay-coin", 102, {artifact: "a-coin"});
   buildBreakableTile("a-hay-key", 102, {artifact: "a-key"});
   buildBreakableTile("a-hay-red-potion", 102, {artifact: "a-red-potion"});
+  buildBreakableTile("a-hay-health", 102, {artifact: "a-health"});
   buildBreakableTile("a-hay-death", 102, {artifact: "a-death"});
   buildBreakableTile("a-hay-spider", 102, {artifact: "spider"});
+  buildBreakableTile("a-chess", 78);
+  buildBreakableTile("a-chess-coin", 78, {artifact: "a-coin"});
+  buildBreakableTile("a-chess-key", 78, {artifact: "a-key"});
+  buildBreakableTile("a-chess-red-potion", 78, {artifact: "a-red-potion"});
+  buildBreakableTile("a-chess-health", 78, {artifact: "a-health"});
+  buildBreakableTile("a-chess-death", 78, {artifact: "a-death"});
+  buildBreakableTile("a-chess-spider", 78, {artifact: "spider"});
   
 }).call(this);
