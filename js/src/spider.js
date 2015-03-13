@@ -154,6 +154,9 @@
       return this;
     },
     ai: function(dt) {
+      Backbone.Character.prototype.ai.apply(this, arguments);
+      if (this.cancelUpdate) return this;
+
       var cur = this.getStateInfo();
       if ((cur.mov != "walk" && cur.mov != "idle") || cur.mov2 != null) return this;
 

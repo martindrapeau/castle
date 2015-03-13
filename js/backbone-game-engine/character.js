@@ -117,6 +117,7 @@
     initialize: function(attributes, options) {
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
+      this.turnArounds = 0;
 
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
@@ -172,8 +173,7 @@
       return this;
     },
     hit: function(sprite, dir, dir2) {
-      var cur = this.getStateInfo(),
-          opo = dir == "left" ? "right" : "left";
+      var cur = this.getStateInfo();
       
       if (cur.mov2 == "hurt") return this;
 
@@ -183,7 +183,7 @@
         this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
       } else if (cur.dir == dir && cur.mov2 == null) {
         this.cancelUpdate = true;
-        this.set("state", this.buildState(cur.mov, null, cur.opo));
+        this.set("state", this.buildState(cur.mov, cur.opo));
       }
 
       return this;
@@ -225,6 +225,18 @@
       return sequenceIndex;
     },
     ai: function(dt) {
+      var cur = this.getStateInfo();
+
+      if (cur.mov == "walk" && this.turnArounds > 10) {
+        this.set({
+          state: this.buildState("idle", cur.dir),
+          velocity: 0
+        });
+        this.cancelUpdate = true;
+      }
+
+      this.turnArounds = 0;
+
       return this;
     },
     update: function(dt) {
@@ -371,7 +383,7 @@
           var worldLeft = -tileWidth,
               leftX = worldLeft,
               leftCharacter;
-          if (cur.mov != "ko")
+          if (cur.mov != "ko" && cur.mov != "idle")
             for (i = 0; i < this.collisionMap.left.sprites.length; i++) {
               sprite = this.collisionMap.left.sprites[i];
               leftX = Math.max(leftX, sprite.getRight(true));
@@ -385,12 +397,18 @@
               this.world.remove(this);
               return false;
             }
-            velocity = velocity * -1;
-            attrs.state = this.buildState(cur.mov, null, cur.opo);
-            attrs.x = x = leftX - paddingLeft;
             if (leftCharacter && cur.mov2 != "hurt") {
               leftCharacter.trigger("hit", this, "right", cur.mov2);
               if (this.cancelUpdate) return true;
+            }
+            attrs.velocity = velocity = velocity * -1;
+            attrs.state = this.buildState(cur.mov, cur.opo);
+            attrs.x = x = leftX - paddingLeft;
+            if (this.collisionMap.right.sprite) {
+              attrs.state = this.buildState("idle", cur.dir);
+              attrs.velocity = velocity = 0;
+            } else {
+              this.turnArounds++;
             }
           }
         }
@@ -400,7 +418,7 @@
           var worldRight = this.world.width(),
               rightX = worldRight,
               rightCharacter;
-          if (cur.mov != "ko")
+          if (cur.mov != "ko" && cur.mov != "idle")
             for (i = 0; i < this.collisionMap.right.sprites.length; i++) {
               sprite = this.collisionMap.right.sprites[i];
               rightX = Math.min(rightX, sprite.getLeft(true));
@@ -414,12 +432,18 @@
               this.world.remove(this);
               return false;
             }
-            velocity = velocity * -1;
-            attrs.state = this.buildState(cur.mov, null, cur.opo);
-            attrs.x = x = rightX - charWidth - paddingLeft;
             if (rightCharacter && cur.mov2 != "hurt") {
               rightCharacter.trigger("hit", this, "left", cur.mov2);
               if (this.cancelUpdate) return true;
+            }
+            attrs.velocity = velocity = velocity * -1;
+            attrs.state = this.buildState(cur.mov, cur.opo);
+            attrs.x = x = rightX - charWidth - paddingLeft;
+            if (this.collisionMap.left.sprite) {
+              attrs.state = this.buildState("idle", cur.dir);
+              attrs.velocity = velocity = 0;
+            } else {
+              this.turnArounds++;
             }
           }
         }

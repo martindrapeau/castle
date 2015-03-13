@@ -87,6 +87,8 @@
       paddingTop: 16
     }),
     hit: function(sprite, dir, dir2) {
+      if (!this.world) return this;
+      
       if (dir == "top" && sprite.get("type") == "breakable-tile") {
         sprite.trigger("hit", this, "bottom");
         return this;
