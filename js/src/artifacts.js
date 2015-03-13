@@ -73,11 +73,47 @@
   });
 
 
+  Backbone.GainCoin = Backbone.Button.extend({
+    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+      width: 90,
+      height: 64,
+      backgroundColor: "transparent",
+      img: "#artifacts", imgX: 256, imgY: 256, imgWidth: 64, imgHeight: 64, imgMargin: 0,
+      text: "+1",
+      textContextAttributes: {
+        fillStyle: "#FFF",
+        font: "32px arcade",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "right"
+      },
+      easing: "easeOutCubic",
+      easingTime: 400
+    }),
+    onAttach: function() {
+      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      this.stopListening(this.engine);
+    },
+    onUpdate: function(dt) {
+      var now = _.now(),
+          easingTime = this.get("easingTime"),
+          easing = this.get("easing"),
+          velocity = this._animation ? Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime)*20 : 10;
+
+      if (this._animation == "fadeOut") velocity -= 1;
+      this.set("y", this.get("y") + velocity*(dt/1000));
+
+      return true;
+    }
+  });
+
+
   // Artifacts
   var Artifact = Backbone.Object.extend({
     defaults: _.extend({}, Backbone.Object.prototype.defaults, {
       spriteSheet: "artifacts",
       type: "artifact",
+      gain: 1,
       width: 64,
       height: 64,
       collision: true,
@@ -163,6 +199,30 @@
     return this;
   };
 
+  Backbone.ACoinBag.prototype.defaults.gain = 5;
+  Backbone.ACoin.prototype.onUpdate = Backbone.ACoinBag.prototype.onUpdate = function(dt) {
+    if (this.attributes.state == "ko" && this.attributes.yVelocity > 0) {
+      var engine = this.world.engine;
+      var gain = window.gain = new Backbone.GainCoin({
+        x: this.get("x") + this.world.get("x"),
+        y: this.get("y") + this.world.get("y"),
+        easingTime: 300,
+        text: "+" + this.get("gain")
+      });
+      engine.add(gain);
+      gain.fadeIn(function() {
+        setTimeout(function() {
+          gain.set("easingTime", 600);
+          gain.fadeOut(function() {
+            engine.remove(gain);
+          });
+        }, 1000);
+      });
+      this.world.remove(this);
+      return false;
+    }
+    return true;
+  };
 
   // Breakable tiles
   var BreakableTile = Backbone.Object.extend({
@@ -305,6 +365,7 @@
 
   buildBreakableTile("a-crate", 77);
   buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
+  buildBreakableTile("a-crate-coin-bag", 77, {artifact: "a-coin"});
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
   buildBreakableTile("a-crate-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-crate-health", 77, {artifact: "a-health"});
@@ -326,6 +387,7 @@
   buildBreakableTile("a-hay-spider", 102, {artifact: "spider"});
   buildBreakableTile("a-chess", 78);
   buildBreakableTile("a-chess-coin", 78, {artifact: "a-coin"});
+  buildBreakableTile("a-chess-coin-bag", 78, {artifact: "a-coin-bag"});
   buildBreakableTile("a-chess-key", 78, {artifact: "a-key"});
   buildBreakableTile("a-chess-red-potion", 78, {artifact: "a-red-potion"});
   buildBreakableTile("a-chess-health", 78, {artifact: "a-health"});

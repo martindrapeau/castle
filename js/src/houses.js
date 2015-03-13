@@ -221,7 +221,7 @@
         case "close1":
           this.exitCharacter();
           this.stopListening(world.sprites);
-          character.set({visible:false, ignoreInput: true, velocity:  0});
+          character.set({visible: false, ignoreInput: true, velocity:  0});
           _.each(this.insideSprites, world.remove);
           this.door.set({state: "open-close"});
           world.add(this.door);
@@ -261,7 +261,7 @@
   createHouse("h-1", 0, null, [
     {name: "bc-table1", x: 64, y: 320},
     {name: "bc-table2", x: 128, y: 320},
-    {name: "a-barrel-coin", x: 320, y: 320},
+    {name: "a-chess-coin-bag", x: 320, y: 320},
     {name: "barrier1x2", x: -20, y: 256},
     {name: "barrier2x1", x: 0, y: 150},
     {name: "barrier2x1", x: 128, y: 150},
@@ -271,7 +271,7 @@
   createHouse("h-2", 2, {
     doorX: 264
   }, [
-    {name: "a-crate-coin", x: 192, y: 320},
+    {name: "a-chess-coin-bag", x: 192, y: 320},
     {name: "barrier1x2", x: 20, y: 256},
     {name: "barrier2x1", x: 0, y: 128},
     {name: "barrier2x1", x: 128, y: 128},
@@ -279,7 +279,7 @@
     {name: "barrier1x2", x: 410, y: 256}
   ]);
   createHouse("h-3", 4, null, [
-    {name: "a-crate-key", x: 64, y: 320},
+    {name: "a-chess-key", x: 64, y: 320},
     {name: "bc-table1", x: 256, y: 320},
     {name: "bc-table2", x: 320, y: 320},
     {name: "barrier1x2", x: -20, y: 256},
@@ -297,7 +297,9 @@
     doorX: 284,
     doorY: 48
   }, [
-    {name: "a-crate-coin", x: 60, y: 192},
+    {name: "a-crate", x: 60, y: 192},
+    {name: "a-crate-red-potion", x: 60, y: 128},
+    {name: "a-crate-death", x: 124, y: 192},
     {name: "barrier2x1", x: 256, y: 192},
     {name: "barrier1x2", x: 0, y: 64},
     {name: "barrier", x: 0, y: 192},
