@@ -272,6 +272,8 @@
     doorX: 264
   }, [
     {name: "a-chess-coin-bag", x: 192, y: 320},
+    {name: "a-barrel", x: 128, y: 320},
+    {name: "a-barrel", x: 128, y: 256},
     {name: "barrier1x2", x: 20, y: 256},
     {name: "barrier2x1", x: 0, y: 128},
     {name: "barrier2x1", x: 128, y: 128},
