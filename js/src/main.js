@@ -12,8 +12,7 @@ $(window).on("load", function() {
       spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
   if (MOBILE) {
-    canvas.width = Math.round(window.innerWidth);
-    canvas.height = Math.round(window.innerHeight);
+    canvas.height = Math.round(Math.min(window.innerHeight, window.innerWidth));
     console.log("mobile full-screen: canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
   } else {
     // Ensure the canvas is always visible and centered
