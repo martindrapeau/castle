@@ -1,7 +1,7 @@
 $(window).on("load", function() {
 
   var NATIVE = navigator.isCocoonJS,
-      ENV = navigator.isCocoonJS || window.location.hostname == "ludo.mariocraft.club" ? "prod" : "dev",
+      ENV = NATIVE /*|| window.location.hostname == "ludo.mariocraft.club"*/ ? "prod" : "dev",
       MOBILE = "onorientationchange" in window ||
         window.navigator.msMaxTouchPoints ||
         window.navigator.isCocoonJS;
