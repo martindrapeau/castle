@@ -1,6 +1,9 @@
 $(window).on("load", function() {
 
-  var ENV = navigator.isCocoonJS ? "prod" : "dev";
+  var ENV = navigator.isCocoonJS ? "prod" : "dev",
+      MOBILE = "onorientationchange" in window ||
+        window.navigator.msMaxTouchPoints ||
+        window.navigator.isCocoonJS;
   
   var canvas = document.getElementById("foreground"),
       context = canvas.getContext("2d"),
@@ -8,10 +11,10 @@ $(window).on("load", function() {
       tileHeight = 64,
       spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
-  if (navigator.isCocoonJS) {
+  if (MOBILE) {
     canvas.width = Math.round(window.innerWidth);
     canvas.height = Math.round(window.innerHeight);
-    console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
+    console.log("mobile full-screen: canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
   } else {
     // Ensure the canvas is always visible and centered
     adjustViewport(canvas, canvas.width, canvas.height);

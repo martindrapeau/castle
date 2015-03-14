@@ -256,7 +256,6 @@
       }
 
       if (!sprite || !sprite.get("hero") || dir2 != "attack") return;
-      if (this.get("state") != "idle") return;
 
       this.set({state: "bounce", sequenceIndex: 0});
       this.world.setTimeout(this.endHit, 200);
