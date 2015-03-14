@@ -1,7 +1,7 @@
 (function() {
   
-  Backbone.LabelButton = Backbone.Element.extend({
-    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
+  Backbone.LabelButton = Backbone.Button.extend({
+    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: 400,
       y: 400,
       width: 160,
@@ -43,10 +43,6 @@
       this.input = options.input;
       _.bindAll(this, "enter", "exit");
     },
-    onAttach: function() {
-      Backbone.Element.prototype.onAttach.apply(this, arguments);
-      this.stopListening(this.engine);
-    },
     enter: function() {
       this.set("opacity", 0);
       this.fadeIn();
@@ -83,10 +79,6 @@
       Backbone.Element.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "show");
       this.set("y", Backbone.HEIGHT);
-    },
-    onAttach: function() {
-      Backbone.Element.prototype.onAttach.apply(this, arguments);
-      this.stopListening(this.engine);
     },
     show: function() {
       this.moveTo(this.get("x"), 100);

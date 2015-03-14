@@ -473,7 +473,6 @@
   // Element class; mimics an elementary fixed position element on canvas.
   // Supports background color, rounded corners, background image and text.
   // Also has rudimentary animations.
-  // Triggers the tap event when clicked/pressed.
   var fontRe = /(\d+)px/;
   Backbone.Element = Backbone.Model.extend({
     defaults: {
@@ -512,11 +511,19 @@
     },
     onAttach: function() {
       this.onDetach();
-      this.listenTo(this.engine, "tap", this.onTap);
       if (!this.img && this.attributes.img) this.spawnImg();
     },
     onDetach: function() {
-      this.stopListening(this.engine);
+    },
+    clearAnimation: function() {
+      this._animation = undefined;
+      this._animationUpdateFn = undefined;
+      this._startTime = undefined;
+      this._startX = undefined;
+      this._startY = undefined;
+      this._targetX = undefined;
+      this._targetY = undefined;
+      this._callback = undefined;
     },
     moveTo: function(x, y, callback) {
       this._animation = "move";
@@ -526,6 +533,22 @@
       this._targetX = x;
       this._targetY = y;
       this._callback = callback;
+      this._animationUpdateFn = function(dt) {
+        var now = _.now(),
+            easingTime = this.get("easingTime"),
+            easing = this.get("easing");
+        if (now < this._startTime + easingTime) {
+          var factor = Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime);
+          this.set({
+            x: this._startX + factor * (this._targetX - this._startX),
+            y: this._startY + factor * (this._targetY - this._startY)
+          });
+        } else {
+          if (typeof this._callback == "function") _.defer(this._callback.bind(this));
+          this.set({x: this._targetX, y: this._targetY}, {silent: true});
+          this.clearAnimation();
+        }
+      };
       return this;
     },
     fadeIn: function(callback) {
@@ -533,6 +556,18 @@
       this._startTime = _.now();
       this._callback = callback;
       this.set("opacity", 0);
+      this._animationUpdateFn = function(dt) {
+        var now = _.now(),
+            easingTime = this.get("easingTime"),
+            easing = this.get("easing");
+        if (now < this._startTime + easingTime) {
+          this.set("opacity", Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime));
+        } else {
+          if (typeof this._callback == "function") _.defer(this._callback.bind(this));
+          this.set({opacity: 1}, {silent: true});
+          this.clearAnimation();
+        }
+      };
       return this;
     },
     fadeOut: function(callback) {
@@ -540,80 +575,22 @@
       this._startTime = _.now();
       this._callback = callback;
       this.set("opacity", 1);
-      return this;
-    },
-    pressed: function(callback) {
-      this._animation = "pressed";
-      this._startTime = _.now();
-      this._callback = callback
-      this.set("scale", 1);
+      this._animationUpdateFn = function(dt) {
+        var now = _.now(),
+            easingTime = this.get("easingTime"),
+            easing = this.get("easing");
+        if (now < this._startTime + easingTime) {
+          this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime));
+        } else {
+          if (typeof this._callback == "function") _.defer(this._callback.bind(this));
+          this.set({opacity: 0}, {silent: true});
+          this.clearAnimation();
+        }
+      };
       return this;
     },
     update: function(dt) {
-      var now = _.now(),
-          easingTime = this.get("easingTime"),
-          easing = this.get("easing");
-
-      switch (this._animation) {
-        case "move":
-          if (now < this._startTime + easingTime) {
-            var factor = Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime);
-            this.set({
-              x: this._startX + factor * (this._targetX - this._startX),
-              y: this._startY + factor * (this._targetY - this._startY)
-            });
-          } else {
-            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
-            this.set({x: this._targetX, y: this._targetY}, {silent: true});
-            this._animation = undefined;
-            this._startTime = undefined;
-            this._startX = undefined;
-            this._startY = undefined;
-            this._targetX = undefined;
-            this._targetY = undefined;
-            this._callback = undefined;
-          }
-          break;
-
-        case "fadeIn":
-          if (now < this._startTime + easingTime) {
-            this.set("opacity", Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime));
-          } else {
-            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
-            this.set({opacity: 1}, {silent: true});
-            this._animation = undefined;
-            this._startTime = undefined;
-            this._callback = undefined;
-          }
-          break;
-
-        case "fadeOut":
-          if (now < this._startTime + easingTime) {
-            this.set("opacity", 1 - Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime));
-          } else {
-            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
-            this.set({opacity: 0}, {silent: true});
-            this._animation = undefined;
-            this._startTime = undefined;
-            this._callback = undefined;
-          }
-          break;
-
-        case "pressed":
-          easing = "linear";
-          easingTime = 200;
-          if (now < this._startTime + easingTime) {
-            this.set("scale", 1.05 - Math.abs(Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime)-0.5)/10 );
-          } else {
-            if (typeof this._callback == "function") _.defer(this._callback.bind(this));
-            this.set({scale: 1}, {silent: true});
-            this._animation = undefined;
-            this._startTime = undefined;
-            this._callback = undefined;
-          }
-          break;
-      }
-
+      if (this._animation) this._animationUpdateFn(dt);
       if (typeof this.onUpdate == "function") this.onUpdate(dt);
       return true;
     },
@@ -711,15 +688,47 @@
       }
       return this;
     },
+    overlaps: Backbone.Sprite.prototype.overlaps,
+    spawnImg: Backbone.SpriteSheet.prototype.spawnImg
+  });
+
+  // Button class; an element when pressed animates a slight grow/shrink
+  // and triggers a tap event
+  Backbone.Button = Backbone.Element.extend({
+    onAttach: function() {
+      Backbone.Element.prototype.onAttach.apply(this, arguments);
+      this.listenTo(this.engine, "tap", this.onTap);
+    },
+    onDetach: function() {
+      Backbone.Element.prototype.onDetach.apply(this, arguments);
+      this.stopListening(this.engine);
+    },
+    pressed: function(callback) {
+      this._animation = "pressed";
+      this._startTime = _.now();
+      this._callback = callback
+      this.set("scale", 1);
+      this._animationUpdateFn = function(dt) {
+        var now = _.now(),
+            easing = "linear",
+            easingTime = 200;
+        if (now < this._startTime + easingTime) {
+          this.set("scale", 1.05 - Math.abs(Backbone.EasingFunctions[easing]((now - this._startTime) / easingTime)-0.5)/10 );
+        } else {
+          if (typeof this._callback == "function") _.defer(this._callback.bind(this));
+          this.set({scale: 1}, {silent: true});
+          this.clearAnimation();
+        }
+      };
+      return this;
+    },
     onTap: function(e) {
       if (this.get("opacity") == 0) return;
       if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
           e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height) {
         this.pressed(_.partial(this.trigger, "tap", e));
       }
-    },
-    overlaps: Backbone.Sprite.prototype.overlaps,
-    spawnImg: Backbone.SpriteSheet.prototype.spawnImg
+    }
   });
 
   // Displays a message top center

@@ -1,7 +1,7 @@
 (function() {
 
-  Backbone.PullOutButton = Backbone.Element.extend({
-    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
+  Backbone.PullOutButton = Backbone.Button.extend({
+    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
       x: -372,
       width: 372,
       height: 76,
@@ -132,7 +132,7 @@
     initialize: function(attributes, options) {
       Backbone.Scene.prototype.initialize.apply(this, arguments);
 
-      this.banner = new Backbone.Element({
+      this.banner = new Backbone.Button({
         x: 0, y: 240,
         width: 960, height: 145,
         backgroundColor: "transparent",

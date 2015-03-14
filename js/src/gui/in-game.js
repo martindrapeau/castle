@@ -113,7 +113,7 @@
 
       var panel = this;
       _.each(this.buttons, function(button, name) {
-        button.instance = new Backbone.Element(button);
+        button.instance = new Backbone.Button(button);
         var callback = typeof button.click == "function" ? button.click : panel[button.click];
         button.instance.on("tap", callback, panel);
       });
