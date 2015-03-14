@@ -20,10 +20,14 @@ $(window).on("load", function() {
   }
   console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
 
-  if (!NATIVE && MOBILE)
-    _.loadScript("/add-to-home-screen/src/addtohomescreen.min.js", function() {
-      addToHomescreen();
+  if (!NATIVE && MOBILE) {
+    _.loadStylesheet("add-to-homescreen/style/addtohomescreen.css");
+    _.loadScript("add-to-homescreen/src/addtohomescreen.js", function() {
+      var addtohome = addToHomescreen({
+        appID: window.location.hostname
+      });
     });
+  }
 
   _.extend(Backbone, {
     ENV: ENV,
