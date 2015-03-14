@@ -11,14 +11,13 @@ $(window).on("load", function() {
       tileHeight = 64,
       spriteNames = _.map(Backbone.pagedSprites, function(names) {return names;});
 
-  if (MOBILE)
-    canvas.height = Math.round(Math.min(canvas.height, window.innerHeight, window.innerWidth));
-  else
+  if (MOBILE) {
+    canvas.height = Math.round(Math.min(canvas.height, canvas.width * Math.min(window.innerHeight, window.innerWidth) / Math.max(window.innerHeight, window.innerWidth) ));
+  } else {
     canvas.height = Math.round(Math.min(canvas.height, window.innerHeight));
+    adjustViewport(canvas, canvas.width, canvas.height);
+  }
   console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
-  
-  // On desktop, viewport is not stretched. Ensure the canvas is always centered.
-  if (!MOBILE) adjustViewport(canvas, canvas.width, canvas.height);
 
   _.extend(Backbone, {
     ENV: ENV,
