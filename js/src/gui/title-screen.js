@@ -1,7 +1,7 @@
 (function() {
 
-  Backbone.PullOutButton = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.PullOutButton = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: -372,
       width: 372,
       height: 76,
@@ -20,8 +20,8 @@
     })
   });
 
-  Backbone.SavedGame = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.SavedGame = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 960,
       y: 280,
       width: 333,
@@ -41,11 +41,11 @@
       easingTime: 600
     }),
     initialize: function(attributes, options) {
-      Backbone.Button.prototype.initialize.apply(this, arguments);
+      Backbone.Element.prototype.initialize.apply(this, arguments);
       this.saved = options.saved;
     },
     onAttach: function() {
-      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      Backbone.Element.prototype.onAttach.apply(this, arguments);
       this.set("text", "Level " + (this.saved.size() > 0 ? this.saved.last().get("level") : "?"));
     },
     onDraw: function(context) {
@@ -132,7 +132,7 @@
     initialize: function(attributes, options) {
       Backbone.Scene.prototype.initialize.apply(this, arguments);
 
-      this.banner = new Backbone.Button({
+      this.banner = new Backbone.Element({
         x: 0, y: 240,
         width: 960, height: 145,
         backgroundColor: "transparent",

@@ -81,7 +81,7 @@
       if (!this.world && !_.isFunction(this.world.add))
         throw "Missing or invalid world option.";
 
-      this.changePageButton = new Backbone.Button({
+      this.changePageButton = new Backbone.Element({
         x: 68, y: 646, width: 32, height: 50, borderRadius: 2,
         img: "#icons", imgX: 394, imgY: 0, imgWidth: 22, imgHeight: 32, imgMargin: 10
       });

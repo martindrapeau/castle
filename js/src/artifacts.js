@@ -73,8 +73,8 @@
   });
 
 
-  Backbone.GainCoin = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.GainCoin = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       width: 90,
       height: 64,
       backgroundColor: "transparent",
@@ -91,7 +91,7 @@
       easingTime: 400
     }),
     onAttach: function() {
-      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      Backbone.Element.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
     },
     onUpdate: function(dt) {

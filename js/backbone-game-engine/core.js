@@ -470,10 +470,12 @@
     draw: function() {}
   });
 
-  // Button class; a button with an optional image.
-  // Triggers the tap event when pressed.
+  // Element class; mimics an elementary fixed position element on canvas.
+  // Supports background color, rounded corners, background image and text.
+  // Also has rudimentary animations.
+  // Triggers the tap event when clicked/pressed.
   var fontRe = /(\d+)px/;
-  Backbone.Button = Backbone.Model.extend({
+  Backbone.Element = Backbone.Model.extend({
     defaults: {
       x: 0,
       y: 0,

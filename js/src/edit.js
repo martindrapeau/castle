@@ -62,7 +62,7 @@ $(window).on("load", function() {
       });
 
       // Buttons
-      this.toggleButton = new Backbone.Button({
+      this.toggleButton = new Backbone.Element({
         x: 4, y: 4, width: 52, height: 52, borderRadius: 5,
         img: "#icons", imgX: 0, imgY: 0, imgWidth: 32, imgHeight: 32, imgMargin: 10
       });

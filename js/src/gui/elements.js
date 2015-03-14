@@ -1,7 +1,7 @@
 (function() {
   
-  Backbone.LabelButton = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.LabelButton = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 400,
       y: 400,
       width: 160,
@@ -21,8 +21,8 @@
     })
   });
 
-  Backbone.Scene = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.Scene = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 0,
       y: 0,
       width: 960,
@@ -34,7 +34,7 @@
       easingTime: 400
     }),
     initialize: function(attributes, options) {
-      Backbone.Button.prototype.initialize.apply(this, arguments);
+      Backbone.Element.prototype.initialize.apply(this, arguments);
       options || (options = {});
       this.saved = options.saved;
       this.world = options.world;
@@ -44,7 +44,7 @@
       _.bindAll(this, "enter", "exit");
     },
     onAttach: function() {
-      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      Backbone.Element.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
     },
     enter: function() {
@@ -59,8 +59,8 @@
     }
   });
 
-  Backbone.Panel = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.Panel = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 160,
       y: 720,
       width: 640,
@@ -80,12 +80,12 @@
       easingTime: 600
     }),
     initialize: function(attributes, options) {
-      Backbone.Button.prototype.initialize.apply(this, arguments);
+      Backbone.Element.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "show");
       this.set("y", Backbone.HEIGHT);
     },
     onAttach: function() {
-      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      Backbone.Element.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
     },
     show: function() {

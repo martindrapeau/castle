@@ -12,8 +12,8 @@
   var keyboardImg = new Image();
   keyboardImg.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAAwCAYAAABHTnUeAAACYklEQVR42u3dS5KCQBAEUNx5LJbcYs42t2DJsViOizFCnQH6U9Wd2ZW5JuQVmtAoEd4mRQmcW2+AovSMCqCEjgqghM5hAbZt++qNe808z9852zP7me1s/n8LgDZAyiCj+JntjP4/BUAd4GqQEfzMdla/CgDkZ7az+lUAID+zndWvAgD5me2sfhUAyM9sZ/WrAEB+ZjurXwUA8jPbWf0qAJCf2c7qVwGA/Mx2Vr8KAORntrP6VQAgf6798VpFhsd+zO0W/itX7vYpfvMCPJGlB7lkCEu/d1SAc/+RLWfbHL9pAV6RoxXAqtgqwPUMnz6LD/+R36QAVsDSIWr9uTPWzNb6HsDyvfE69mdGb39VAc7OQCMXoGbGlgWwPjF5Hvuj9X3tuv/KX1SAlEtvhAKUzNqqAB5X5ZYFONmHqT+rAKVrztSkDIdYACu/ld1rSep97K+OsUeBQxag5xzeBfC8H2tx8jl6b7wK7LIEut/v07qu1eDUIaz9tUEqgOVSVAVIxFqBU4co9edkWZZp3/fTbXovgby/jQu/BMqBj1YA9JvgFu9B+JvgnCEiFADla9BWJyB9DZqQ51Jh5AIg/RA2wtWX9oewHulZAIube4RHIX73ZWov8R/NQPcoRMvoYbi31yp2IBRguIfhWkQFeHutYgdiAYZ4HNo7KgCmndWvAgD5me2sfhUAyM9sZ/WrAEB+ZjurXwUA8jPbWf0qAJCf2c7qVwGA/Mx2Vr8KAORntrP6VQAgP7Od1a8CAPmZ7ax+/UkemJ/ZzujX36QC+pntbH79UbYSOiqAEjoqgBI6KoASOj+RrUxeKnOx4gAAAABJRU5ErkJggg==";
 
-  Backbone.InputButton = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.InputButton = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       // Relative position references
       left: undefined,
       right: undefined,
@@ -23,12 +23,12 @@
       pressed: false
     }),
     onAttach: function() {
-      Backbone.Button.prototype.onAttach.apply(this, arguments);
+      Backbone.Element.prototype.onAttach.apply(this, arguments);
       this.stopListening();
       this.calculatePosition();
     },
     onDetach: function() {
-      Backbone.Button.prototype.onDetach.apply(this, arguments);
+      Backbone.Element.prototype.onDetach.apply(this, arguments);
       this.set("pressed", false);
     },
     calculatePosition: function() {

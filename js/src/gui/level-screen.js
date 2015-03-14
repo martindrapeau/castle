@@ -1,7 +1,7 @@
 (function() {
 
-  Backbone.LevelViewModel = Backbone.Button.extend({
-    defaults: _.extend({}, Backbone.Button.prototype.defaults, {
+  Backbone.LevelViewModel = Backbone.Element.extend({
+    defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       level: 1,
       name: "",
       state: "locked", // locked, unlocked, played, future
@@ -20,7 +20,7 @@
     }),
     idAttribute: "level",
     initialize: function(attributes, options) {
-      Backbone.Button.prototype.initialize.apply(this, arguments);
+      Backbone.Element.prototype.initialize.apply(this, arguments);
       this.scoreTextAttributes = {
         height: 198,
         textPadding: 65,
@@ -97,7 +97,7 @@
 
       _.bindAll(this, "_calculateState");
 
-      this.backButton = new Backbone.Button({
+      this.backButton = new Backbone.Element({
         x: 20, y: Backbone.HEIGHT - 100,
         width: 70, height: 70,
         backgroundColor: "transparent",
