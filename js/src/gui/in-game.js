@@ -173,7 +173,7 @@
         panel.engine.remove(this.levelInOutScene);
         panel.pauseButton.trigger("attach");
         panel.input.trigger("attach");
-        panel.set({y: 720});
+        panel.set({y: Backbone.HEIGHT});
         if (arg1)
           panel.engine.trigger(event, arg1);
         else
@@ -211,13 +211,13 @@
       this.pauseButton.trigger("detach");
       this.input.trigger("detach");
 
-      this.moveTo(this.get("x"), 200, function() {
+      this.moveTo(this.get("x"), 50, function() {
         this.attachButtons();
       });
       return this;
     },
     resume: function() {
-      this.moveTo(this.get("x"), 720, function() {
+      this.moveTo(this.get("x"), Backbone.HEIGHT, function() {
         this.detachButtons();
         this.world.set("state", "play");
         this.pauseButton.trigger("attach");
@@ -268,7 +268,7 @@
 
       this.detachButtons();
 
-      this.moveTo(this.get("x"), 200, function() {
+      this.moveTo(this.get("x"), 50, function() {
         this.attachButtons();
       });
       return this;

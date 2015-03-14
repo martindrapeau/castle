@@ -23,7 +23,7 @@ $(window).on("load", function() {
   if (!NATIVE && MOBILE) {
     _.loadStylesheet("add-to-homescreen/style/addtohomescreen.css");
     _.loadScript("add-to-homescreen/src/addtohomescreen.js", function() {
-      var addtohome = addToHomescreen({
+      addToHomescreen({
         appID: window.location.hostname
       });
     });
