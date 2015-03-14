@@ -1,6 +1,7 @@
 $(window).on("load", function() {
 
-  var ENV = navigator.isCocoonJS ? "prod" : "dev",
+  var NATIVE = navigator.isCocoonJS,
+      ENV = navigator.isCocoonJS || window.location.hostname == "ludo.mariocraft.club" ? "prod" : "dev",
       MOBILE = "onorientationchange" in window ||
         window.navigator.msMaxTouchPoints ||
         window.navigator.isCocoonJS;
@@ -19,8 +20,14 @@ $(window).on("load", function() {
   }
   console.log("canvas.width=" + canvas.width + " canvas.height=" + canvas.height);
 
+  if (!NATIVE && MOBILE)
+    _.loadScript("/add-to-home-screen/src/addtohomescreen.min.js", function() {
+      addToHomescreen();
+    });
+
   _.extend(Backbone, {
     ENV: ENV,
+    NATIVE: NATIVE,
     MOBILE: MOBILE,
     HEIGHT: canvas.height,
     WIDTH: canvas.width
