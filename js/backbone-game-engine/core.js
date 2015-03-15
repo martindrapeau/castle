@@ -422,7 +422,7 @@
       touchStarted = true;
 
       var engine = this;
-      setTimeout(function (){
+      setTimeout(function() {
         if ((engine.cachedX === engine.currX) && !engine.touchStarted && (engine.cachedY === engine.currY)) {
           e.canvas = engine.canvas;
           e.canvasX = pointer.pageX - engine.canvas.offsetLeft + engine.canvas.scrollLeft;
