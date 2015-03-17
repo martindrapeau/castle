@@ -255,7 +255,8 @@
     defaults: {
       version: 0.2,
       clearOnDraw: false,
-      tapDetectionDelay: 50 // in ms
+      tapDetectionDelay: 50, // in ms
+      tapMoveTolerance: 5 // Move tolerance for a tap detection in pixels
     },
     initialize: function(attributes, options) {
       options || (options = {});
@@ -448,7 +449,8 @@
       if (!this._touchStartTime) return;
       e.preventDefault();
 
-      var pointer = this.getPointerEvent(e);
+      var pointer = this.getPointerEvent(e),
+          tolerance = this.get("tapMoveTolerance");
       this._currX = pointer.pageX;
       this._currY = pointer.pageY;
 
@@ -460,7 +462,7 @@
 
       if (this._gesture == "drag") {
         this.trigger("dragmove", e);
-      } else if (e.canvasDeltaX != 0 || e.canvasDeltaY != 0) {
+      } else if (Math.abs(e.canvasDeltaX) > tolerance || Math.abs(e.canvasDeltaY) > tolerance) {
         this._gesture = "drag";
         this.trigger("dragstart", e);
       }
