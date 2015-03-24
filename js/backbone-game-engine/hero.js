@@ -384,9 +384,11 @@
       return this;
     },
     hurt: function(sprite, dir) {
+      dir = dir == "right" ? "right" : "left";
+      var opo = _.opo(dir);
       this.set({
-        state: this.buildState("jump", "hurt", dir == "left" ? "right" : "left"),
-        nextState: this.buildState("idle", null, dir),
+        state: this.buildState("jump", "hurt", opo),
+        nextState: this.buildState("idle", dir),
         yVelocity: hurtBounceVelocity,
         velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
         sequenceIndex: 0

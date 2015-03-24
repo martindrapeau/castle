@@ -152,7 +152,7 @@
       return this;
     },
     knockout: function(sprite, dir) {
-      var opo = _.opo(dir),
+      var opo = dir == "left" ? "right" : "left",
           state = this.buildState("ko", opo);
       this.whenAnimationEnds = null;
       this.set({
@@ -166,6 +166,7 @@
       return this;
     },
     hurt: function(sprite, dir) {
+      dir = dir == "right" ? "right" : "left";
       this.whenAnimationEnds = null;
       this.set({
         state: this.buildState("fall", "hurt", dir),
