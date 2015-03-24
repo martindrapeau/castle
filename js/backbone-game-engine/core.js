@@ -79,6 +79,16 @@
       this.bbox.y2 = this.getBottom(withPadding);
       return this.bbox;
     },
+    getCenterX: function(withPadding) {
+      var x = this.getLeft(withPadding),
+          width = this.getRight(withPadding) - x;
+      return x + width/2;
+    },
+    getCenterY: function(withPadding) {
+      var y = this.getTop(withPadding),
+          height = this.getBottom(withPadding) - y;
+      return x + height/2;
+    },
     update: function(dt) {
       // Fetch animation and change sequence if need be
       var animation = this.getAnimation(),
@@ -253,7 +263,7 @@
   // on an HTML5 canvas.
   Backbone.Engine = Backbone.Model.extend({
     defaults: {
-      version: 0.2,
+      version: 0.3,
       clearOnDraw: false,
       tapDetectionDelay: 50, // in ms
       tapMoveTolerance: 5 // Move tolerance for a tap detection in pixels
@@ -436,6 +446,7 @@
       e.canvas = this.canvas;
       e.canvasX = this._currX - this.canvas.offsetLeft + this.canvas.scrollLeft;
       e.canvasY = this._currY - this.canvas.offsetTop + this.canvas.scrollTop;
+      e.canvasHandled = false;
 
       if (this._gesture == "tap" && now - this._touchStartTime > this.get("tapDetectionDelay")) {
         this.trigger("tap", e);
@@ -748,10 +759,11 @@
       return this;
     },
     onTap: function(e) {
-      if (this.get("opacity") == 0) return;
+      if (this.get("opacity") == 0 && !e.canvasHandled) return;
       if (e.canvasX >= this.attributes.x && e.canvasX <= this.attributes.x + this.attributes.width &&
           e.canvasY >= this.attributes.y && e.canvasY <= this.attributes.y + this.attributes.height) {
         this.pressed(_.partial(this.trigger, "tap", e));
+        e.canvasHandled = true;
       }
     }
   });

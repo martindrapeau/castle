@@ -525,6 +525,7 @@
     drawDynamicSprites: function(context) {
       var start =_.now(),
           sprite, index, count = 0,
+          clip = this.attributes.viewportLeft || this.attributes.viewportRight || this.attributes.viewportTop || this.attributes.viewportBottom,
           tileX1 = this.getWorldCol(-this.attributes.x + this.attributes.viewportLeft - this.attributes.tileWidth*3),
           tileX2 = this.getWorldCol(-this.attributes.x + context.canvas.width - this.attributes.viewportRight + this.attributes.tileWidth*3),
           tileY1 = this.getWorldRow(-this.attributes.y + this.attributes.viewportTop - this.attributes.tileHeight*3),
@@ -532,13 +533,16 @@
       this.spriteOptions.offsetX = this.attributes.x;
       this.spriteOptions.offsetY = this.attributes.y;
 
-      /*context.save();
-      context.rect(
-        this.attributes.viewportLeft,
-        this.attributes.viewportTop,
-        context.canvas.width - this.attributes.viewportRight,
-        context.canvas.height - this.attributes.viewportBottom);
-      context.clip();*/
+
+      if (clip) {
+        context.save();
+        context.rect(
+          this.attributes.viewportLeft,
+          this.attributes.viewportTop,
+          context.canvas.width - this.attributes.viewportRight,
+          context.canvas.height - this.attributes.viewportBottom);
+        context.clip();
+      }
 
       context.drawImage(this.backgroundCanvas,
         this.attributes.viewportLeft, this.attributes.viewportTop, this.viewport.width, this.viewport.height,
@@ -567,7 +571,7 @@
           sprite.draw.call(sprite, context, this.spriteOptions);
       }
 
-      //context.restore();
+      if (clip) context.restore();
 
       if (this.debugPanel) this.debugPanel.set({
         dynamicDrawn: count,
@@ -641,6 +645,7 @@
     // Map is a map of objects describing the locations to look at, and the result.
     // Each map item is an object with:
     //  - x, y: The lookup coordinate.
+    //  - width, height: Optional. If specified and non-zero, defines an area to lookup (not just a point).
     //  - dir: The lookout direction; top, right, bottom or left.
     //  - sprites: array of detected colliding sprites. Reset/initialized to [] every call.
     //  - sprite: The closest sprite based on the lookout direction.
@@ -655,10 +660,12 @@
 
       for (m in map)
         if (map.hasOwnProperty(m)) {
+          map[m].width || (map[m].width = 0);
+          map[m].height || (map[m].height = 0);
           if (minX == undefined || map[m].x < minX) minX = map[m].x;
-          if (maxX == undefined || map[m].x > maxX) maxX = map[m].x;
+          if (maxX == undefined || map[m].x + map[m].width > maxX) maxX = map[m].x + map[m].width;
           if (minY == undefined || map[m].y < minY) minY = map[m].y;
-          if (maxY == undefined || map[m].y > maxY) maxY = map[m].y;
+          if (maxY == undefined || map[m].y + map[m].height > maxY) maxY = map[m].y + map[m].height;
           map[m].sprites = [];
           map[m].sprite = null;
         }
@@ -669,7 +676,7 @@
             (collision === undefined || sprite.attributes.collision === collision))
           for (m in map)
             if (map.hasOwnProperty(m) &&
-                sprite.overlaps.call(sprite, map[m].x, map[m].y)) {
+                sprite.overlaps.call(sprite, map[m])) {
               map[m].sprites.push(sprite);
               if (!map[m].sprite) map[m].sprite = sprite;
               count++;

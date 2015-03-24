@@ -148,17 +148,20 @@
     },
     ouch: Backbone.Spider.prototype.ouch,
     hit: function(sprite, dir, dir2) {
+      if (this._handlingSpriteHit) return this;
+      this._handlingSpriteHit = sprite;
+      
       var cur = this.getStateInfo(),
           opo = dir == "left" ? "right" : "left";
 
-      if (cur.mov2 == "hurt") return this;
-
-      if (dir2 == "attack") {
+      if (cur.mov2 == "hurt") {
+        // Do nothing
+      } else if (sprite.isAttacking(this)) {
         // Damage from an attack
         this.cancelUpdate = true;
         var attackDamage = sprite.get("attackDamage") || 1;
         this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
-      } else if (dir2 == "collision") {
+      } else {
         // Wiplash from a collision
         this.cancelUpdate = true;
         this.startNewAnimation(
@@ -168,6 +171,9 @@
         );
       }
 
+      sprite.trigger("hit", this, opo);
+
+      this._handlingSpriteHit = undefined;
       return this;
     },
     endHurt: function() {

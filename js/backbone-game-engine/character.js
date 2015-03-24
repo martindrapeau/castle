@@ -9,10 +9,10 @@
    *
    */
 
-  var sequenceDelay = 100,
-      walkVelocity = 40,
+  var sequenceDelay = 300,
+      walkVelocity = 50,
       fallAcceleration = 1200,
-      fallVelocity = 400;
+      fallVelocity = 600;
 
   var animations = {
     "idle-left": {
@@ -62,19 +62,19 @@
       scaleY: 1
     },
     "ko-left": {
-      sequences: [2, 3],
+      sequences: [0],
       delay: sequenceDelay,
-      velocity: -walkVelocity/2,
-      yVelocity: fallVelocity/2,
+      velocity: -walkVelocity,
+      yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
       scaleX: 1,
       scaleY: -1
     },
     "ko-right": {
-      sequences: [2, 3],
+      sequences: [0],
       delay: sequenceDelay,
-      velocity: walkVelocity/2,
-      yVelocity: fallVelocity/2,
+      velocity: walkVelocity,
+      yVelocity: fallVelocity,
       yAcceleration: fallAcceleration,
       scaleX: -1,
       scaleY: -1
@@ -107,7 +107,9 @@
       velocity: 0,
       yVelocity: 0,
       collision: true,
-      health: 2,
+      static: false,
+      visible: true,
+      health: 1,
       attackDamage: 1,
       floor: null,
       ceiling: null,
@@ -117,7 +119,6 @@
     initialize: function(attributes, options) {
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
-      this.turnArounds = 0;
 
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
@@ -151,15 +152,17 @@
       return this;
     },
     knockout: function(sprite, dir) {
-      var opo = dir == "left" ? "right" : "left";
+      var opo = dir == "left" ? "right" : "left",
+          state = this.buildState("ko", opo);
       this.whenAnimationEnds = null;
       this.set({
-        state: this.buildState("ko", opo),
-        velocity: this.animations["ko-"+opo].velocity,
-        yVelocity: -this.animations["ko-"+opo].yVelocity,
+        state: state,
+        velocity: this.animations[state].velocity,
+        yVelocity: -this.animations[state].yVelocity,
         sequenceIndex: 0,
         collision: false
       });
+      this.cancelUpdate = true;
       return this;
     },
     hurt: function(sprite, dir) {
@@ -173,6 +176,9 @@
       return this;
     },
     hit: function(sprite, dir, dir2) {
+      if (this._handlingSpriteHit) return this;
+      this._handlingSpriteHit = sprite;
+
       var cur = this.getStateInfo();
       
       if (cur.mov2 == "hurt") return this;
@@ -186,6 +192,7 @@
         this.set("state", this.buildState(cur.mov, cur.opo));
       }
 
+      this._handlingSpriteHit = undefined;
       return this;
     },
     startNewAnimation: function(state, attrs, done) {
@@ -225,18 +232,6 @@
       return sequenceIndex;
     },
     ai: function(dt) {
-      var cur = this.getStateInfo();
-
-      if (cur.mov == "walk" && this.turnArounds > 10) {
-        this.set({
-          state: this.buildState("idle", cur.dir),
-          velocity: 0
-        });
-        this.cancelUpdate = true;
-      }
-
-      this.turnArounds = 0;
-
       return this;
     },
     update: function(dt) {
@@ -295,8 +290,6 @@
           paddingTop = this.get("paddingTop"),
           charWidth = tileWidth - paddingLeft - paddingRight,
           charHeight = tileHeight - paddingTop - paddingBottom,
-          charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
-          charTopY = charBottomY - charHeight,
           charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
           bottomWorld = this.world.height() + tileHeight,
@@ -306,10 +299,17 @@
             bottomWorld
           ]);
 
-      this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
-      this.world.findCollisions(this.collisionMap, null, this, true);
+      var charBottomY, charTopY,
+          bottomPlatform, sprite, i, type;
+      function updateTopBottom() {
+        charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
+        charTopY = charBottomY - charHeight,
+        self.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
+        if (collision)
+          self.world.findCollisions(self.collisionMap, null, self, true);
+      }
+      updateTopBottom();
 
-      var bottomPlatform, sprite, i, type;
       for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
         sprite = this.collisionMap.bottom.sprites[i];
         type = sprite.get("type")
@@ -335,17 +335,18 @@
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = bottomY - tileHeight + paddingBottom;
           if (cur.mov == "fall")
-            attrs.state = this.buildState("walk", null, cur.dir);
+            attrs.state = this.buildState("walk", cur.mov2, cur.dir);
           else if (cur.mov == "ko") {
             attrs.velocity = velocity = 0;
           }
+          updateTopBottom();
 
           if (charBottomY == bottomY && bottomPlatform)
             relativeVelocity = bottomPlatform.get("velocity");
 
         } else if (cur.mov != "fall" && cur.mov != "ko" && charBottomY < bottomY) {
           // Start falling if no obstacle below
-          attrs.state = this.buildState("fall", null, cur.dir);
+          attrs.state = this.buildState("fall", cur.mov2, cur.dir);
 
           if (cur.mov == "walk" && velocity != 0) {
             this.trigger("beforeFall");
@@ -366,6 +367,7 @@
           charTopY = topY;
           charBottomY = topY + charHeight;
           attrs.y = y = charBottomY - tileHeight;
+          updateTopBottom();
         }
 
       }
@@ -402,14 +404,8 @@
               if (this.cancelUpdate) return true;
             }
             attrs.velocity = velocity = velocity * -1;
-            attrs.state = this.buildState(cur.mov, cur.opo);
+            attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
             attrs.x = x = leftX - paddingLeft;
-            if (this.collisionMap.right.sprite) {
-              attrs.state = this.buildState("idle", cur.dir);
-              attrs.velocity = velocity = 0;
-            } else {
-              this.turnArounds++;
-            }
           }
         }
 
@@ -437,14 +433,8 @@
               if (this.cancelUpdate) return true;
             }
             attrs.velocity = velocity = velocity * -1;
-            attrs.state = this.buildState(cur.mov, cur.opo);
+            attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
             attrs.x = x = rightX - charWidth - paddingLeft;
-            if (this.collisionMap.left.sprite) {
-              attrs.state = this.buildState("idle", cur.dir);
-              attrs.velocity = velocity = 0;
-            } else {
-              this.turnArounds++;
-            }
           }
         }
       }
@@ -460,7 +450,7 @@
     },
     toggleDirection: function(dirIntent) {
       var cur = this.getStateInfo();
-      this.set({state: this.buildState(cur.mov, null, dirIntent)});
+      this.set({state: this.buildState(cur.mov, cur.mov2, dirIntent)});
       return this;
     },
     getStateInfo: function(state) {
@@ -478,7 +468,8 @@
       stateInfo.opo = stateInfo.dir == "right" ? "left" : "right";
       return stateInfo;
     },
-    isAttacking: function() {
+    isAttacking: function(sprite) {
+      if (this.cancelUpdate) return false;
       var cur = this.getStateInfo();
       return cur.mov2 == "attack";
     },
@@ -491,21 +482,30 @@
     },
     buildCollisionMap: function(top, right, bottom, left) {
       this.collisionMap || (this.collisionMap = {
-        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
-        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null},
+        right: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
         left: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
-        right: {x: 0, y: 0, dir: "right", sprites: [], sprite: null}
+        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
+        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null}
       });
 
-      var width = right - left;
-      this.collisionMap.bottom.x = left + width/2;
-      this.collisionMap.bottom.y = bottom;
-      this.collisionMap.top.x = left + width/2;
-      this.collisionMap.top.y = top;
+      var width = right - left,
+          height = bottom - top;
       this.collisionMap.left.x = left;
-      this.collisionMap.left.y = top;
       this.collisionMap.right.x = right;
-      this.collisionMap.right.y = top;
+      this.collisionMap.left.y = this.collisionMap.right.y = top + height*0.20;
+      this.collisionMap.top.x = this.collisionMap.bottom.x = left + width*0.20;
+      this.collisionMap.top.y = top;
+      this.collisionMap.bottom.y = bottom;
+      this.collisionMap.left.height = this.collisionMap.right.height = height*0.60;
+      this.collisionMap.left.width = this.collisionMap.right.width = 0;
+      this.collisionMap.top.width = this.collisionMap.bottom.width = width*0.60;
+      this.collisionMap.top.height = this.collisionMap.bottom.height = 0;
+
+      for (var m in this.collisionMap)
+        if (this.collisionMap.hasOwnProperty(m)) {
+          this.collisionMap[m].sprites.length = 0;
+          this.collisionMap[m].sprite = null;
+        }
     }
   });
 

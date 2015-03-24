@@ -113,7 +113,7 @@
       attackDamage: 1
     }),
     animations: animations,
-    isAttacking: function() {
+    isAttacking: function(sprite) {
       return true;
     },
     ai: function(dt) {

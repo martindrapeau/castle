@@ -123,19 +123,18 @@
       paddingTop: 16
     }),
     hit: function(sprite, dir, dir2) {
-      if (!this.world) return this;
+      if (!this.world || this._handlingSpriteHit) return this;
+      this._handlingSpriteHit = sprite;
       
       if (dir == "top" && sprite.get("type") == "breakable-tile") {
         sprite.trigger("hit", this, "bottom");
-        return this;
-      }
-
-      var opo = dir == "left" ? "right" : "left";
-      if (sprite.get("hero")) {
+      } else if (sprite.get("hero")) {
+        var opo = dir == "left" ? "right" : "left";
         sprite.trigger("hit", this, opo);
-        return this.knockout(sprite, "left", dir2);
+        this.knockout(sprite, "left", dir2);
       }
 
+      this._handlingSpriteHit = undefined;
       return this;
     },
     knockout: function(sprite, dir, dir2) {
@@ -246,24 +245,27 @@
         this.artifacts.push(new Backbone[_.classify(this.attributes.artifact)]());
     },
     hit: function(sprite, dir, dir2) {
+      if (!this.world || this._handlingSpriteHit) return this;
+      this._handlingSpriteHit = sprite;
+
       if (dir == "bottom" && !sprite.get("hero")) {
         // Absorb the sprite
         this.set({state: "bounce", sequenceIndex: 0});
         this.artifacts.push(sprite);
         sprite.cancelUpdate = true;
         this.world.remove(sprite);
-        return this;
+      } else if (sprite.get("hero") && sprite.isAttacking(this)) {
+        // Take a hit
+        this.set({state: "bounce", sequenceIndex: 0});
+        this.world.setTimeout(this.endHit, 200);
+        this.explosion.set({
+          x: this.get("x"),
+          y: this.get("y")
+        });
+        this.world.add(this.explosion);
       }
 
-      if (!sprite || !sprite.get("hero") || dir2 != "attack") return;
-
-      this.set({state: "bounce", sequenceIndex: 0});
-      this.world.setTimeout(this.endHit, 200);
-      this.explosion.set({
-        x: this.get("x"),
-        y: this.get("y")
-      });
-      this.world.add(this.explosion);
+      this._handlingSpriteHit = undefined;
       return this;
     },
     endHit: function() {

@@ -112,7 +112,10 @@
     animations: animations,
     hit: function(sprite, dir, dir2) {
       if (dir == "top" && sprite.get("type") == "breakable-tile") {
+        if (this._handlingSpriteHit) return this;
+        this._handlingSpriteHit = sprite;
         sprite.trigger("hit", this, "bottom");
+        this._handlingSpriteHit = undefined;
         return this;
       }
       return Backbone.Character.prototype.hit.apply(this, arguments);

@@ -85,7 +85,7 @@
         throw "Missing or invalid world option.";
 
       this.changePageButton = new Backbone.Button({
-        x: 68, y: 646, width: 32, height: 50, borderRadius: 2,
+        width: 32, height: 50, borderRadius: 2,
         img: pageImg, imgX: 0, imgY: 0, imgWidth: 16, imgHeight: 32, imgMargin: 10
       });
       this.changePageButton.on("tap", this.changePage, this);
@@ -171,10 +171,11 @@
         }
       });
 
-      this.changePageButton.set({
-        x: sp.x + sp.width - this.changePageButton.get("width"),
-        y: sp.y + sp.height - this.changePageButton.get("height")
-      });
+      if (this.get("pages") > 1)
+        this.changePageButton.set({
+          x: sp.x + sp.width - this.changePageButton.get("width"),
+          y: sp.y + sp.height - this.changePageButton.get("height")
+        });
 
       return this;
     },
@@ -228,8 +229,9 @@
 
         context.restore();
       }
-
-      this.changePageButton.draw(context);
+      
+      if (this.get("pages") > 1)
+        this.changePageButton.draw(context);
     },
 
     getSelectedSprite: function() {
@@ -238,7 +240,7 @@
       return this.sprites.findWhere({name: selected});
     },
     onTap: function(e) {
-      if (e.target != this.engine.canvas) return;
+      if (e.target != this.engine.canvas || e.canvasHandled) return;
 
       var editor = this,
           sp = this.toJSON(),
