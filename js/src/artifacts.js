@@ -123,7 +123,7 @@
       paddingTop: 16
     }),
     hit: function(sprite, dir, dir2) {
-      if (!this.world || this._handlingSpriteHit) return this;
+      if (!this.world || this._handlingSpriteHit || this.get("state") == "ko") return this;
       this._handlingSpriteHit = sprite;
       
       if (dir == "top" && sprite.get("type") == "breakable-tile") {
@@ -244,7 +244,7 @@
         this.artifacts.push(new Backbone[_.classify(this.attributes.artifact)]());
     },
     hit: function(sprite, dir, dir2) {
-      if (!this.world || this._handlingSpriteHit || this.get("state") != "idle") return this;
+      if (!this.world || this._handlingSpriteHit || this.get("state") == "bounce") return this;
       this._handlingSpriteHit = sprite;
 
       if (dir == "bottom" && !sprite.get("hero")) {

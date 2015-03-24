@@ -369,10 +369,11 @@
       var attackPoint = this.getAttackPoint();
       if (!attackPoint) return true;
 
-      var sprite = this.world.findAt(attackPoint.x, attackPoint.y, undefined, this, undefined),
-          type = sprite ? sprite.get("type") : undefined;
+      this.attackSpriteTypes || (this.attackSpriteTypes = ["character", "breakable-tile", "artifact"]);
 
-      if (type == "character" || type == "breakable-tile" || type == "artifact") {
+      var sprite = this.world.findAt(attackPoint.x, attackPoint.y, this.attackSpriteTypes, this, undefined);
+
+      if (sprite) {
         var cur = this.getStateInfo();
         this.attackingSprite = sprite;
         sprite.trigger("hit", this, cur.opo);

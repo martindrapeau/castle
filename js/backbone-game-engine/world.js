@@ -611,6 +611,7 @@
     },
     _findOrFilter: function(fn, x, y, type, exclude, collision) {
       var id = exclude && exclude.id ? exclude.id : null,
+          types = !_.isEmpty(type) && typeof type == "object" && type.length != undefined ? " " + type.join(" ") : type || "",
           col = this.getWorldCol(x),
           row = this.getWorldRow(y),
           index, c, r, s,
@@ -618,7 +619,7 @@
 
       function test(sprite) {
         return (sprite && sprite.id && sprite.id != id) &&
-          (!type || sprite.get("type") == type) &&
+          (!type || types.indexOf(" "+sprite.get("type")) >= 0) &&
           (collision === undefined || sprite.attributes.collision === collision) &&
           sprite.overlaps.call(sprite, x, y);
       }
@@ -654,6 +655,7 @@
       if (_.size(map) == 0) return 0;
 
       var id = exclude && exclude.id ? exclude.id : null,
+          types = !_.isEmpty(type) && typeof type == "object" && type.length != undefined ? " " + type.join(" ") : type || "",
           minX, minY, maxX, maxY,
           m, c, r, index, s,
           count = 0;
@@ -672,7 +674,7 @@
 
       function doIt(sprite) {
         if (sprite && sprite.id && sprite.id != id &&
-            (!type || sprite.attributes.type == type) &&
+            (!type || types.indexOf(" "+sprite.get("type")) >= 0) &&
             (collision === undefined || sprite.attributes.collision === collision))
           for (m in map)
             if (map.hasOwnProperty(m) &&
