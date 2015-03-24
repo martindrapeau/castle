@@ -937,6 +937,9 @@
         link.onload = callback;
       }
       head.appendChild(link);
+    },
+    opo: function(dir) {
+      return dir == "left" ? "right" : (dir == "right" ? "left" : (dir == "top" ? "bottom" : (dir == "bottom" ? "top" : null)));
     }
   });
 

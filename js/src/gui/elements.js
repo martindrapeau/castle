@@ -26,7 +26,7 @@
       x: 0,
       y: 0,
       width: 960,
-      height: 700,
+      height: 720,
       backgroundColor: "#000",
       opacity: 0,
       text: "",

@@ -152,7 +152,7 @@
       return this;
     },
     knockout: function(sprite, dir) {
-      var opo = dir == "left" ? "right" : "left",
+      var opo = _.opo(dir),
           state = this.buildState("ko", opo);
       this.whenAnimationEnds = null;
       this.set({
@@ -176,21 +176,22 @@
       return this;
     },
     hit: function(sprite, dir, dir2) {
-      if (this._handlingSpriteHit) return this;
+      var cur = this.getStateInfo(),
+          opo = _.opo(dir);
+
+      if (this._handlingSpriteHit || cur.mov == "ko" || cur.mov2 == "hurt") return this;
       this._handlingSpriteHit = sprite;
 
-      var cur = this.getStateInfo();
-      
-      if (cur.mov2 == "hurt") return this;
-
-      if (dir2 == "attack") {
+      if (sprite.get("hero") && sprite.isAttacking(this)) {
         this.cancelUpdate = true;
-        var attackDamage = sprite.get("attackDamage") || 1;
+        var attackDamage = sprite.get("attackDamage") || 0;
         this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
       } else if (cur.dir == dir && cur.mov2 == null) {
         this.cancelUpdate = true;
         this.set("state", this.buildState(cur.mov, cur.opo));
       }
+
+      sprite.trigger("hit", this, opo);
 
       this._handlingSpriteHit = undefined;
       return this;
@@ -335,7 +336,7 @@
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = bottomY - tileHeight + paddingBottom;
           if (cur.mov == "fall")
-            attrs.state = this.buildState("walk", cur.mov2, cur.dir);
+            attrs.state = this.buildState("walk", cur.dir);
           else if (cur.mov == "ko") {
             attrs.velocity = velocity = 0;
           }

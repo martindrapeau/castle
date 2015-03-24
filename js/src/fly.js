@@ -148,18 +148,16 @@
     },
     ouch: Backbone.Spider.prototype.ouch,
     hit: function(sprite, dir, dir2) {
-      if (this._handlingSpriteHit) return this;
-      this._handlingSpriteHit = sprite;
-      
       var cur = this.getStateInfo(),
-          opo = dir == "left" ? "right" : "left";
+          opo = _.opo(dir);
 
-      if (cur.mov2 == "hurt") {
-        // Do nothing
-      } else if (sprite.isAttacking(this)) {
+      if (this._handlingSpriteHit || cur.mov == "ko" || cur.mov2 == "hurt") return this;
+      this._handlingSpriteHit = sprite;
+
+      if (sprite.get("hero") && sprite.isAttacking(this)) {
         // Damage from an attack
         this.cancelUpdate = true;
-        var attackDamage = sprite.get("attackDamage") || 1;
+        var attackDamage = sprite.get("attackDamage") || 0;
         this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
       } else {
         // Wiplash from a collision

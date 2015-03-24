@@ -129,8 +129,7 @@
       if (dir == "top" && sprite.get("type") == "breakable-tile") {
         sprite.trigger("hit", this, "bottom");
       } else if (sprite.get("hero")) {
-        var opo = dir == "left" ? "right" : "left";
-        sprite.trigger("hit", this, opo);
+        sprite.trigger("hit", this, _.opo(dir));
         this.knockout(sprite, "left", dir2);
       }
 
@@ -245,7 +244,7 @@
         this.artifacts.push(new Backbone[_.classify(this.attributes.artifact)]());
     },
     hit: function(sprite, dir, dir2) {
-      if (!this.world || this._handlingSpriteHit) return this;
+      if (!this.world || this._handlingSpriteHit || this.get("state") != "idle") return this;
       this._handlingSpriteHit = sprite;
 
       if (dir == "bottom" && !sprite.get("hero")) {
@@ -263,6 +262,7 @@
           y: this.get("y")
         });
         this.world.add(this.explosion);
+        sprite.trigger("hit", this, _.opo(dir));
       }
 
       this._handlingSpriteHit = undefined;

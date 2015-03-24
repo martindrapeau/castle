@@ -333,16 +333,24 @@
       if (!this.get("canAttack")) return this;
 
       if (pressed && cur.mov2 != "attack") {
-        var nextState = this.get("nextState");
-        if (nextState) {
-          var nex = this.getStateInfo(nextState);
-          nextState = this.buildState(nex.mov, "attack", nex.dir);
-        }
-        this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), {nextState: nextState}, this.endAttack);
-        this.cancelUpdate = true;
+        this.startAttack();
       } else if (!pressed && cur.mov2 == "attack") {
         this.endAttack();
       }
+
+      return this;
+    },
+    startAttack: function() {
+      var cur = this.getStateInfo(),
+          nextState = this.get("nextState");
+
+      if (nextState) {
+        var nex = this.getStateInfo(nextState);
+        nextState = this.buildState(nex.mov, "attack", nex.dir);
+      }
+
+      this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), {nextState: nextState}, this.endAttack);
+      this.cancelUpdate = true;
 
       return this;
     },
@@ -351,9 +359,11 @@
           attrs = {state: this.buildState(cur.mov, cur.dir)},
           nextState = this.get("nextState"),
           nex = nextState ? this.getStateInfo(nextState) : null;
+
       if (nextState) attrs.nextState = this.buildState(nex.mov, nex.dir);
       this.whenAnimationEnds = null;
       this.set(attrs);
+
       return this;
     },
     knockout: function(sprite, dir) {

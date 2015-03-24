@@ -218,6 +218,7 @@
       health: 8,
       healthMax: 8,
       attackDamage: 1,
+      maxAttackDamage: 1,
       ignoreInput: false,
       canAttack: true,
       canTurnInJump: true,
@@ -262,11 +263,16 @@
       this._handlingSpriteHit = sprite;
 
       var cur = this.getStateInfo(),
-          type = sprite.get("type");
+          type = sprite.get("type"),
+          attackDamage = this.get("attackDamage");
 
-      if (type == "barrier" || type == "breakable-tile") return this;
+      if (type == "barrier") return this;
 
-      if (type == "artifact") {
+      if (type == "breakable-tile") {
+        if (this.isAttacking(sprite)) {
+          this.set("attackDamage", Math.min(attackDamage-1, 0));
+        }
+      } if (type == "artifact") {
         switch (sprite.get("name")) {
           case "a-coin":
             this.cancelUpdate = true;
@@ -308,8 +314,9 @@
             break;
         }
       } else if (type == "character" && cur.mov2 != "hurt") {
-        if (this.isAttacking(sprite) && cur.dir == dir) {
+        if (this.isAttacking(sprite)) {
           // Hero is attacking
+          this.set("attackDamage", Math.min(attackDamage-1, 0));
         } else if (sprite.isAttacking(this)) {
           this.cancelUpdate = true;
           var attackDamage = sprite.get("attackDamage") || 1;
@@ -321,36 +328,52 @@
       this._handlingSpriteHit = undefined;
       return this;
     },
+    startAttack: function() {
+      this.attackingSprite = undefined;
+      this.set("attackDamage", this.get("maxAttackDamage"));
+      return Backbone.Hero.prototype.startAttack.apply(this, arguments);
+    },
     endAttack: function() {
       this.attackingSprite = undefined;
+      this.set("attackDamage", this.get("maxAttackDamage"));
       return Backbone.Hero.prototype.endAttack.apply(this, arguments);
     },
-    isAttacking: function(sprite) {
-      return this.attributes.state.indexOf("-attack") > 0 &&
-        this.attackingSprite == sprite;
-    },
-    onUpdate: function(dt) {
-      var cur = this.getStateInfo();
-      if (cur.mov2 != "attack") return true;
+    getAttackPoint: function() {
+      if (this.attributes.state.indexOf("-attack") == -1) return null;
 
-      this.attackingSprite = undefined;
       this.attackCollisionPoints || (this.attackCollisionPoints = [
-        {x: 32, y: 0},
-        {x: 64, y: 0},
-        {x: 96, y: 0},
-        {x: 114, y: 32},
-        {x: 114, y: 64},
-        {x: 114, y: 96}
+        {x: 40, y: 0},
+        {x: 70, y: 0},
+        {x: 110, y: 10},
+        {x: 114, y: 60},
+        {x: 120, y: 90},
+        {x: 114, y: 120}
       ]);
 
       var sequenceIndex =  this.get("sequenceIndex"),
           point = this.attackCollisionPoints[sequenceIndex],
-          x = this.get("x") + (cur.dir == "left" ? this.get("width") - point.x : point.x),
-          y = this.get("y") + point.y,
-          sprite = this.world.findAt(x, y, undefined, this, undefined),
+          x = this.get("x") + (this.attributes.state.indexOf("-left") >= 0 ? this.get("width") - point.x : point.x),
+          y = this.get("y") + point.y;
+
+      return {x: x, y: y};
+    },
+    isAttacking: function(sprite) {
+      if (this.attackingSprite != sprite || !this.get("attackDamage")) return false;
+
+      var attackPoint = this.getAttackPoint();
+      if (!attackPoint) return false;
+
+      return sprite.overlaps(attackPoint);
+    },
+    onUpdate: function(dt) {
+      var attackPoint = this.getAttackPoint();
+      if (!attackPoint) return true;
+
+      var sprite = this.world.findAt(attackPoint.x, attackPoint.y, undefined, this, undefined),
           type = sprite ? sprite.get("type") : undefined;
-      console.log(sequenceIndex, x, y, sprite);
+
       if (type == "character" || type == "breakable-tile" || type == "artifact") {
+        var cur = this.getStateInfo();
         this.attackingSprite = sprite;
         sprite.trigger("hit", this, cur.opo);
       }
