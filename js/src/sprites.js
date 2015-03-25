@@ -130,20 +130,21 @@
           charLeftX = x + paddingLeft,
           charRightX = charLeftX + charWidth,
           bottomWorld = this.world.height() + tileHeight,
-          relativeVelocity = 0,
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld
           ]);
+      attrs.relativeVelocity = attrs.relativeYVelocity = 0,
 
       this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
       this.world.findCollisions(this.collisionMap, null, this, true);
 
-      var bottomPlatform, sprite, i;
+      var sprite, i;
       for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
         sprite = this.collisionMap.bottom.sprites[i];
         bottomY = Math.min(bottomY, sprite.getTop(true));
-        if (sprite.get("type") == "platform") bottomPlatform = sprite;
+        attrs.relativeVelocity = sprite.get("relativeVelocity") || attrs.relativeVelocity;
+        attrs.relativeYVelocity = sprite.get("relativeYVelocity") || attrs.relativeYVelocity;
       }
 
       if (yVelocity >= 0) {
@@ -157,9 +158,6 @@
           for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
             this.collisionMap.bottom.sprites[i].trigger("hit", this, "top");
           if (this.cancelUpdate) return this;
-
-          if (charBottomY == bottomY && bottomPlatform)
-            relativeVelocity = bottomPlatform.get("velocity");
           
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
@@ -172,8 +170,8 @@
 
       }
 
-      if (relativeVelocity) attrs.x = x = x + Math.round(relativeVelocity * (dt/1000));
-      if (yVelocity) attrs.y = y = y + Math.round(yVelocity * (dt/1000));
+      if (attrs.relativeVelocity) attrs.x = x = x + Math.round(attrs.relativeVelocity * (dt/1000));
+      if (yVelocity || attrs.relativeYVelocity) attrs.y = y = y + Math.round((yVelocity + attrs.relativeYVelocity) * (dt/1000));
 
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);

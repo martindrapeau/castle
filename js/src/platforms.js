@@ -69,10 +69,11 @@
 
       attrs.sequenceIndex = this.updateSequenceIndex();
 
-      if  (cur.mov == "idle") return true;
-
       if (this.world.get("state") != "play") {
         attrs.velocity = velocity = 0;
+      } else if (cur.mov == "idle") {
+        if (velocity)
+          attrs.velocity = velocity = 0;
       } else {
 
         var collision = this.get("collision"),
@@ -130,6 +131,7 @@
         }
       }
 
+      if (attrs.relativeVelocity != velocity) attrs.relativeVelocity = velocity;
       if (velocity) attrs.x = x = x + Math.round(velocity * (dt/1000));
 
       // Set modified attributes

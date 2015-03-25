@@ -598,11 +598,10 @@
           heroWidth = tileWidth - paddingLeft - paddingRight,
           heroHeight = tileHeight - paddingTop - paddingBottom,
           heroLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
-          heroRightX = heroLeftX + heroWidth,
-          relativeVelocity = 0;
+          heroRightX = heroLeftX + heroWidth;
+      attrs.relativeVelocity = attrs.relativeYVelocity = 0;
 
-      var heroBottomY, heroTopY,
-          bottomPlatform, sprite, i;
+      var heroBottomY, heroTopY, sprite, i;
       function updateTopBottom() {
         heroBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom;
         heroTopY = heroBottomY - heroHeight;
@@ -621,7 +620,8 @@
         for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {
           sprite = this.collisionMap.bottom.sprites[i];
           bottomY = Math.min(bottomY, sprite.getTop(true));
-          if (sprite.get("type") == "platform") bottomPlatform = sprite;
+          attrs.relativeVelocity = sprite.get("relativeVelocity") || attrs.relativeVelocity;
+          attrs.relativeYVelocity = sprite.get("relativeYVelocity") || attrs.relativeYVelocity;
         }
 
         if (cur.mov == "jump" && cur.mov2 == null) attrs.sequenceIndex = 1;
@@ -662,9 +662,6 @@
           // Start falling if no obstacle below
           attrs.nextState = state;
           attrs.state = this.buildState("jump", cur.mov2, cur.dir);
-        } else if (yVelocity == 0 && heroBottomY == bottomY) {
-          if (bottomPlatform)
-            relativeVelocity = bottomPlatform.get("velocity");
         }
 
       } else {
@@ -724,8 +721,8 @@
         }
       }
 
-      if (velocity || relativeVelocity) attrs.x = x = x + Math.round((velocity + relativeVelocity) * (dt/1000));
-      if (yVelocity) attrs.y = y = y + Math.round(yVelocity * (dt/1000));
+      if (velocity || attrs.relativeVelocity) attrs.x = x = x + Math.round((velocity + attrs.relativeVelocity) * (dt/1000));
+      if (yVelocity || attrs.relativeYVelocity) attrs.y = y = y + Math.round((yVelocity+ attrs.relativeYVelocity) * (dt/1000));
 
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);

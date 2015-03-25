@@ -106,6 +106,8 @@
       state: "walk-left",
       velocity: 0,
       yVelocity: 0,
+      relativeVelocity: 0,
+      relativeYVelocity: 0,
       collision: true,
       static: false,
       visible: true,
@@ -300,14 +302,13 @@
           charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
           bottomWorld = this.world.height() + tileHeight,
-          relativeVelocity = 0,
           bottomY = _.minNotNull([
             this.get("floor"),
             bottomWorld
           ]);
+      attrs.relativeVelocity = attrs.relativeYVelocity = 0;
 
-      var charBottomY, charTopY,
-          bottomPlatform, sprite, i, type;
+      var charBottomY, charTopY, sprite, i, type;
       function updateTopBottom() {
         charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
         charTopY = charBottomY - charHeight,
@@ -322,7 +323,8 @@
         type = sprite.get("type")
         if (type == "tile" || type == "platform")
           bottomY = Math.min(bottomY, sprite.getTop(true));
-        if (type == "platform") bottomPlatform = sprite;
+        attrs.relativeVelocity = sprite.get("relativeVelocity") || attrs.relativeVelocity;
+        attrs.relativeYVelocity = sprite.get("relativeYVelocity") || attrs.relativeYVelocity;
       }
 
       if (yVelocity >= 0) {
@@ -349,9 +351,6 @@
             attrs.velocity = velocity = 0;
           }
           updateTopBottom();
-
-          if (charBottomY == bottomY && bottomPlatform)
-            relativeVelocity = bottomPlatform.get("velocity");
 
         } else if (cur.mov != "fall" && cur.mov != "ko" && charBottomY < bottomY) {
           // Start falling if no obstacle below
@@ -448,8 +447,8 @@
         }
       }
 
-      if (velocity || relativeVelocity) attrs.x = x = x + Math.round((velocity + relativeVelocity) * (dt/1000));
-      if (yVelocity) attrs.y = y = y + Math.round(yVelocity * (dt/1000));
+      if (velocity || attrs.relativeVelocity) attrs.x = x = x + Math.round((velocity + attrs.relativeVelocity) * (dt/1000));
+      if (yVelocity || attrs.relativeYVelocity) attrs.y = y = y + Math.round((yVelocity + attrs.relativeYVelocity) * (dt/1000));
 
       // Set modified attributes
       if (!_.isEmpty(attrs)) this.set(attrs);
