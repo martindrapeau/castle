@@ -1,4 +1,17 @@
+if (navigator.isCocoonJS) {
+  var head = document.getElementsByTagName("head")[0];
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src = "js/3rd/cocoon.min.js";
+  script.onreadystatechange = function() {
+    console.log("cocoon.js loaded");
+    Cocoon.Utils.setAntialias(false);
+    Cocoon.Utils.setNPOTEnabled(true);
+  }
+  head.appendChild(script);
+}
 $(window).on("load", function() {
+  console.log("window on load");
 
   var NATIVE = navigator.isCocoonJS,
       ENV = NATIVE /*|| window.location.hostname == "ludo.mariocraft.club"*/ ? "prod" : "dev",
