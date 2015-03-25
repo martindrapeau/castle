@@ -378,7 +378,8 @@
         yVelocity: -this.animations[state].yVelocity,
         nextState: this.buildState("dead", null, opo),
         dead: true,
-        collision: false
+        collision: false,
+        ignorePhysics: true
       });
       this.cancelUpdate = true;
       return this;
@@ -493,7 +494,12 @@
           nextAnimation = nextState ? (this.getAnimation(nextState) || {}) : null,
           attrs = {};
 
-      attrs.sequenceIndex = this.updateSequenceIndex();
+      if ((cur.mov == "ko" || cur.mov == "dead" || cur.mov2 == "hurt") &&
+          this.get("sequenceIndex") == animation.sequences.length-1) {
+        // No sequence change - stay on last one
+      } else {
+        attrs.sequenceIndex = this.updateSequenceIndex();
+      }
 
       switch (cur.mov + "-" + cur.dir) {
         case "walk-right":
@@ -582,6 +588,7 @@
 
       // Collision detection
       var collision = this.get("collision"),
+          ignorePhysics = this.get("ignorePhysics"),
           tileWidth = this.get("width"),
           tileHeight = this.get("height"),
           paddingLeft = this.get("paddingLeft"),
@@ -600,7 +607,7 @@
         heroBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom;
         heroTopY = heroBottomY - heroHeight;
         hero.buildCollisionMap(heroTopY, heroRightX, heroBottomY, heroLeftX);
-        if (collision)
+        if (!ignorePhysics)
           hero.world.findCollisions(hero.collisionMap, null, hero, true);
       }
       updateTopBottom();
@@ -646,9 +653,11 @@
         if (yVelocity > 0 && heroBottomY >= bottomY) {
           // Stop falling
           land(bottomY);
-          for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
-            this.collisionMap.bottom.sprites[i].trigger("hit", this, "top", cur.dir);
-          if (this.cancelUpdate) return true;
+          if (collision) {
+            for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
+              this.collisionMap.bottom.sprites[i].trigger("hit", this, "top", cur.dir);
+            if (this.cancelUpdate) return true;
+          }
         } else if (cur.mov != "jump" && yVelocity == 0 && heroBottomY < bottomY) {
           // Start falling if no obstacle below
           attrs.nextState = state;
@@ -671,9 +680,11 @@
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = topY - paddingTop;
           updateTopBottom();
-          for (i = 0; i < this.collisionMap.top.sprites.length; i++)
-            this.collisionMap.top.sprites[i].trigger("hit", this, "bottom", cur.dir);
-          if (this.cancelUpdate) return true;
+          if (collision) {
+            for (i = 0; i < this.collisionMap.top.sprites.length; i++)
+              this.collisionMap.top.sprites[i].trigger("hit", this, "bottom", cur.dir);
+            if (this.cancelUpdate) return true;
+          }
         }
       }
 
@@ -687,9 +698,11 @@
         if (heroLeftX <= leftX) {
           attrs.velocity = velocity = 0;
           attrs.x = x = leftX - paddingLeft;
-          for (i = 0; i < this.collisionMap.left.sprites.length; i++)
-            this.collisionMap.left.sprites[i].trigger("hit", this, "right", cur.mov2);
-          if (this.cancelUpdate) return true;
+          if (collision) {
+            for (i = 0; i < this.collisionMap.left.sprites.length; i++)
+              this.collisionMap.left.sprites[i].trigger("hit", this, "right", cur.mov2);
+            if (this.cancelUpdate) return true;
+          }
         }
       }
 
@@ -703,9 +716,11 @@
         if (heroRightX >= rightX) {
           attrs.velocity = velocity = 0;
           attrs.x = x = rightX - heroWidth - paddingLeft;
-          for (i = 0; i < this.collisionMap.right.sprites.length; i++)
-            this.collisionMap.right.sprites[i].trigger("hit", this, "left", cur.mov2);
-          if (this.cancelUpdate) return true;
+          if (collision) {
+            for (i = 0; i < this.collisionMap.right.sprites.length; i++)
+              this.collisionMap.right.sprites[i].trigger("hit", this, "left", cur.mov2);
+            if (this.cancelUpdate) return true;
+          }
         }
       }
 

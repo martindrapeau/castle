@@ -127,7 +127,12 @@
     animations: animations,
     knockout: function(sprite, dir) {
       this.ouch(dir);
-      return Backbone.Character.prototype.knockout.apply(this, arguments);
+      Backbone.Character.prototype.knockout.apply(this, arguments);
+      this.set({
+        collision: false,
+        ignorePhysics: false
+      });
+      return this;
     },
     hurt: function(sprite, dir) {
       this.ouch(dir);

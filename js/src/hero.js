@@ -231,7 +231,7 @@
     isInsideHouse: function() {
       return !!this.get("houseId");
     },
-    knockout: function(sprite, dir) {
+    /*knockout: function(sprite, dir) {
       dir || (dir = cur.dir);
       var cur = this.getStateInfo(),
           opo = dir == "left" ? "right" : "left",
@@ -243,9 +243,15 @@
         yVelocity: -this.animations[state].yVelocity/2,
         nextState: this.buildState("dead", null, opo),
         dead: true,
-        collision: true
+        collision: false,
+        ignorePhysics: false
       });
       this.cancelUpdate = true;
+      return this;
+    },*/
+    knockout: function(sprite, dir) {
+      Backbone.Hero.prototype.knockout.apply(this, arguments);
+      this.set("ignorePhysics", false);
       return this;
     },
     hurt: function(sprite, dir) {

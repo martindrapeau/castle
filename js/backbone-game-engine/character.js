@@ -111,6 +111,8 @@
       visible: true,
       health: 1,
       attackDamage: 1,
+      dead: false,
+      ignorePhysics: false,
       floor: null,
       ceiling: null,
       aiDelay: 1000
@@ -160,7 +162,9 @@
         velocity: this.animations[state].velocity,
         yVelocity: -this.animations[state].yVelocity,
         sequenceIndex: 0,
-        collision: false
+        dead: true,
+        collision: false,
+        ignorePhysics: true
       });
       this.cancelUpdate = true;
       return this;
@@ -284,6 +288,7 @@
 
       // Collision detection
       var collision = this.get("collision"),
+          ignorePhysics = this.get("ignorePhysics"),
           tileWidth = this.get("width"),
           tileHeight = this.get("height"),
           paddingLeft = this.get("paddingLeft"),
@@ -307,7 +312,7 @@
         charBottomY = Math.round(y + yVelocity * (dt/1000)) + tileHeight - paddingBottom,
         charTopY = charBottomY - charHeight,
         self.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
-        if (collision)
+        if (!ignorePhysics)
           self.world.findCollisions(self.collisionMap, null, self, true);
       }
       updateTopBottom();
@@ -328,10 +333,12 @@
             return false;
           }
 
-          for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
-            if (cur.mov != "ko")
-              this.collisionMap.bottom.sprites[i].trigger("hit", this, "top");
-          if (this.cancelUpdate) return this;
+          if (collision) {
+            for (i = 0; i < this.collisionMap.bottom.sprites.length; i++)
+              if (cur.mov != "ko")
+                this.collisionMap.bottom.sprites[i].trigger("hit", this, "top");
+            if (this.cancelUpdate) return this;
+          }
 
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
@@ -382,7 +389,7 @@
       } else {
         
         // Walls and other obstacles
-        if (velocity <= 0 && collision) {
+        if (velocity <= 0 && !ignorePhysics) {
           // Turn around if obstacle left
           var worldLeft = -tileWidth,
               leftX = worldLeft,
@@ -401,7 +408,7 @@
               this.world.remove(this);
               return false;
             }
-            if (leftCharacter && cur.mov2 != "hurt") {
+            if (collision && leftCharacter && cur.mov2 != "hurt") {
               leftCharacter.trigger("hit", this, "right", cur.mov2);
               if (this.cancelUpdate) return true;
             }
@@ -411,7 +418,7 @@
           }
         }
 
-        if (velocity >= 0 && collision) {
+        if (velocity >= 0 && !ignorePhysics) {
           // Turn around if obstacle to the right
           var worldRight = this.world.width(),
               rightX = worldRight,
@@ -430,7 +437,7 @@
               this.world.remove(this);
               return false;
             }
-            if (rightCharacter && cur.mov2 != "hurt") {
+            if (collision && rightCharacter && cur.mov2 != "hurt") {
               rightCharacter.trigger("hit", this, "left", cur.mov2);
               if (this.cancelUpdate) return true;
             }
