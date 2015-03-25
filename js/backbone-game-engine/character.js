@@ -389,7 +389,7 @@
       } else {
         
         // Walls and other obstacles
-        if (velocity <= 0 && !ignorePhysics) {
+        if (velocity <= 0) {
           // Turn around if obstacle left
           var worldLeft = -tileWidth,
               leftX = worldLeft,
@@ -418,7 +418,7 @@
           }
         }
 
-        if (velocity >= 0 && !ignorePhysics) {
+        if (velocity >= 0) {
           // Turn around if obstacle to the right
           var worldRight = this.world.width(),
               rightX = worldRight,

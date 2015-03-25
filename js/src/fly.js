@@ -125,15 +125,6 @@
       dY: 0
     }),
     animations: animations,
-    knockout: function(sprite, dir) {
-      this.ouch(dir);
-      Backbone.Character.prototype.knockout.apply(this, arguments);
-      this.set({
-        collision: false,
-        ignorePhysics: false
-      });
-      return this;
-    },
     hurt: function(sprite, dir) {
       this.ouch(dir);
       var fly = this,
@@ -151,6 +142,7 @@
       );
       return this;
     },
+    knockout: Backbone.Spider.prototype.knockout,
     ouch: Backbone.Spider.prototype.ouch,
     hit: function(sprite, dir, dir2) {
       var cur = this.getStateInfo(),
