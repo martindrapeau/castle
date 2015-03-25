@@ -1,3 +1,5 @@
+/*
+// Load CocoonJS API and turn off anti-aliasing and image power of two
 if (navigator.isCocoonJS) {
   var head = document.getElementsByTagName("head")[0];
   var script = document.createElement("script");
@@ -9,6 +11,7 @@ if (navigator.isCocoonJS) {
   script.src = "js/src/cocoon-setup.js";
   head.appendChild(script);
 }
+*/
 $(window).on("load", function() {
   console.log("window on load");
 
