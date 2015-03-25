@@ -3,11 +3,6 @@ if (navigator.isCocoonJS) {
   var script = document.createElement("script");
   script.type = "text/javascript";
   script.src = "js/3rd/cocoon.min.js";
-  script.onreadystatechange = function() {
-    console.log("cocoon.js loaded");
-    Cocoon.Utils.setAntialias(false);
-    Cocoon.Utils.setNPOTEnabled(true);
-  }
   head.appendChild(script);
 }
 $(window).on("load", function() {
@@ -18,6 +13,11 @@ $(window).on("load", function() {
       MOBILE = "onorientationchange" in window ||
         window.navigator.msMaxTouchPoints ||
         window.navigator.isCocoonJS;
+
+  if (navigator.isCocoonJS) {
+    Cocoon.Utils.setAntialias(false);
+    Cocoon.Utils.setNPOTEnabled(true);
+  }
   
   var canvas = document.getElementById("foreground"),
       context = canvas.getContext("2d"),
