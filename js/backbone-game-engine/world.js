@@ -320,7 +320,7 @@
           newSprite.trigger("attach");
         }
 
-        if (newSprite.get("hero"))
+        if (newSprite.get("hero") && world.camera)
           world.camera.setOptions({world: world, subject: newSprite});
       });
 
@@ -873,7 +873,7 @@
       return this;
     },
     pan: function(targetX, targetY, callback, easing, easingTime) {
-      if (this.get("state") == "play") throw "Cannot pan world in play.";
+      //if (this.get("state") == "play") throw "Cannot pan world in play.";
       this._pan || (this._pan = {});
       this._pan.startTime = _.now();
       this._pan.startX = this.get("x");

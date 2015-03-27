@@ -87,15 +87,24 @@
   });
 
   Backbone.LevelScreenGui = Backbone.Scene.extend({
-    defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
-      img: "#level-screen",
-      imgWidth: 960,
-      imgHeight: 700
-    }),
     initialize: function(attributes, options) {
       Backbone.Scene.prototype.initialize.apply(this, arguments);
-
       _.bindAll(this, "_calculateState");
+
+      this.backgroundTown = new Backbone.Element({
+        x: 0,
+        y: 0,
+        img: "#background-town",
+        imgWidth: 960,
+        imgHeight: 300
+      });
+      this.backgroundForest = new Backbone.Element({
+        x: 0,
+        y: 300,
+        img: "#background-forest",
+        imgWidth: 960,
+        imgHeight: 420
+      });
 
       this.backButton = new Backbone.Button({
         x: 20, y: Backbone.HEIGHT - 100,
@@ -133,7 +142,7 @@
       this.stopListening(this.engine);
       this.set("opacity", 0);
 
-      this.engine.add(this.backButton);
+      this.engine.add([this.backgroundTown, this.backgroundForest, this.backButton]);
       this.engine.add(this.views.models);
       this.updateLevelStates();
 
@@ -141,7 +150,7 @@
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove(this.backButton);
+      this.engine.remove([this.backgroundTown, this.backgroundForest, this.backButton]);
       this.engine.remove(this.views.models);
     },
     _calculateState: function(level) {
