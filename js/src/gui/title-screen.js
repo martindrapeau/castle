@@ -194,11 +194,12 @@
 
       this.play.set("text", this.saved.size() > 0 ? "Continue " : "New Game ");
 
-      this.camera = this.world.camera;
+      var camera = this.world.camera;
       this.world.camera = undefined;
       this.world.set(WORLD);
       if (this.ready) this.world.set("y", this.engine.canvas.height - this.world.height());
       this.world.spawnSprites();
+      this.world.camera = camera;
 
       this.engine.add([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame]);
 
@@ -209,8 +210,6 @@
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.world.camera = this.camera;
-      this.camera = undefined;
       this.engine.remove([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame]);
     },
     onTouchStart: function(e) {
