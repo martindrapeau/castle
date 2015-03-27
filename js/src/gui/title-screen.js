@@ -151,24 +151,24 @@
       });
 
       this.play = new Backbone.PullOutButton({
-        y: Backbone.HEIGHT - 300,
+        y: 100,
         text: "New Game "
       });
       this.play.on("tap", _.partial(this.action, "play"), this);
 
       this.levelButton = new Backbone.PullOutButton({
-        y: Backbone.HEIGHT - 200,
+        y: 220,
         text: "Levels "
       });
       this.levelButton.on("tap", _.partial(this.action, "showLevelScreen"), this);
 
       this.showCredits = new Backbone.PullOutButton({
-        y: Backbone.HEIGHT - 100,
+        y: 340,
         text: "Credits "
       });
 
       this.savedGame = new Backbone.SavedGame({
-        y: Backbone.HEIGHT - 300
+        y: 100
       }, {
         saved: this.saved
       });
@@ -214,7 +214,7 @@
     },
     onTouchStart: function(e) {
       // Animate some stuff
-      this.banner.moveTo(this.banner.get("x"), 50);
+      this.banner.moveTo(this.banner.get("x"), -this.banner.get("height"));
       this.touchStart.moveTo(this.touchStart.get("x"), Backbone.HEIGHT);
       this.stopListening(this.engine);
       this.ready = true;
