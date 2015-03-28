@@ -26,7 +26,19 @@
       state: "callout",
       width: 126,
       height: 116,
-      text: "Short text"
+      text: "Short text",
+      textPadding: 0,
+      textLineHeight: 30,
+      textContextAttributes: {
+        fillStyle: "#E3BC70",
+        font: "24px arcade",
+        textBaseline: "middle",
+        fontWeight: "normal",
+        textAlign: "center"
+      },
+      opacity: 1,
+      scale: 1,
+      zIndex: 1
     }),
     animations: {
       callout: {
@@ -49,7 +61,19 @@
           {frame: 0, x: 0, y: -10},
           {frame: 0, x: 0, y: -8},
           {frame: 0, x: 0, y: -4},
-          {frame: 0, x: 0, y: 0}
+          {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: -4},
+          {frame: 0, x: 0, y: -8},
+          {frame: 0, x: 0, y: -10},
+          {frame: 0, x: 0, y: -8},
+          {frame: 0, x: 0, y: -4},
+          {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: 4},
+          {frame: 0, x: 0, y: 8},
+          {frame: 0, x: 0, y: 10},
+          {frame: 0, x: 0, y: 8},
+          {frame: 0, x: 0, y: 4},
+          {frame: 0, x: 0, y: 0},
         ],
         delay: 100
       }
@@ -57,18 +81,14 @@
     draw: function(context) {
       Backbone.Ephemeral.prototype.draw.apply(this, arguments);
 
-      var animation = this.getAnimation(),
-          sequence = animation.sequences[this.get("sequenceIndex")],
-          x = this.world.get("x") + this.get("x") + this.get("width")/2 + sequence.x,
-          y = this.world.get("y") + this.get("y") + this.get("height")/4 + sequence.y,
-          text = this.get("text");
+      var b = this.toJSON(),
+          animation = this.getAnimation(),
+          sequence = animation.sequences[this.get("sequenceIndex")];
+      b.x = this.world.get("x") + b.x + sequence.x;
+      b.y = this.world.get("y") + b.y + sequence.y - b.height*0.15;
+      Backbone.Element.prototype.drawText(b, context);
 
-      context.fillStyle = "#E3BC70";
-      context.font = "24px arcade";
-      context.textBaseline = "top";
-      context.fontWeight = "normal";
-      context.textAlign = "center";
-      context.fillText(text, x, y);
+      return this;
     }
   });
 

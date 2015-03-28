@@ -49,6 +49,11 @@ $(window).on("load", function() {
         //debugPanel: this.debugPanel
       });
 
+      this.tutorial = new Backbone.Tutorial(null, {
+        world: this.world,
+        input: this.input
+      });
+
       this.display = new Backbone.Display({
         x: 100,
         y: 0
@@ -75,6 +80,7 @@ $(window).on("load", function() {
       });
       this.engine.add(_.compact([
         this.world,
+        this.tutorial,
         this.display,
         this.camera,
         this.toggleButton,

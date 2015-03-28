@@ -117,6 +117,11 @@ $(window).on("load", function() {
         camera: this.camera
       });
 
+      this.tutorial = new Backbone.Tutorial(null, {
+        world: this.world,
+        input: this.input
+      });
+
       this.display = new Backbone.Display({
         id: "display",
         x: 100,
@@ -247,6 +252,7 @@ $(window).on("load", function() {
 
       this.engine.add(_.compact([
         this.world,
+        this.world.get("level") == 1 ? this.tutorial : null,
         this.display,
         this.camera,
         this.pauseButton,

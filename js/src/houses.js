@@ -44,6 +44,7 @@
     defaults: _.extend({}, Backbone.Tile.prototype.defaults, {
       spriteSheet: "houses",
       door: "house-door",
+      type: "house",
       width: 432,
       height: 384,
       collision: false,
@@ -354,12 +355,11 @@
     if (this.get("state") == "idle") {
       var key = character.get("key");
       if (!key) {
-        var callout = new Backbone.Callout({
+        this.world.add(new Backbone.Callout({
           x: this.door.get("x"),
           y: this.door.get("y") - Backbone.Callout.prototype.defaults.height,
           text: "Key ?" 
-        });
-        this.world.add(callout);
+        }));
       } else {
         character.set({key: false});
         this.open(character);

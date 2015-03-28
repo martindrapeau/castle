@@ -335,8 +335,8 @@
     save: function() {
       var sprites = this.sprites.reduce(function(sprites, sprite) {
         var s = sprite.toSave.apply(sprite);
-        if (s) sprites.push(s);
-        return s;
+        if (!_.isEmpty(s)) sprites.push(s);
+        return sprites;
       }, []);
 
       // Save a screenshot of 30x15 tiles, skipping the two top first rows
