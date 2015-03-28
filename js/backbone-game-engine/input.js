@@ -125,6 +125,14 @@
       context.arc(x+80, y+80, 55, 0, 2*Math.PI, false);
       context.fillStyle = pressed ? "#0000FF" : "#000099";
       context.fill();
+
+      context.fillStyle = "#000066";
+      context.font = "bold 60px sans-serif";
+      context.textBaseline = "middle";
+      context.fontWeight = "normal";
+      context.textAlign = "center";
+      context.fillText("X", x+80, y+80);
+
       context.restore();
       return this;
     }
@@ -147,6 +155,14 @@
       context.arc(x+80, y+80, 55, 0, 2*Math.PI, false);
       context.fillStyle = pressed ? "#FF0000" : "#990000";
       context.fill();
+
+      context.fillStyle = "#660000";
+      context.font = "bold 60px sans-serif";
+      context.textBaseline = "middle";
+      context.fontWeight = "normal";
+      context.textAlign = "center";
+      context.fillText("Z", x+80, y+80);
+
       context.restore();
       return this;
     }

@@ -48,7 +48,7 @@
           this.world.add(new Backbone.Callout({
             x: house.door.get("x"),
             y: house.door.get("y") - Backbone.Callout.prototype.defaults.height,
-            text: (this.touch ? "tap" : "Up key") + "\nto open" 
+            text: (this.touch ? "Tap" : "Up key") + "\nto open" 
           }));
           _.each(this.houses, this.stopListening);
           this.houses.length = 0;          
@@ -59,7 +59,7 @@
         this.world.add(new Backbone.Callout({
           x: this.hay.get("x"),
           y: this.hay.get("y") - Backbone.Callout.prototype.defaults.height,
-          text: (this.touch ? "red" : "press Z") + "\nto break" 
+          text: "Press Z\nto break"
         }));
         this.hay = undefined;
       }
@@ -68,7 +68,7 @@
         this.world.add(new Backbone.Callout({
           x: this.fence.get("x"),
           y: this.fence.get("y") - Backbone.Callout.prototype.defaults.height,
-          text: (this.touch ? "hold red" : "hold Z") + "\nto run" 
+          text: "Hold Z\nto run" 
         }));
         this.fence = undefined;
       }
@@ -77,7 +77,7 @@
         this.world.add(new Backbone.Callout({
           x: this.brick.get("x"),
           y: this.brick.get("y") - Backbone.Callout.prototype.defaults.height,
-          text: "run to\njump high" 
+          text: "Run to\njump high" 
         }));
         this.brick = undefined;
       }
