@@ -80,7 +80,7 @@ $(window).on("load", function() {
       });
       this.engine.add(_.compact([
         this.world,
-        this.tutorial,
+        this.world.get("level") == 1 ? this.tutorial : null,
         this.display,
         this.camera,
         this.toggleButton,

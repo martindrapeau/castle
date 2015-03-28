@@ -26,7 +26,7 @@
           tutorial.hay = sprite;
         } else if (sprite.overlaps(4500, 920)) {
           tutorial.brick = sprite;
-        } else if (sprite.overlaps(3850, 1000)) {
+        } else if (sprite.overlaps(3650, 1000)) {
           tutorial.fence = sprite;
         }
       });

@@ -62,6 +62,13 @@
           {frame: 0, x: 0, y: -8},
           {frame: 0, x: 0, y: -4},
           {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: 4},
+          {frame: 0, x: 0, y: 8},
+          {frame: 0, x: 0, y: 10},
+          {frame: 0, x: 0, y: 8},
+          {frame: 0, x: 0, y: 4},
+          {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: 0},
           {frame: 0, x: 0, y: -4},
           {frame: 0, x: 0, y: -8},
           {frame: 0, x: 0, y: -10},
@@ -74,6 +81,7 @@
           {frame: 0, x: 0, y: 8},
           {frame: 0, x: 0, y: 4},
           {frame: 0, x: 0, y: 0},
+          {frame: 0, x: 0, y: 0}
         ],
         delay: 100
       }
