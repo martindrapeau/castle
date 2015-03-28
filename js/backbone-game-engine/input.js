@@ -126,11 +126,13 @@
       context.fillStyle = pressed ? "#0000FF" : "#000099";
       context.fill();
 
-      context.fillStyle = "#000066";
       context.font = "bold 60px sans-serif";
       context.textBaseline = "middle";
       context.fontWeight = "normal";
       context.textAlign = "center";
+      context.fillStyle = "#0000CC";
+      context.fillText("X", x+80, y+82);
+      context.fillStyle = "#111";
       context.fillText("X", x+80, y+80);
 
       context.restore();
@@ -156,11 +158,13 @@
       context.fillStyle = pressed ? "#FF0000" : "#990000";
       context.fill();
 
-      context.fillStyle = "#660000";
       context.font = "bold 60px sans-serif";
       context.textBaseline = "middle";
       context.fontWeight = "normal";
       context.textAlign = "center";
+      context.fillStyle = "#CC0000";
+      context.fillText("Z", x+80, y+82);
+      context.fillStyle = "#111";
       context.fillText("Z", x+80, y+80);
 
       context.restore();
