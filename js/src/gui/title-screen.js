@@ -173,6 +173,13 @@
         saved: this.saved
       });
 
+      this.fader = new Backbone.Scene({
+        backgroundColor: "#000",
+        opacity: 0,
+        easing: "easeInCubic",
+        easingTime: 400
+      });
+
 
       this.credits = new Backbone.Credits();
       this.showCredits.on("tap", _.partial(this.showPanel, this.credits), this);
@@ -189,7 +196,7 @@
     onAttach: function() {
       Backbone.Scene.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
-      this.set("opacity", 1);
+      this.fader.set("opacity", 0);
       this.loading.set("x", Backbone.HEIGHT);
 
       this.play.set("text", this.saved.size() > 0 ? "Continue " : "New Game ");
@@ -201,16 +208,18 @@
       this.world.spawnSprites();
       this.world.camera = camera;
 
-      this.engine.add([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame]);
+      this.engine.add([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame, this.fader]);
 
       if (!this.ready)
         setTimeout(this.postInitialize.bind(this), 200);
-      else 
+      else {
+        this.fader.fadeOut();
         setTimeout(this.showButtons.bind(this), 100);
+      }
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame]);
+      this.engine.remove([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame, this.fader]);
     },
     onTouchStart: function(e) {
       // Animate some stuff
@@ -246,30 +255,14 @@
       this.panel = undefined;
       this.showButtons();
     },
-    update: function(dt) {
-      if (!Backbone.Scene.prototype.update.apply(this, arguments)) return false;
-
-      var attrs = {opacity: this.get("opacity")},
-          options = {silent: true};
-
-      this.banner.set(attrs, options);
-      this.touchStart.set(attrs, options);
-      this.loading.set(attrs, options);
-      this.play.set(attrs, options);
-      this.showCredits.set(attrs, options);
-      this.credits.set(attrs, options);
-      this.levelButton.set(attrs, options);
-      this.savedGame.set(attrs, options);
-
-      return true;
-    },
     action: function(event) {
       if (event == "play") this.loading.set("x", 400);
 
-      var gui = this;
+      var gui = this,
+          fader = this.fader;
       this.hideButtons();
       setTimeout(function() {
-        gui.fadeOut(function() {
+        fader.fadeIn(function() {
           gui.engine.trigger(event);
         });
       }, 400);

@@ -177,6 +177,8 @@
           options = {silent: true};
 
       this.backButton.set(attrs, options);
+      this.backgroundTown.set(attrs, options);
+      this.backgroundForest.set(attrs, options);
       for (var i = 0; i < this.views.models.length; i++)
         this.views.models[i].set(attrs, options);
 
