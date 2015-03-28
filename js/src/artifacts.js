@@ -30,7 +30,7 @@
       textPadding: 0,
       textLineHeight: 30,
       textContextAttributes: {
-        fillStyle: "#E3BC70",
+        fillStyle: "#986E05",
         font: "24px arcade",
         textBaseline: "middle",
         fontWeight: "normal",
