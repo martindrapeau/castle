@@ -693,13 +693,13 @@
             leftX = Math.max(leftX, this.collisionMap.left.sprites[i].getRight(true));
 
         if (heroLeftX <= leftX) {
-          attrs.velocity = velocity = 0;
-          attrs.x = x = leftX - paddingLeft;
           if (collision) {
             for (i = 0; i < this.collisionMap.left.sprites.length; i++)
-              this.collisionMap.left.sprites[i].trigger("hit", this, "right", cur.mov2);
+              this.collisionMap.left.sprites[i].trigger("hit", this, "right");
             if (this.cancelUpdate) return true;
           }
+          attrs.velocity = velocity = 0;
+          attrs.x = x = leftX - paddingLeft;
         }
       }
 
@@ -711,13 +711,13 @@
             rightX = Math.min(rightX, this.collisionMap.right.sprites[i].getLeft(true));
 
         if (heroRightX >= rightX) {
-          attrs.velocity = velocity = 0;
-          attrs.x = x = rightX - heroWidth - paddingLeft;
           if (collision) {
             for (i = 0; i < this.collisionMap.right.sprites.length; i++)
-              this.collisionMap.right.sprites[i].trigger("hit", this, "left", cur.mov2);
+              this.collisionMap.right.sprites[i].trigger("hit", this, "left");
             if (this.cancelUpdate) return true;
           }
+          attrs.velocity = velocity = 0;
+          attrs.x = x = rightX - heroWidth - paddingLeft;
         }
       }
 

@@ -619,6 +619,7 @@
 
       function test(sprite) {
         return (sprite && sprite.id && sprite.id != id) &&
+          (!id || sprite.get("masterId") != id) &&
           (!type || types.indexOf(" "+sprite.get("type")) >= 0) &&
           (collision === undefined || sprite.attributes.collision === collision) &&
           sprite.overlaps.call(sprite, x, y);
@@ -674,6 +675,7 @@
 
       function doIt(sprite) {
         if (sprite && sprite.id && sprite.id != id &&
+            (!id || sprite.get("masterId") != id) &&
             (!type || types.indexOf(" "+sprite.get("type")) >= 0) &&
             (collision === undefined || sprite.attributes.collision === collision))
           for (m in map)

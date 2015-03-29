@@ -228,6 +228,10 @@
       houseId: undefined
     }),
     animations: animations,
+    initialize: function(attributes, options) {
+      Backbone.Hero.prototype.initialize.apply(this, arguments);
+      this.fireAttack = _.debounce(this.fireAttack, 250, true);
+    },
     isInsideHouse: function() {
       return !!this.get("houseId");
     },
@@ -256,13 +260,14 @@
           type = sprite.get("type"),
           attackDamage = this.get("attackDamage");
 
-      if (type == "barrier") return this;
+      if (type == "barrier") {
 
-      if (type == "breakable-tile") {
+      } else if (type == "breakable-tile") {
         if (this.isAttacking(sprite)) {
           this.set("attackDamage", Math.min(attackDamage-1, 0));
         }
-      } if (type == "artifact") {
+
+      } else if (type == "artifact") {
         switch (sprite.get("name")) {
           case "a-coin":
             this.cancelUpdate = true;
@@ -303,6 +308,7 @@
             this.set("potion", "green");
             break;
         }
+
       } else if (type == "character" && cur.mov2 != "hurt") {
         if (this.isAttacking(sprite)) {
           // Hero is attacking
@@ -323,6 +329,24 @@
       this.set("attackDamage", this.get("maxAttackDamage"));
       return Backbone.Hero.prototype.startAttack.apply(this, arguments);
     },
+    fireAttack: function() {
+      if (!this.get("potion")) return this;
+      
+      var cur = this.getStateInfo(),
+          dir = cur.dir;
+      if (this.input)
+        if (this.input.leftPressed()) dir = "left";
+        else if (this.input.rightPressed()) dir = "right";
+
+      this.world.add(new Backbone.Fireball({
+        x: (dir == "left" ? this.getLeft(true) : this.getRight(true)) - Backbone.Fireball.prototype.defaults.width/2,
+        y: this.getCenterY(),
+        state: this.buildState("fly", dir),
+        masterId: this.id
+      }));
+
+      return this;
+    },
     endAttack: function() {
       this.attackingSprite = undefined;
       this.set("attackDamage", this.get("maxAttackDamage"));
@@ -333,11 +357,11 @@
 
       this.attackCollisionPoints || (this.attackCollisionPoints = [
         {x: 40, y: 0},
-        {x: 70, y: 0},
-        {x: 110, y: 10},
-        {x: 114, y: 60},
-        {x: 120, y: 90},
-        {x: 114, y: 120}
+        {x: 70, y: 10},
+        {x: 120, y: 30},
+        {x: 120, y: 70},
+        {x: 120, y: 100},
+        {x: 120, y: 120}
       ]);
 
       var sequenceIndex =  this.get("sequenceIndex"),
@@ -358,6 +382,8 @@
     onUpdate: function(dt) {
       var attackPoint = this.getAttackPoint();
       if (!attackPoint) return true;
+
+      if (this.get("sequenceIndex") == 2) this.fireAttack();
 
       this.attackSpriteTypes || (this.attackSpriteTypes = ["character", "breakable-tile", "artifact"]);
 

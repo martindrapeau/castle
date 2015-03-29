@@ -131,7 +131,7 @@
       Backbone.Scene.prototype.initialize.apply(this, arguments);
 
       this.banner = new Backbone.Button({
-        x: 0, y: 240,
+        x: 0, y: Backbone.HEIGHT/2 - 72,
         width: 960, height: 145,
         backgroundColor: "transparent",
         img: "#gui", imgX: 0, imgY: 80, imgWidth: 960, imgHeight: 144, imgMargin: 5,
@@ -141,6 +141,7 @@
 
       this.touchStart = new Backbone.LabelButton({
         text: "Touch to start",
+        y: Backbone.HEIGHT/2 + 100,
         opacity: 0
       });
 

@@ -490,10 +490,10 @@
     },
     buildCollisionMap: function(top, right, bottom, left) {
       this.collisionMap || (this.collisionMap = {
-        right: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
-        left: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
-        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
-        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null}
+        right: {x: 0, y: 0, width:0, height: 0, dir: "right", sprites: [], sprite: null},
+        left: {x: 0, y: 0, width:0, height: 0, dir: "left", sprites: [], sprite: null},
+        bottom: {x: 0, y: 0, width:0, height: 0, dir: "bottom", sprites: [], sprite: null},
+        top: {x: 0, y: 0, width:0, height: 0, dir: "top", sprites: [], sprite: null}
       });
 
       var width = right - left,

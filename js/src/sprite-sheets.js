@@ -103,6 +103,15 @@
     tileColumns: 1,
     tileRows: 1
   }, {
+    id: "fireball",
+    img: "#artifacts",
+    x: 0,
+    y: 486,
+    tileWidth: 70,
+    tileHeight: 41,
+    tileColumns: 4,
+    tileRows: 1
+  }, {
     id: "doors",
     img: "#doors",
     x: 0,
