@@ -231,6 +231,9 @@
     initialize: function(attributes, options) {
       Backbone.Hero.prototype.initialize.apply(this, arguments);
       this.fireAttack = _.debounce(this.fireAttack, 250, true);
+      this._glowStartTime = 0;
+      this._glowEasingTime = 3000;
+      this._glowEasing = "linear";
     },
     isInsideHouse: function() {
       return !!this.get("houseId");
@@ -396,6 +399,49 @@
       }
 
       return true;
+    },
+    onDraw: function(context, options) {
+      if (!this.world) return this;
+
+      var animation = this.getAnimation(),
+          sequenceIndex = this.get("sequenceIndex") || 0;
+      if (sequenceIndex >= animation.sequences.length) sequenceIndex = 0;
+
+      var sequence = animation.sequences[sequenceIndex],
+          frameIndex = _.isNumber(sequence) ? sequence : sequence.frame,
+          scaleX = animation.scaleX && animation.scaleX != 1 ? animation.scaleX : null,
+          scaleY = animation.scaleY && animation.scaleY != 1 ? animation.scaleY : null,
+          x = Math.round(this.get("x") + (options.offsetX || 0) + (sequence.x || 0)),
+          y = Math.round(this.get("y") + (options.offsetY || 0) + (sequence.y || 0)),
+          now = _.now();
+
+      if (now > this._glowStartTime + this._glowEasingTime) this._glowStartTime = now;
+      
+      var opacity = 0.8 - Math.abs(0.5-Backbone.EasingFunctions[this._glowEasing]((now - this._glowStartTime) / this._glowEasingTime)),
+          unit = 1,
+          radians = -0.10;
+      x += 52;
+      y += 98;
+
+      context.save();
+      context.beginPath();
+      context.translate(x, y);
+      if (_.isNumber(scaleX) || _.isNumber(scaleY)) context.scale(scaleX || 1, scaleY || 1);
+      context.rotate(Math.PI * radians);
+      context.lineTo(0, unit*1);
+      context.lineTo(unit*30, 0);
+      context.lineTo(unit*32, unit*2);
+      context.lineTo(unit*30, unit*4);
+      context.lineTo(0, unit*4);
+      context.closePath();
+      context.lineWidth = 1;
+      context.fillStyle = "rgba(0, 125, 249, " + opacity + ")";
+      context.shadowColor = "rgba(0, 125, 249, " + opacity + ")";
+      context.shadowBlur = 20;
+      context.fill();
+      context.restore();
+
+      return this;
     }
   });
 
