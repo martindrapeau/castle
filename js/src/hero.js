@@ -330,8 +330,8 @@
       return Backbone.Hero.prototype.startAttack.apply(this, arguments);
     },
     fireAttack: function() {
-      if (!this.get("potion")) return this;
-      
+      //if (!this.get("potion")) return this;
+
       var cur = this.getStateInfo(),
           dir = cur.dir;
       if (this.input)
@@ -342,7 +342,7 @@
         x: (dir == "left" ? this.getLeft(true) : this.getRight(true)) - Backbone.Fireball.prototype.defaults.width/2,
         y: this.getCenterY(),
         state: this.buildState("fly", dir),
-        masterId: this.id
+        parentId: this.id
       }));
 
       return this;

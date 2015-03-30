@@ -189,7 +189,8 @@
       if (this._handlingSpriteHit || cur.mov == "ko" || cur.mov2 == "hurt") return this;
       this._handlingSpriteHit = sprite;
 
-      if (sprite.get("hero") && sprite.isAttacking(this)) {
+      if (sprite.get("hero") && sprite.isAttacking(this) ||
+          sprite.get("type") == "projectile") {
         this.cancelUpdate = true;
         var attackDamage = sprite.get("attackDamage") || 0;
         this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});

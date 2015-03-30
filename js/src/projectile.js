@@ -14,7 +14,8 @@
       type: "projectile",
       state: "fly-left",
       collision: true,
-      masterId: undefined
+      attackDamage: 1,
+      parentId: undefined
     }),
     animations: {
       "fly-left": {
@@ -40,6 +41,13 @@
       return this;
     },
     removeAfterHit: function(sprite) {
+      if (sprite) {
+        var cur = this.getStateInfo();
+        this.world.add(new Backbone.Explosion({
+          x: (cur.dir == "right" ? this.getRight(true) : this.getLeft(true)) - Backbone.Explosion.prototype.defaults.width/2,
+          y: this.getCenterY() - Backbone.Explosion.prototype.defaults.height/2
+        }));
+      }
       _.defer(this.world.remove, this);
       return this;
     },
@@ -75,8 +83,8 @@
           charTopY = charBottomY - charHeight,
           charLeftX = Math.round(x + velocity * (dt/1000)) + paddingLeft,
           charRightX = charLeftX + charWidth,
-          masterId = this.get("masterId"),
-          master = this.world.sprites.get(masterId),
+          parentId = this.get("parentId"),
+          master = this.world.sprites.get(parentId),
           viewportWidth = this.world.viewport.width;
 
       // When not in play mode, do not allow horizontal displacements or animations
@@ -94,23 +102,22 @@
           // Turn around if obstacle left
           var worldLeft = master ? master.attributes.x - viewportWidth*0.75 : -tileWidth,
               leftX = worldLeft,
-              leftCharacter;
+              leftSprite;
           if (cur.mov != "ko" && cur.mov != "idle")
             for (i = 0; i < this.collisionMap.left.sprites.length; i++) {
               sprite = this.collisionMap.left.sprites[i];
-              if (sprite.id == masterId) continue;
+              if (sprite.id == parentId) continue;
               leftX = Math.max(leftX, sprite.getRight(true));
-              if (sprite.get("type") == "character" &&
-                  (!leftCharacter || sprite.getRight(true) > leftCharacter.getRight(true)))
-                leftCharacter = sprite;
+              if (!leftSprite || sprite.getRight(true) > leftSprite.getRight(true))
+                leftSprite = sprite;
             }
 
           if (charLeftX <= leftX) {
-            if (leftCharacter && cur.mov2 != "hurt") {
-              leftCharacter.trigger("hit", this, "right", cur.mov2);
+            if (leftSprite && leftSprite.get("type") == "character") {
+              leftSprite.trigger("hit", this, "right", cur.mov2);
               if (this.cancelUpdate) return true;
             }
-            this.removeAfterHit(leftCharacter);
+            this.removeAfterHit(leftSprite);
             return false;
           }
         }
@@ -119,23 +126,22 @@
           // Turn around if obstacle to the right
           var worldRight = master ? master.attributes.x + viewportWidth*0.75 : this.world.width(),
               rightX = worldRight,
-              rightCharacter;
+              rightSprite;
           if (cur.mov != "ko" && cur.mov != "idle")
             for (i = 0; i < this.collisionMap.right.sprites.length; i++) {
               sprite = this.collisionMap.right.sprites[i];
-              if (sprite.id == masterId) continue;
+              if (sprite.id == parentId) continue;
               rightX = Math.min(rightX, sprite.getLeft(true));
-              if (sprite.get("type") == "character" &&
-                  (!rightCharacter || sprite.getLeft(true) < rightCharacter.getLeft(true)))
-                rightCharacter = sprite;
+              if (!rightSprite || sprite.getLeft(true) < rightSprite.getLeft(true))
+                rightSprite = sprite;
             }
 
           if (charRightX >= rightX) {
-            if (rightCharacter && cur.mov2 != "hurt") {
-              rightCharacter.trigger("hit", this, "left", cur.mov2);
+            if (rightSprite && rightSprite.get("type") == "character") {
+              rightSprite.trigger("hit", this, "left", cur.mov2);
               if (this.cancelUpdate) return true;
             }
-            this.removeAfterHit(rightCharacter);
+            this.removeAfterHit(rightSprite);
             return false;
           }
         }

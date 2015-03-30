@@ -14,7 +14,10 @@
     }),
     enter: function() {
       var scene = this;
-      this.set("opacity", 1);
+      this.set({
+        opacity: 1,
+        height: Backbone.HEIGHT
+      });
       this.world.set("state", "pause");
       this.set("text", "Level " + this.world.get("level") + " - " + this.world.get("name"));
 

@@ -216,11 +216,10 @@
   Backbone.pagedSprites.a.pop();
 
   Backbone.ADeath.prototype.knockout = function(sprite, dir, dir2) {
-    var explosion = new Backbone.Explosion({
+    this.world.add(new Backbone.Explosion({
       x: this.get("x"),
       y: this.get("y")
-    });
-    this.world.add(explosion);
+    }));
     this.world.remove(this);
     return this;
   };

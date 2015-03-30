@@ -151,7 +151,8 @@
       if (this._handlingSpriteHit || cur.mov == "ko" || cur.mov2 == "hurt") return this;
       this._handlingSpriteHit = sprite;
 
-      if (sprite.get("hero") && sprite.isAttacking(this)) {
+      if (sprite.get("hero") && sprite.isAttacking(this) ||
+          sprite.get("type") == "projectile") {
         // Damage from an attack
         this.cancelUpdate = true;
         var attackDamage = sprite.get("attackDamage") || 0;
