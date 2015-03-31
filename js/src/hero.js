@@ -196,6 +196,61 @@
   animations["skid-hurt-left"] = _.extend({}, animations["skid-left"], hurtAnimation);
   animations["skid-hurt-right"] = _.extend({}, animations["skid-right"], hurtAnimation);
 
+  var seq2glow = {
+    0: {x: 52, y: 98, r: -0.10},
+    1: {x: 52, y: 98, r: -0.08},
+    14: {x: 52, y: 98, r: -0.09},
+    15: {x: 49, y: 99, r: -0.02},
+    16: {x: 44, y: 99, r: 0.07},
+    17: {x: 40, y: 98, r: 0.13},
+    18: {x: 44, y: 99, r: 0.07},
+    19: {x: 49, y: 98, r: -0.01},
+    20: {x: 52, y: 98, r: -0.09},
+    21: {x: 54, y: 99, r: -0.13},
+    22: {x: 58, y: 99, r: -0.18},
+    23: {x: 58, y: 99, r: -0.21},
+    24: {x: 57, y: 99, r: -0.18},
+    25: {x: 56, y: 99, r: -0.15},
+    42: {x: 50, y: 105, r: -0.10},
+    56: {x: 35, y: 88, r: 0.14},
+    57: {x: 41, y: 91, r: 0},
+    70: {x: 39, y: 97, r: 0.15},
+    71: {x: 47, y: 101, r: 0.07},
+    72: {x: 65, y: 107, r: -0.10},
+    73: {x: 75, y: 110, r: -0.20},
+    28: {x: 41, y: 97, r: -0.01},
+    29: {x: 39, y: 96, r: 0.04},
+    30: {x: 37, y: 96, r: 0.08},
+    31: {x: 31, y: 94, r: 0.23},
+    32: {x: 37, y: 96, r: 0.08},
+    33: {x: 40, y: 96, r: 0.04},
+    34: {x: 41, y: 97, r: -0.01},
+    35: {x: 44, y: 97, r: -0.06},
+    36: {x: 48, y: 96, r: -0.15},
+    37: {x: 48, y: 96, r: -0.18},
+    38: {x: 53, y: 94, r: -0.32},
+    39: {x: 49, y: 96, r: -0.19},
+    40: {x: 48, y: 96, r: -0.15},
+    41: {x: 44, y: 97, r: -0.07},
+    84: {x: 52, y: 69, r: -0.98},
+    85: {x: 66, y: 78, r: -0.64},
+    86: {x: 85, y: 77, r: -0.32},
+    87: {x: 82, y: 90, r: -0.14},
+    88: {x: 70, y: 103, r: 0.11},
+    89: {x: 44, y: 92, r: 0.30},
+    98: {x: 45, y: 60, r: -1.02},
+    99: {x: 61, y: 67, r: -0.64},
+    100: {x: 76, y: 70, r: -0.30},
+    101: {x: 72, y: 92, r: -0.03},
+    102: {x: 48, y: 100, r: 0.23},
+    103: {x: 36, y: 92, r: 0.34},
+    112: {x: 45, y: 104, r: 0.04},
+    113: {x: 62, y: 108, r: 0.01},
+    114: {x: 72, y: 107, r: -0.08},
+    115: {x: 78, y: 104, r: -0.11},
+    116: {x: 85, y: 99, r: -0.16}
+  };
+
   Backbone.Hero1 = Backbone.Hero.extend({
     defaults: _.extend({}, Backbone.Hero.prototype.defaults, {
       name: "hero1",
@@ -232,7 +287,7 @@
       Backbone.Hero.prototype.initialize.apply(this, arguments);
       this.fireAttack = _.debounce(this.fireAttack, 250, true);
       this._glowStartTime = 0;
-      this._glowEasingTime = 3000;
+      this._glowEasingTime = 2000;
       this._glowEasing = "linear";
     },
     isInsideHouse: function() {
@@ -421,26 +476,25 @@
 
       if (now > this._glowStartTime + this._glowEasingTime) this._glowStartTime = now;
       
-      var opacity = 0.8 - Math.abs(0.5-Backbone.EasingFunctions[this._glowEasing]((now - this._glowStartTime) / this._glowEasingTime)),
+      var opacity = 0.8 - Math.abs(0.5-Backbone.EasingFunctions[this._glowEasing]((now - this._glowStartTime) / this._glowEasingTime))*1.2,
           unit = 1,
-          radians = -0.10;
-      x += 52;
-      y += 98;
+          glowParams = seq2glow[frameIndex] ? seq2glow[frameIndex] : seq2glow[0];
 
       context.save();
       context.beginPath();
       context.translate(x, y);
       if (_.isNumber(scaleX) || _.isNumber(scaleY)) context.scale(scaleX || 1, scaleY || 1);
-      context.rotate(Math.PI * radians);
-      context.lineTo(0, unit*1);
-      context.lineTo(unit*30, 0);
-      context.lineTo(unit*32, unit*2);
-      context.lineTo(unit*30, unit*4);
-      context.lineTo(0, unit*4);
+      context.translate(glowParams.x - (scaleX < 0 ? frame.width : 0) , glowParams.y - (scaleY < 0 ? frame.height : 0));
+      context.rotate(Math.PI * glowParams.r);
+      context.lineTo(0, unit*0);
+      context.lineTo(unit*30, -2);
+      context.lineTo(unit*36, unit*3);
+      context.lineTo(unit*30, unit*6);
+      context.lineTo(0, unit*5);
       context.closePath();
       context.lineWidth = 1;
       context.fillStyle = "rgba(0, 125, 249, " + opacity + ")";
-      context.shadowColor = "rgba(0, 125, 249, " + opacity + ")";
+      context.shadowColor = "rgba(179, 237, 241, " + 1 + ")";
       context.shadowBlur = 20;
       context.fill();
       context.restore();
