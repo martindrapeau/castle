@@ -15,9 +15,13 @@
   extendSprite(Backbone.Tile, "bc-block1", {collision: true}, {idle: {sequences: [12]}});
   extendSprite(Backbone.Tile, "bc-block2", {collision: true}, {idle: {sequences: [13]}});
 
-  extendSprite(Backbone.Tile, "bc-pillar1", {collision: true}, {idle: {sequences: [20]}});
-  extendSprite(Backbone.Tile, "bc-pillar2", {collision: true}, {idle: {sequences: [21]}});
-  extendSprite(Backbone.Tile, "bc-pillar3", {collision: true}, {idle: {sequences: [22]}});
+  extendSprite(Backbone.Tile, "bc-pillar1", {collision: false}, {idle: {sequences: [20]}});
+  extendSprite(Backbone.Tile, "bc-pillar2", {collision: false}, {idle: {sequences: [21]}});
+  extendSprite(Backbone.Tile, "bc-pillar3", {collision: false}, {idle: {sequences: [22]}});
+
+  extendSprite(Backbone.Tile, "bc-pillar-solid1", {collision: true}, {idle: {sequences: [20]}});
+  extendSprite(Backbone.Tile, "bc-pillar-solid2", {collision: true}, {idle: {sequences: [21]}});
+  extendSprite(Backbone.Tile, "bc-pillar-solid3", {collision: true}, {idle: {sequences: [22]}});
 
   extendSprite(Backbone.Tile, "bc-spikes", {collision: true, paddingTop: 25}, {idle: {sequences: [16]}});
 
@@ -114,5 +118,20 @@
   extendSprite(Backbone.Tile, "g-tombstone1", {collision: true, zIndex: 1, paddingTop: 4}, {idle: {sequences: [72]}});
   extendSprite(Backbone.Tile, "g-tombstone2", {collision: true, zIndex: 1}, {idle: {sequences: [73]}});
   extendSprite(Backbone.Tile, "g-tombstone3", {collision: true, zIndex: 1, paddingTop: 24}, {idle: {sequences: [74]}});
+
+  
+  Backbone.BcSpikes.prototype.initialize = function(attributes, options) {
+    Backbone.Tile.prototype.initialize.apply(this, arguments);
+    this.on("hit", this.hit, this);
+  };
+  Backbone.BcSpikes.prototype.hit = function(sprite, dir, dir2) {
+    if (this._handlingSpriteHit) return this;
+    this._handlingSpriteHit = sprite;
+
+    sprite.trigger("hit", this, _.opo(dir));
+
+    this._handlingSpriteHit = undefined;
+    return this;
+  };
 
 }).call(this);

@@ -269,7 +269,11 @@
         if (this.isAttacking(sprite)) {
           this.set("attackDamage", Math.min(attackDamage-1, 0));
         }
-
+      } else if (type == "tile") {
+        if (sprite.get("name") == "bc-spikes") {
+          this.cancelUpdate = true;
+          this.set({health: 0}, {sprite: sprite, dir: dir, dir2: dir2});
+        }
       } else if (type == "artifact") {
         switch (sprite.get("name")) {
           case "a-coin":
