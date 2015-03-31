@@ -63,10 +63,51 @@
     ctx.restore();
   }
 
+  function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, fill, stroke, shadowBlur, shadowColor) {
+    var rot=Math.PI/2*3;
+    var x=cx;
+    var y=cy;
+    var step=Math.PI/spikes;
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.moveTo(cx,cy-outerRadius);
+    for( i=0; i<spikes; i++) {
+      x = cx + Math.cos(rot) * outerRadius;
+      y = cy + Math.sin(rot) * outerRadius;
+      ctx.lineTo(x, y);
+      rot += step;
+
+      x = cx + Math.cos(rot) * innerRadius;
+      y = cy + Math.sin(rot) * innerRadius;
+      ctx.lineTo(x, y)
+      rot += step
+    }
+    ctx.lineTo(cx, cy - outerRadius);
+
+    if (stroke) {
+      ctx.strokeSyle = stroke;
+      ctx.stroke();
+    }
+    if (fill) {
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+    if (shadowBlur && shadowColor) {
+      ctx.shadowBlur = shadowBlur;
+      ctx.shadowColor = shadowColor;
+    }
+    ctx.closePath();
+
+    ctx.restore();
+  }
+
   _.extend(window, {
     drawRect: drawRect,
     drawRoundRect: drawRoundRect,
-    drawCircle: drawCircle
+    drawCircle: drawCircle,
+    drawStar: drawStar
   });
 
 }).call(this);
