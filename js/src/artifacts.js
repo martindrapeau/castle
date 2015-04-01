@@ -393,7 +393,7 @@
 
   buildBreakableTile("a-crate", 77);
   buildBreakableTile("a-crate-coin", 77, {artifact: "a-coin"});
-  buildBreakableTile("a-crate-coin-bag", 77, {artifact: "a-coin"});
+  buildBreakableTile("a-crate-coin-bag", 77, {artifact: "a-coin-bag"});
   buildBreakableTile("a-crate-key", 77, {artifact: "a-key"});
   buildBreakableTile("a-crate-red-potion", 77, {artifact: "a-red-potion"});
   buildBreakableTile("a-crate-health", 77, {artifact: "a-health"});
@@ -421,5 +421,21 @@
   buildBreakableTile("a-chess-health", 78, {artifact: "a-health"});
   buildBreakableTile("a-chess-death", 78, {artifact: "a-death"});
   buildBreakableTile("a-chess-spider", 78, {artifact: "spider"});
+  buildBreakableTile("a-block", 12);
+  buildBreakableTile("a-block-coin", 12, {artifact: "a-coin"});
+  buildBreakableTile("a-block-coin-bag", 12, {artifact: "a-coin-bag"});
+  buildBreakableTile("a-block-key", 12, {artifact: "a-key"});
+  buildBreakableTile("a-block-red-potion", 12, {artifact: "a-red-potion"});
+  buildBreakableTile("a-block-health", 12, {artifact: "a-health"});
+  buildBreakableTile("a-block-death", 12, {artifact: "a-death"});
+  buildBreakableTile("a-block-spider", 12, {artifact: "spider"});
+  buildBreakableTile("a-vase", 84, {paddingTop: 14});
+  buildBreakableTile("a-vase-coin", 84, {artifact: "a-coin", paddingTop: 14});
+  buildBreakableTile("a-vase-coin-bag", 84, {artifact: "a-coin-bag", paddingTop: 14});
+  buildBreakableTile("a-vase-key", 84, {artifact: "a-key", paddingTop: 14});
+  buildBreakableTile("a-vase-red-potion", 84, {artifact: "a-red-potion", paddingTop: 14});
+  buildBreakableTile("a-vase-health", 84, {artifact: "a-health", paddingTop: 14});
+  buildBreakableTile("a-vase-death", 84, {artifact: "a-death", paddingTop: 14});
+  buildBreakableTile("a-vase-spider", 84, {artifact: "spider", paddingTop: 14});
   
 }).call(this);

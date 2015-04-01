@@ -22,7 +22,7 @@
           tutorial.hero = sprite;
         } else if (sprite.get("type") == "house") {
           tutorial.houses.push(sprite);
-        } else if (sprite.overlaps(400, 1050)) {
+        } else if (sprite.overlaps(550, 950)) {
           tutorial.hay = sprite;
         } else if (sprite.overlaps(4500, 920)) {
           tutorial.brick = sprite;
@@ -55,11 +55,11 @@
         }
       }
 
-      if (this.hay && this.hero.overlaps(this.hay.attributes)) {
+      if (this.hay && this.hero.get("x") > 250) {
         this.world.add(new Backbone.Callout({
           x: this.hay.get("x"),
           y: this.hay.get("y") - Backbone.Callout.prototype.defaults.height,
-          text: "Press Z\nto break"
+          text: "Hit to \nbreak"
         }));
         this.hay = undefined;
       }
