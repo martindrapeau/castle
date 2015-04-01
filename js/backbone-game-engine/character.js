@@ -394,7 +394,7 @@
           var worldLeft = -tileWidth,
               leftX = worldLeft,
               leftCharacter;
-          if (cur.mov != "idle")
+          if (cur.mov != "idle" && !(cur.mov == "ko" && yVelocity == 0))
             for (i = 0; i < this.collisionMap.left.sprites.length; i++) {
               sprite = this.collisionMap.left.sprites[i];
               leftX = Math.max(leftX, sprite.getRight(true));
@@ -423,7 +423,7 @@
           var worldRight = this.world.width(),
               rightX = worldRight,
               rightCharacter;
-          if (cur.mov != "idle")
+          if (cur.mov != "idle" && !(cur.mov == "ko" && yVelocity == 0))
             for (i = 0; i < this.collisionMap.right.sprites.length; i++) {
               sprite = this.collisionMap.right.sprites[i];
               rightX = Math.min(rightX, sprite.getLeft(true));
