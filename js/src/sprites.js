@@ -55,7 +55,8 @@
     defaults: _.extend({}, Backbone.Sprite.prototype.defaults, {
       type: "character",
       state: "idle",
-      collision: true
+      collision: true,
+      ignorePhysics: false
     }),
     animations: {
       idle: {
@@ -117,6 +118,7 @@
 
       // Collision detection
       var collision = this.get("collision"),
+          ignorePhysics = this.get("ignorePhysics"),
           tileWidth = this.get("width"),
           tileHeight = this.get("height"),
           paddingLeft = this.get("paddingLeft"),
@@ -137,7 +139,8 @@
       attrs.relativeVelocity = attrs.relativeYVelocity = 0,
 
       this.buildCollisionMap(charTopY, charRightX, charBottomY, charLeftX);
-      this.world.findCollisions(this.collisionMap, null, this, true);
+      if (!ignorePhysics)
+        this.world.findCollisions(this.collisionMap, null, this, true);
 
       var sprite, i;
       for (i = 0; i < this.collisionMap.bottom.sprites.length; i++) {

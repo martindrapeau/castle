@@ -168,7 +168,8 @@
       this.set({
         state: "ko",
         yVelocity: -this.animations["ko"].yVelocity/2,
-        collision: false
+        collision: false,
+        ignorePhysics: true
       });
       return this;
     },

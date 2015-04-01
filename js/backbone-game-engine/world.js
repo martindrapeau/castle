@@ -850,7 +850,7 @@
     },
     buildId: function(sprite) {
       var attributes = sprite.attributes || sprite;
-      if (attributes.type != "tile")
+      if (!attributes.static)
         return this.buildIdFromName(attributes.name);
 
       return this.getWorldCol(attributes.x) * this.attributes.height +

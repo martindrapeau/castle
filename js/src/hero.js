@@ -372,7 +372,7 @@
         }
 
       } else if (type == "character" && cur.mov2 != "hurt") {
-        if (this.isAttacking(sprite)) {
+        if (this.isAttacking(sprite) && !sprite.get("dead")) {
           // Hero is attacking
           this.set("attackDamage", Math.min(attackDamage-1, 0));
         } else if (sprite.isAttacking(this)) {
@@ -392,8 +392,6 @@
       return Backbone.Hero.prototype.startAttack.apply(this, arguments);
     },
     fireAttack: function() {
-      //if (!this.get("potion")) return this;
-
       var cur = this.getStateInfo(),
           dir = cur.dir;
       if (this.input)
@@ -445,7 +443,7 @@
       var attackPoint = this.getAttackPoint();
       if (!attackPoint) return true;
 
-      if (this.get("sequenceIndex") == 2) this.fireAttack();
+      if (this.get("potion") && this.get("sequenceIndex") == 2) this.fireAttack();
 
       this.attackSpriteTypes || (this.attackSpriteTypes = ["character", "breakable-tile", "artifact"]);
 
@@ -460,7 +458,7 @@
       return true;
     },
     onDraw: function(context, options) {
-      if (!this.world) return this;
+      if (!this.world || !this.get("potion")) return this;
 
       var animation = this.getAnimation(),
           sequenceIndex = this.get("sequenceIndex") || 0;

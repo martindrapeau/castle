@@ -364,12 +364,10 @@
         if (velocity <= 0) {
           // Turn around if obstacle left
           var worldLeft = -tileWidth,
-              sprite1 = this.collisionMap.leftTop.sprite,
-              sprite2 = this.collisionMap.leftBottom.sprite,
+              leftSprite = this.collisionMap.left.sprite,
               leftX = _.maxNotNull([
                 worldLeft,
-                sprite1 ? sprite1.getRight(true) : null,
-                sprite2 ? sprite2.getRight(true) : null
+                leftSprite ? leftSprite.getRight(true) : null
               ]);
 
           if (charLeftX <= leftX) {
@@ -377,9 +375,8 @@
               this.world.remove(this);
               return false;
             }
-            if ((sprite1 || sprite2) && cur.mov2 != "hurt" && cur.mov2 != "collision") {
-              if (sprite1) sprite1.trigger("hit", this, "right");
-              if (sprite2) sprite2.trigger("hit", this, "right");
+            if (leftSprite && cur.mov2 != "hurt" && cur.mov2 != "collision") {
+              if (leftSprite) leftSprite.trigger("hit", this, "right");
               if (this.cancelUpdate) return true;
             }
           }
@@ -388,12 +385,10 @@
         if (velocity >= 0) {
           // Turn around if obstacle to the right
           var worldRight = this.world.width(),
-              sprite1 = this.collisionMap.rightTop.sprite,
-              sprite2 = this.collisionMap.rightBottom.sprite,
+              rightSprite = this.collisionMap.right.sprite,
               rightX = _.minNotNull([
                 worldRight,
-                sprite1 ? sprite1.getLeft(true) : null,
-                sprite2 ? sprite2.getLeft(true) : null
+                rightSprite ? rightSprite.getLeft(true) : null
               ]);
 
           if (charRightX >= rightX) {
@@ -401,9 +396,8 @@
               this.world.remove(this);
               return false;
             }
-            if ((sprite1 || sprite2) && cur.mov2 != "hurt" && cur.mov2 != "collision") {
-              if (sprite1) sprite1.trigger("hit", this, "left");
-              if (sprite2) sprite2.trigger("hit", this, "left");
+            if (rightSprite && cur.mov2 != "hurt" && cur.mov2 != "collision") {
+              if (rightSprite) rightSprite.trigger("hit", this, "left");
               if (this.cancelUpdate) return true;
             }
           }
@@ -418,27 +412,6 @@
 
       if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return true;
-    },
-    buildCollisionMap: function(top, right, bottom, left) {
-      this.collisionMap || (this.collisionMap = {
-        rightTop: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
-        rightBottom: {x: 0, y: 0, dir: "right", sprites: [], sprite: null},
-        leftTop: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
-        leftBottom: {x: 0, y: 0, dir: "left", sprites: [], sprite: null},
-        bottom: {x: 0, y: 0, dir: "bottom", sprites: [], sprite: null},
-        top: {x: 0, y: 0, dir: "top", sprites: [], sprite: null}
-      });
-
-      var width = right - left,
-          height = bottom - top;
-      this.collisionMap.leftTop.y = this.collisionMap.rightTop.y = top + height*0.2;
-      this.collisionMap.leftBottom.y = this.collisionMap.rightBottom.y = top + height*0.8;
-      this.collisionMap.leftTop.x = this.collisionMap.leftBottom.x = left;
-      this.collisionMap.rightTop.x = this.collisionMap.rightBottom.x = right;
-      this.collisionMap.bottom.x = left + width/2;
-      this.collisionMap.bottom.y = bottom;
-      this.collisionMap.top.x = left + width/2;
-      this.collisionMap.top.y = top;
     }
 	});
 
