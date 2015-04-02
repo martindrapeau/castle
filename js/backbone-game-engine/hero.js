@@ -265,7 +265,7 @@
 
       var cur = this.getStateInfo(),
           now = _.now(),
-          opoIntent = dirIntent == "right" ? "left" : "right",
+          opoIntent = _.opo(dirIntent),
           dirPressed = this.input ? this.input[dirIntent+"Pressed"]() : false,
           opoPressed = this.input ? this.input[opoIntent+"Pressed"]() : false,
           run = this.input ? this.input.buttonBPressed() : false,
@@ -322,11 +322,11 @@
 
       if (pressed && cur.mov == "walk") {
         cur.mov = "run";
-        this.set("state",  this.buildState(cur.mov, cur.mov2, cur.dir));
+        this.set("state", this.buildState(cur.mov, cur.mov2, cur.dir));
         this.cancelUpdate = true;
       } else if (!pressed && cur.mov == "run") {
         cur.mov = "walk";
-        this.set("state",  this.buildState(cur.mov, cur.mov2, cur.dir));
+        this.set("state", this.buildState(cur.mov, cur.mov2, cur.dir));
         this.cancelUpdate = true;
       }
 
@@ -434,11 +434,12 @@
 
       var state = this.get("state"),
           cur = this.getStateInfo(),
+          dirIntent = this.input && this.input.leftPressed() ? "left" : (this.input && this.input.rightPressed() ? "right" : cur.dir),
           attrs = {};
 
       if (this.input && this.input.buttonAPressed() && cur.mov != "jump") {
         // Set new state (keep old as next)
-        attrs.state = this.buildState("jump", cur.mov2, cur.dir);
+        attrs.state = this.buildState("jump", cur.mov2, this.get("canTurnInJump") ? dirIntent : cur.dir);
         attrs.nextState = state;
 
         // Determine vertical velocity as a factor of horizontal velocity

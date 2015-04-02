@@ -174,7 +174,7 @@
       return this;
     },
     onUpdate: function(dt) {
-      if (this.attributes.state == "ko" && this.attributes.yVelocity > 0) {
+      if (this.attributes.state == "ko" && this.attributes.yVelocity >= 0) {
         this.world.remove(this);
         return false;
       }
@@ -210,6 +210,7 @@
   buildArtifact("a-green-potion", [16]);
   buildArtifact("a-health", [12]);
   buildArtifact("a-coin-bag", [20]);
+  buildArtifact("a-blue-sword", [22]);
 
   buildArtifact("a-dollar", [24]);
   buildArtifact("a-clock", [23]);
@@ -248,6 +249,43 @@
       return false;
     }
     return true;
+  };
+
+  Backbone.ABlueSword.prototype.initialize = function(attributes, options) {
+    Artifact.prototype.initialize.apply(this, arguments);
+    this._glowStartTime = 0;
+    this._glowEasingTime = 2000;
+    this._glowEasing = "linear";
+  };
+  Backbone.ABlueSword.prototype.onDraw = function(context, options) {
+    var x = Math.round(this.get("x") + (options.offsetX || 0)),
+        y = Math.round(this.get("y") + (options.offsetY || 0)),
+        now = _.now();
+
+    if (now > this._glowStartTime + this._glowEasingTime) this._glowStartTime = now;
+    
+    var opacity = 0.8 - Math.abs(0.5-Backbone.EasingFunctions[this._glowEasing]((now - this._glowStartTime) / this._glowEasingTime))*1.2,
+        unit = 1;
+
+    context.save();
+    context.beginPath();
+    context.translate(x, y);
+    context.translate(33, 19);
+    context.rotate(Math.PI * -1.28);
+    context.lineTo(0, unit*0);
+    context.lineTo(unit*26, -2);
+    context.lineTo(unit*32, unit*3);
+    context.lineTo(unit*26, unit*6);
+    context.lineTo(0, unit*5);
+    context.closePath();
+    context.lineWidth = 1;
+    context.fillStyle = "rgba(0, 125, 249, " + opacity + ")";
+    context.shadowColor = "rgba(179, 237, 241, " + 1 + ")";
+    context.shadowBlur = 20;
+    context.fill();
+    context.restore();
+
+    return this;
   };
 
   // Breakable tiles

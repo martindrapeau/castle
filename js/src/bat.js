@@ -114,7 +114,8 @@
     }),
     animations: animations,
     isAttacking: function(sprite) {
-      return true;
+      var cur = this.getStateInfo();
+      return cur.mov == "fly" || cur.mov == "idle";
     },
     ai: function(dt) {
       var cur = this.getStateInfo();

@@ -375,7 +375,7 @@
               this.world.remove(this);
               return false;
             }
-            if (leftSprite && cur.mov2 != "hurt" && cur.mov2 != "collision") {
+            if (leftSprite && cur.mov2 != "hurt") {
               if (leftSprite) leftSprite.trigger("hit", this, "right");
               if (this.cancelUpdate) return true;
             }
@@ -396,7 +396,7 @@
               this.world.remove(this);
               return false;
             }
-            if (rightSprite && cur.mov2 != "hurt" && cur.mov2 != "collision") {
+            if (rightSprite && cur.mov2 != "hurt") {
               if (rightSprite) rightSprite.trigger("hit", this, "left");
               if (this.cancelUpdate) return true;
             }
