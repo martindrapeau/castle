@@ -205,7 +205,10 @@
       var camera = this.world.camera;
       this.world.camera = undefined;
       this.world.set(WORLD);
-      if (this.ready) this.world.set("y", this.engine.canvas.height - this.world.height());
+      if (!this.ready)
+        this.world.set("y", 280 - Backbone.HEIGHT);
+      else
+        this.world.set("y", this.engine.canvas.height - this.world.height());
       this.world.spawnSprites();
       this.world.camera = camera;
 

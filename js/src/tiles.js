@@ -34,6 +34,9 @@
   extendSprite(Backbone.Tile, "bc-vase2", {collision: true, zIndex: 1}, {idle: {sequences: [85]}});
   extendSprite(Backbone.Tile, "bc-vase3", {collision: true, zIndex: 1, paddingTop: 23}, {idle: {sequences: [86]}});
 
+  extendSprite(Backbone.Tile, "bc-flag1", {collision: false, zIndex: 1}, {idle: {sequences: [104]}});
+  extendSprite(Backbone.Tile, "bc-flag2", {collision: false, zIndex: 1}, {idle: {sequences: [105]}});
+
   extendSprite(Backbone.Tile, "f-grass1", {collision: true}, {idle: {sequences: [24]}});
   extendSprite(Backbone.Tile, "f-grass2", {collision: true}, {idle: {sequences: [25]}});
   extendSprite(Backbone.Tile, "f-grass3", {collision: true}, {idle: {sequences: [26]}});
