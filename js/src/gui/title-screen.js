@@ -206,7 +206,7 @@
       this.world.camera = undefined;
       this.world.set(WORLD);
       if (!this.ready)
-        this.world.set("y", -400 - (720 - Backbone.HEIGHT));
+        this.world.set("y", -400 - (720 - Backbone.HEIGHT) / 2);
       else
         this.world.set("y", this.engine.canvas.height - this.world.height());
       this.world.spawnSprites();
