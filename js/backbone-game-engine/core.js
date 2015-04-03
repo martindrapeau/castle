@@ -495,15 +495,28 @@
       ticks: 0,
       delay: 200
     },
+    initialize: function(attributes, options) {
+      this.on("attach", this.onAttach, this);
+      this.on("detach", this.onDetach, this);
+    },
+    onAttach: function() {
+      this.ticks = 0;
+    },
+    onDetach: function() {
+
+    },
     update: function(dt) {
       var now = _.now();
       if (!this.lastTickTime || now > this.lastTickTime + this.get("delay")) {
         this.set("ticks", this.get("ticks") + 1);
         this.lastTickTime = now;
       }
+      if (typeof this.onUpdate == "function") return this.onUpdate(dt);
       return false;
     },
-    draw: function() {}
+    draw: function() {
+      return this;
+    }
   });
 
   // Element class; mimics an elementary fixed position element on canvas.

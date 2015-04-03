@@ -181,6 +181,9 @@
         easingTime: 400
       });
 
+      this.worldDriver = new Backbone.WorldDriver(null, {
+        world: this.world
+      });
 
       this.credits = new Backbone.Credits();
       this.showCredits.on("tap", _.partial(this.showPanel, this.credits), this);
@@ -212,7 +215,7 @@
       this.world.spawnSprites();
       this.world.camera = camera;
 
-      this.engine.add([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame, this.fader]);
+      this.engine.add([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame, this.fader, this.worldDriver]);
 
       if (!this.ready)
         setTimeout(this.postInitialize.bind(this), 200);
@@ -223,7 +226,7 @@
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame, this.fader]);
+      this.engine.remove([this.world, this.banner, this.touchStart, this.loading, this.play, this.levelButton, this.showCredits, this.credits, this.savedGame, this.fader, this.worldDriver]);
     },
     onTouchStart: function(e) {
       // Animate some stuff
