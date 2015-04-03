@@ -143,8 +143,7 @@
     onHealthChange: function(model, health, options) {
       options || (options = {});
       var cur = this.getStateInfo(),
-          dir = options.dir || cur.dir,
-          opo = dir == "left" ? "right" : "left";
+          dir = options.dir || cur.dir;
       
       if (health == 0)
         return this.knockout(options.sprite || null, dir, options.dir2 || null);
@@ -172,7 +171,7 @@
       return this;
     },
     hurt: function(sprite, dir) {
-      dir = dir == "right" ? "right" : "left";
+      dir = dir == "left" ? "right" : "left";
       this.whenAnimationEnds = null;
       this.set({
         state: this.buildState("fall", "hurt", dir),
@@ -412,7 +411,7 @@
               leftCharacter.trigger("hit", this, "right", cur.mov2);
               if (this.cancelUpdate) return true;
             }
-            attrs.velocity = velocity = velocity * -1;
+            attrs.velocity = velocity = velocity * (cur.mov != "ko" ? -1 : 0);
             attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
             attrs.x = x = leftX - paddingLeft;
           }
@@ -441,7 +440,7 @@
               rightCharacter.trigger("hit", this, "left", cur.mov2);
               if (this.cancelUpdate) return true;
             }
-            attrs.velocity = velocity = velocity * -1;
+            attrs.velocity = velocity = velocity * (cur.mov != "ko" ? -1 : 0);
             attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
             attrs.x = x = rightX - charWidth - paddingLeft;
           }

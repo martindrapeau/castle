@@ -117,6 +117,14 @@
       var cur = this.getStateInfo();
       return cur.mov == "fly" || cur.mov == "idle";
     },
+    knockout: function() {
+      Backbone.Fly.prototype.knockout.apply(this, arguments);
+      this.set({
+        paddingLeft: 40,
+        paddingRight: 40
+      });
+      return this;
+    },
     ai: function(dt) {
       var cur = this.getStateInfo();
       if (cur.mov == "ko" || cur.mov2 == "hurt") return this;

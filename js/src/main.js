@@ -246,7 +246,10 @@ $(window).on("load", function() {
         var hero = this.world.sprites.findWhere({hero: true});
         hero.set({
           health: state.get("health"),
-          coins: state.get("coins")
+          coins: state.get("coins"),
+          potion: state.get("potion"),
+          swordColor: state.get("swordColor"),
+          fireAttackClass: state.get("fireAttackClass")
         });
       }
 
@@ -308,6 +311,9 @@ $(window).on("load", function() {
         date: _.now(),
         health: hero.get("health"),
         coins: hero.get("coins"),
+        swordColor: hero.get("swordColor"),
+        fireAttackClass: hero.get("fireAttackClass"),
+        potion: hero.get("potion"),
         level: this.world.get("level"),
         levelName: this.world.get("name"),
         time: this.world.get("time")

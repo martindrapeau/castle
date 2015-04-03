@@ -183,7 +183,7 @@
     }
   });
 
-  function buildArtifact(name, sequences) {
+  function buildArtifact(Cls, name, sequences, attributes) {
     var idleAnimation = {
           sequences: sequences,
           delay: 50
@@ -195,25 +195,24 @@
           yAcceleration: 1200
         };
 
-    extendSprite(Artifact, name, null, {
+    extendSprite(Cls, name, attributes, {
       "idle" : idleAnimation,
       "fall": fallAnimation,
       "ko": fallAnimation
     });
   }
 
-  buildArtifact("a-coin", [5, 6, 7, 8]);
-  buildArtifact("a-death", [11]);
-  buildArtifact("a-key", [18]);
-  buildArtifact("a-blue-potion", [14]);
-  buildArtifact("a-red-potion", [15]);
-  buildArtifact("a-green-potion", [16]);
-  buildArtifact("a-health", [12]);
-  buildArtifact("a-coin-bag", [20]);
-  buildArtifact("a-blue-sword", [22]);
+  buildArtifact(Artifact, "a-coin", [5, 6, 7, 8], {gain: 1});
+  buildArtifact(Artifact, "a-coin-bag", [20], {gain: 5});
+  buildArtifact(Artifact, "a-death", [11]);
+  buildArtifact(Artifact, "a-key", [18]);
+  buildArtifact(Artifact, "a-blue-potion", [14]);
+  buildArtifact(Artifact, "a-red-potion", [15]);
+  buildArtifact(Artifact, "a-green-potion", [16]);
+  buildArtifact(Artifact, "a-health", [12]);
 
-  buildArtifact("a-dollar", [24]);
-  buildArtifact("a-clock", [23]);
+  buildArtifact(Artifact, "a-dollar", [24]);
+  buildArtifact(Artifact, "a-clock", [23]);
   Backbone.pagedSprites.a.pop();
   Backbone.pagedSprites.a.pop();
 
@@ -226,9 +225,8 @@
     return this;
   };
 
-  Backbone.ACoinBag.prototype.defaults.gain = 5;
   Backbone.ACoin.prototype.onUpdate = Backbone.ACoinBag.prototype.onUpdate = function(dt) {
-    if (this.attributes.state == "ko" && this.attributes.yVelocity > 0) {
+    if (this.attributes.state == "ko" && this.attributes.yVelocity >= 0) {
       var engine = this.world.engine;
       var gain = window.gain = new Backbone.GainCoin({
         x: this.get("x") + this.world.get("x"),
@@ -251,42 +249,53 @@
     return true;
   };
 
-  Backbone.ABlueSword.prototype.initialize = function(attributes, options) {
-    Artifact.prototype.initialize.apply(this, arguments);
-    this._glowStartTime = 0;
-    this._glowEasingTime = 2000;
-    this._glowEasing = "linear";
-  };
-  Backbone.ABlueSword.prototype.onDraw = function(context, options) {
-    var x = Math.round(this.get("x") + (options.offsetX || 0)),
-        y = Math.round(this.get("y") + (options.offsetY || 0)),
-        now = _.now();
+  var Sword = Artifact.extend({
+    defaults: _.extend({}, Artifact.prototype.defaults, {
+      paddingBottom: 6,
+      color: "rgba(0, 125, 249, {0})"
+    }),
+    initialize: function(attributes, options) {
+      Artifact.prototype.initialize.apply(this, arguments);
+      this._glowStartTime = 0;
+      this._glowEasingTime = 2000;
+      this._glowEasing = "linear";
+    },
+    onDraw: function(context, options) {
+      var x = Math.round(this.get("x") + (options.offsetX || 0)),
+          y = Math.round(this.get("y") + (options.offsetY || 0)),
+          now = _.now(),
+          scaleX = options && options.tileWidth ? options.tileWidth / this.get("width") : null,
+          scaleY = options && options.tileHeight ? options.tileHeight / this.get("height") : null,
+          color = this.get("color");
 
-    if (now > this._glowStartTime + this._glowEasingTime) this._glowStartTime = now;
-    
-    var opacity = 0.8 - Math.abs(0.5-Backbone.EasingFunctions[this._glowEasing]((now - this._glowStartTime) / this._glowEasingTime))*1.2,
-        unit = 1;
+      if (now > this._glowStartTime + this._glowEasingTime) this._glowStartTime = now;
+      
+      var opacity = 1.0 - Math.abs(0.5-Backbone.EasingFunctions[this._glowEasing]((now - this._glowStartTime) / this._glowEasingTime))*1.2;
 
-    context.save();
-    context.beginPath();
-    context.translate(x, y);
-    context.translate(33, 19);
-    context.rotate(Math.PI * -1.28);
-    context.lineTo(0, unit*0);
-    context.lineTo(unit*26, -2);
-    context.lineTo(unit*32, unit*3);
-    context.lineTo(unit*26, unit*6);
-    context.lineTo(0, unit*5);
-    context.closePath();
-    context.lineWidth = 1;
-    context.fillStyle = "rgba(0, 125, 249, " + opacity + ")";
-    context.shadowColor = "rgba(179, 237, 241, " + 1 + ")";
-    context.shadowBlur = 20;
-    context.fill();
-    context.restore();
+      context.save();
+      context.beginPath();
+      context.translate(x, y);
+      if (_.isNumber(scaleX) || _.isNumber(scaleY)) context.scale(scaleX || 1, scaleY || 1);
+      context.translate(44 - (scaleX < 0 ? frame.width : 0) , 23 - (scaleY < 0 ? frame.height : 0));
+      context.rotate(Math.PI * -1.28);
+      context.lineTo(0, 0);
+      context.lineTo(36, -3);
+      context.lineTo(42, 2);
+      context.lineTo(36, 6);
+      context.lineTo(0, 5);
+      context.closePath();
+      context.lineWidth = 1;
+      context.fillStyle = color.replace("{0}", opacity);
+      context.shadowColor = color.replace("{0}", 1);
+      context.shadowBlur = 20;
+      context.fill();
+      context.restore();
 
-    return this;
-  };
+      return this;
+    }
+  });
+
+  buildArtifact(Sword, "a-blue-sword", [22], {color: "rgba(0, 125, 249, {0})"});
 
   // Breakable tiles
   var BreakableTile = Backbone.Object.extend({

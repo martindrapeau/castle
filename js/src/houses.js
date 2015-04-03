@@ -355,11 +355,12 @@
     if (this.get("state") == "idle") {
       var key = character.get("key");
       if (!key) {
-        this.world.add(new Backbone.Callout({
-          x: this.door.get("x"),
-          y: this.door.get("y") - Backbone.Callout.prototype.defaults.height,
-          text: "Key ?" 
-        }));
+        if (!this.world.sprites.findWhere({name: "callout"}))
+          this.world.add(new Backbone.Callout({
+            x: this.door.get("x"),
+            y: this.door.get("y") - Backbone.Callout.prototype.defaults.height,
+            text: "Key ?" 
+          }));
       } else {
         character.set({key: false});
         this.open(character);

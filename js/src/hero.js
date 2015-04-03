@@ -280,6 +280,8 @@
       coins: 0,
       key: false,
       potion: null,
+      fireAttackClass: null,
+      swordColor: null,
       houseId: undefined
     }),
     animations: animations,
@@ -342,7 +344,7 @@
           case "a-health":
             if (cur.mov2 != "hurt") {
               this.cancelUpdate = true;
-              this.set({health: Math.min(this.get("health") + 2, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
+              this.set({health: Math.min(this.get("health") + 4, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
             }
             break;
           case "a-death":
@@ -356,10 +358,12 @@
             this.set("key", true);
             break;
           case "a-red-potion":
-            if (cur.mov2 != "hurt") {
+            this.cancelUpdate = true;
+            this.set("potion", "red");
+            /*if (cur.mov2 != "hurt") {
               this.cancelUpdate = true;
               this.set({health: Math.min(this.get("health") + 8, this.get("healthMax"))}, {sprite: sprite, dir: dir, dir2: dir2});
-            }
+            }*/
             break;
           case "a-blue-potion":
             this.cancelUpdate = true;
@@ -368,6 +372,13 @@
           case "a-green-potion":
             this.cancelUpdate = true;
             this.set("potion", "green");
+            break;
+          case "a-blue-sword":
+            this.cancelUpdate = true;
+            this.set({
+              fireAttackClass: Backbone.Fireball,
+              swordColor: "rgba(0, 125, 249, {0})"
+            });
             break;
         }
 
@@ -393,12 +404,14 @@
     },
     fireAttack: function() {
       var cur = this.getStateInfo(),
-          dir = cur.dir;
+          dir = cur.dir,
+          Cls = this.get("fireAttackClass");
+
       if (this.input)
         if (this.input.leftPressed()) dir = "left";
         else if (this.input.rightPressed()) dir = "right";
 
-      this.world.add(new Backbone.Fireball({
+      this.world.add(new Cls({
         x: (dir == "left" ? this.getLeft(true) : this.getRight(true)) - Backbone.Fireball.prototype.defaults.width/2,
         y: this.getCenterY(),
         state: this.buildState("fly", dir),
@@ -443,7 +456,7 @@
       var attackPoint = this.getAttackPoint();
       if (!attackPoint) return true;
 
-      if (this.get("potion") && this.get("sequenceIndex") == 2) this.fireAttack();
+      if (this.get("fireAttackClass") && this.get("sequenceIndex") == 2) this.fireAttack();
 
       this.attackSpriteTypes || (this.attackSpriteTypes = ["character", "breakable-tile", "artifact"]);
 
@@ -458,7 +471,7 @@
       return true;
     },
     onDraw: function(context, options) {
-      if (!this.world || !this.get("potion")) return this;
+      if (!this.world || !this.get("swordColor")) return this;
 
       var animation = this.getAnimation(),
           sequenceIndex = this.get("sequenceIndex") || 0;
@@ -470,7 +483,8 @@
           scaleY = animation.scaleY && animation.scaleY != 1 ? animation.scaleY : null,
           x = Math.round(this.get("x") + (options.offsetX || 0) + (sequence.x || 0)),
           y = Math.round(this.get("y") + (options.offsetY || 0) + (sequence.y || 0)),
-          now = _.now();
+          now = _.now(),
+          color = this.get("swordColor");
 
       if (now > this._glowStartTime + this._glowEasingTime) this._glowStartTime = now;
       
@@ -491,8 +505,8 @@
       context.lineTo(0, unit*5);
       context.closePath();
       context.lineWidth = 1;
-      context.fillStyle = "rgba(0, 125, 249, " + opacity + ")";
-      context.shadowColor = "rgba(179, 237, 241, " + 1 + ")";
+      context.fillStyle = color.replace("{0}", opacity);
+      context.shadowColor = color.replace("{0}", 1);
       context.shadowBlur = 20;
       context.fill();
       context.restore();
