@@ -204,12 +204,21 @@
       return this;
     },
     startNewAnimation: function(state, attrs, done) {
+      var animation = this.getAnimation(state),
+          delay = animation.delay || 0;
+
+      if (!animation || !animation.sequences.length || !delay)
+        throw "No animation to animate";
+
       this.lastSequenceChangeTime = _.now();
       this.set(_.extend({
         state: state,
         sequenceIndex: 0
       }, attrs));
+
+      this.animationEndTimeLimit = this.lastSequenceChangeTime + animation.sequences.length * delay;
       this.whenAnimationEnds = done;
+
       return this;
     },
     updateSequenceIndex: function(dt) {
@@ -231,6 +240,8 @@
         this.lastSequenceChangeTime = now;
         if (sequenceIndex == 0) triggerAnimationEnd = true;
       }
+
+      if (now > this.animationEndTimeLimit) triggerAnimationEnd = true;
 
       if (triggerAnimationEnd && typeof this.whenAnimationEnds == "function") {
         this.whenAnimationEnds.call(this);

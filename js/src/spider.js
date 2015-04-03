@@ -107,7 +107,7 @@
       paddingRight: 24,
       health: 2,
       attackDamage: 2,
-      aiDelay: 500
+      aiDelay: 250
     }),
     animations: animations,
     hit: function(sprite, dir, dir2) {
@@ -183,8 +183,8 @@
 
       // Attack hero if in line of sight
       var heroWidth = heroBbox.x2 - heroBbox.x1;
-      if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth*1.5 && heroBbox.x1 <= bbox.x2) ||
-          (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth*1.5 && heroBbox.x2 >= bbox.x1)) {
+      if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth && heroBbox.x1 <= bbox.x2) ||
+          (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth && heroBbox.x2 >= bbox.x1)) {
         this.cancelUpdate = true;
         this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
       }

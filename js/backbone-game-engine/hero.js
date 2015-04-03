@@ -376,7 +376,7 @@
         state: state,
         velocity: this.animations[state].velocity,
         yVelocity: -this.animations[state].yVelocity,
-        nextState: this.buildState("dead", null, opo),
+        nextState: this.buildState("dead", opo),
         dead: true,
         collision: false,
         ignorePhysics: true
@@ -555,6 +555,11 @@
           }
           break;
 
+        case "walk":
+          if (input && input.buttonBPressed())
+            attrs.state = this.buildState("run", cur.mov2, cur.dir);
+          break;
+
         case "jump":
           // Update vertical velocity. Determine proper vertical acceleration.
           if (yVelocity < animation.yEndVelocity) {
@@ -689,9 +694,10 @@
       if (velocity <= 0) {
         // Stop if obstacle left
         var leftX = 0;
-        for (i = 0; i < this.collisionMap.left.sprites.length; i++)
-          if (heroTopY > 0 )
-            leftX = Math.max(leftX, this.collisionMap.left.sprites[i].getRight(true));
+        if (cur.mov != "dead")
+          for (i = 0; i < this.collisionMap.left.sprites.length; i++)
+            if (heroTopY > 0)
+              leftX = Math.max(leftX, this.collisionMap.left.sprites[i].getRight(true));
 
         if (heroLeftX <= leftX) {
           if (collision) {
@@ -707,9 +713,10 @@
       if (velocity >= 0) {
         // Stop if obstacle to the right
         var rightX = this.world.width();
-        for (i = 0; i < this.collisionMap.right.sprites.length; i++)
-          if (heroTopY > 0 )
-            rightX = Math.min(rightX, this.collisionMap.right.sprites[i].getLeft(true));
+        if (cur.mov != "dead")
+          for (i = 0; i < this.collisionMap.right.sprites.length; i++)
+            if (heroTopY > 0)
+              rightX = Math.min(rightX, this.collisionMap.right.sprites[i].getLeft(true));
 
         if (heroRightX >= rightX) {
           if (collision) {
