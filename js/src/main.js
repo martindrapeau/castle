@@ -191,6 +191,7 @@ $(window).on("load", function() {
       }, {
         saved: this.saved,
         world: this.world,
+        input: this.input,
         levels: this.levels
       });
 
