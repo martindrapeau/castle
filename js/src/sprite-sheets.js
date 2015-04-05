@@ -85,6 +85,15 @@
     tileColumns: 5,
     tileRows: 6
   }, {
+    id: "farts",
+    img: "#artifacts",
+    x: 0,
+    y: 128,
+    tileWidth: 21,
+    tileHeight: 21,
+    tileColumns: 3,
+    tileRows: 2
+  }, {
     id: "health-indicator",
     img: "#artifacts",
     x: 0,

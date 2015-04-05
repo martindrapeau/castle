@@ -18,6 +18,16 @@
     }
   });
 
+  Backbone.Fart = Backbone.Explosion.extend({
+    defaults: _.extend({}, Backbone.Explosion.prototype.defaults, {
+      name: "fart",
+      spriteSheet: "farts",
+      width: 21,
+      height: 21,
+      zIndex: 0
+    })
+  });
+
   // Shows a callout (bubble) with instructions and disappears
   Backbone.Callout = Backbone.Ephemeral.extend({
     defaults: _.extend({}, Backbone.Ephemeral.prototype.defaults, {

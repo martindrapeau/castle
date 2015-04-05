@@ -282,6 +282,7 @@
       potion: null,
       fireAttackClass: null,
       swordColor: null,
+      farts: 0,
       houseId: undefined
     }),
     animations: animations,
@@ -291,6 +292,13 @@
       this._glowStartTime = 0;
       this._glowEasingTime = 2000;
       this._glowEasing = "linear";
+      this._fartPool = new Backbone.Collection([
+        new Backbone.Fart(),
+        new Backbone.Fart(),
+        new Backbone.Fart(),
+        new Backbone.Fart()
+      ]);
+      this._lastFartTime = 0;
     },
     isInsideHouse: function() {
       return !!this.get("houseId");
@@ -482,6 +490,29 @@
       }
 
       return true;
+    },
+    draw: function(context, options) {
+      var farts = this.get("farts");
+      if (this.world && farts) {
+        var now = _.now(),
+            used = 0;
+        this._fartPool.each(function(fart) {
+          if (fart.world) used += 1;
+        });
+        if (now > this._lastFartTime && used == 0) {
+          var fart = this._fartPool.first(),
+              x = this.get("x") + this.get("width")/2 + (this.attributes.state.indexOf("-left") >= 0 ? 10 : -30),
+              y = this.get("y") + 100;
+          fart.set({
+            x: x + Math.round((0.5-Math.random())*10),
+            y: y + Math.round((0.5-Math.random())*10)
+          });
+          this.world.add(fart);
+          this._lastFartTime = now;
+        }
+      }
+
+      return Backbone.Hero.prototype.draw.apply(this, arguments);
     },
     onDraw: function(context, options) {
       if (!this.world || !this.get("swordColor")) return this;
