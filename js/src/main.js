@@ -251,7 +251,7 @@ $(window).on("load", function() {
           potion: state.get("potion"),
           swordColor: state.get("swordColor"),
           fireAttackClass: state.get("fireAttackClass")
-        });
+        }, {silent: true});
       }
 
       this.engine.add(_.compact([
