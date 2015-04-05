@@ -15,6 +15,7 @@
       fallAcceleration = 1200,
       airTurnaroundDeceleration = 400,
       fallVelocity = 600,
+      flyVelocity = -200,
       idleDelay = 2500,
       walkDelay = 75,
       koDelay = 100,
@@ -282,7 +283,6 @@
       potion: null,
       fireAttackClass: null,
       swordColor: null,
-      farts: false,
       houseId: undefined
     }),
     animations: animations,
@@ -393,7 +393,7 @@
             break;
           case "a-green-potion":
             this.cancelUpdate = true;
-            this.set({potion: "green", farts: true});
+            this.set({potion: "green"});
             break;
           case "a-blue-sword":
             this.cancelUpdate = true;
@@ -475,6 +475,13 @@
 
       return sprite.overlaps(attackPoint);
     },
+    update: function(dt) {
+      if (this.get("potion") == "green" && !this.get("dead") && this.input && this.input.buttonAPressed()) {
+        var yVelocity = this.get("yVelocity");
+        if (yVelocity > flyVelocity) this.set("yVelocity", flyVelocity);
+      }
+      return Backbone.Hero.prototype.update.apply(this, arguments);
+    },
     onUpdate: function(dt) {
       var attackPoint = this.getAttackPoint();
       if (!attackPoint) return true;
@@ -494,7 +501,7 @@
       return true;
     },
     draw: function(context, options) {
-      if (this.world && this.world.get("state") == "play" && this.get("farts")) {
+      if (this.world && this.world.get("state") == "play" && this.get("potion") == "green") {
         var now = _.now(),
             time = 500 / (this.attributes.yVelocity ? 6 : 1);
 

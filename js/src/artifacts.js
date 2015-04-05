@@ -460,7 +460,7 @@
   buildBreakableTile("a-barrel", 76);
   buildBreakableTile("a-barrel-coin", 76, {artifact: "a-coin"});
   buildBreakableTile("a-barrel-key", 76, {artifact: "a-key"});
-  buildBreakableTile("a-barrel-red-potion", 76, {artifact: "a-red-potion"});
+  buildBreakableTile("a-barrel-green-potion", 76, {artifact: "a-green-potion"});
   buildBreakableTile("a-barrel-health", 76, {artifact: "a-health"});
   buildBreakableTile("a-barrel-death", 76, {artifact: "a-death"});
   buildBreakableTile("a-barrel-spider", 76, {artifact: "spider"});

@@ -104,7 +104,8 @@ $(window).on("load", function() {
       // Camera
       this.camera = new Backbone.Camera({
         id: "camera",
-        bottom: 400
+        top: 200,
+        bottom: 300
       });
 
       // Our world
@@ -248,7 +249,7 @@ $(window).on("load", function() {
         hero.set({
           health: state.get("health"),
           coins: state.get("coins"),
-          potion: state.get("potion"),
+          //potion: state.get("potion"),
           swordColor: state.get("swordColor"),
           fireAttackClass: state.get("fireAttackClass")
         }, {silent: true});
@@ -314,7 +315,7 @@ $(window).on("load", function() {
         coins: hero.get("coins"),
         swordColor: hero.get("swordColor"),
         fireAttackClass: hero.get("fireAttackClass"),
-        potion: hero.get("potion"),
+        //potion: hero.get("potion"),
         level: this.world.get("level"),
         levelName: this.world.get("name"),
         time: this.world.get("time")

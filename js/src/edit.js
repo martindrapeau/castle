@@ -29,7 +29,8 @@ $(window).on("load", function() {
 
       // Camera
       this.camera = new Backbone.Camera({
-        bottom: 228
+        top: 200,
+        bottom: 300
       });
 
       // Our world
