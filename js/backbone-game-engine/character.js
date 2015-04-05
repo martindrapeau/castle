@@ -141,10 +141,12 @@
       return this;
     },
     onHealthChange: function(model, health, options) {
+      if (this.get("dead")) return this;
+
       options || (options = {});
       var cur = this.getStateInfo(),
           dir = options.dir || cur.dir;
-      
+
       if (health == 0)
         return this.knockout(options.sprite || null, dir, options.dir2 || null);
       else if (health < this.previous("health")) 
@@ -260,6 +262,7 @@
 
       // Velocity and state
       var self = this,
+          dead = this.get("dead"),
           velocity = this.get("velocity") || 0,
           yVelocity = this.get("yVelocity") || 0,
           x = this.get("x"),
@@ -280,7 +283,7 @@
         if (this.cancelUpdate) return true;
       }
 
-      if ((cur.mov == "ko" || cur.mov2 == "hurt") &&
+      if ((dead || cur.mov2 == "hurt") &&
           this.get("sequenceIndex") == animation.sequences.length-1) {
         // No sequence change - stay on last one
       } else {
@@ -404,7 +407,7 @@
           var worldLeft = -tileWidth,
               leftX = worldLeft,
               leftCharacter;
-          if (cur.mov != "idle" && !(cur.mov == "ko" && yVelocity == 0))
+          if (cur.mov != "idle" && !(dead && yVelocity == 0))
             for (i = 0; i < this.collisionMap.left.sprites.length; i++) {
               sprite = this.collisionMap.left.sprites[i];
               leftX = Math.max(leftX, sprite.getRight(true));
@@ -433,7 +436,7 @@
           var worldRight = this.world.width(),
               rightX = worldRight,
               rightCharacter;
-          if (cur.mov != "idle" && !(cur.mov == "ko" && yVelocity == 0))
+          if (cur.mov != "idle" && !(dead && yVelocity == 0))
             for (i = 0; i < this.collisionMap.right.sprites.length; i++) {
               sprite = this.collisionMap.right.sprites[i];
               rightX = Math.min(rightX, sprite.getLeft(true));

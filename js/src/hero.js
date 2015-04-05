@@ -312,12 +312,24 @@
       });
       return this;
     },
+    bounce: function(sprite, dir, dir2) {
+      var cur = this.getStateInfo(),
+          state = this.buildState("jump", cur.dir);
+      this.set({
+        state: state,
+        yVelocity: this.animations[state].yStartVelocity*0.5,
+        nextState: this.buildState("idle", cur.dir)
+      });
+      this.cancelUpdate = true;
+      return this;
+    },
     hit: function(sprite, dir, dir2) {
       if (this._handlingSpriteHit) return this;
       this._handlingSpriteHit = sprite;
 
       var cur = this.getStateInfo(),
           type = sprite.get("type"),
+          name = sprite.get("name"),
           attackDamage = this.get("attackDamage");
 
       if (type == "barrier") {
@@ -381,7 +393,8 @@
             });
             break;
         }
-
+      } else if (name == "spider" && dir == "bottom") {
+        this.bounce.apply(this, arguments);
       } else if (type == "character" && cur.mov2 != "hurt") {
         if (this.isAttacking(sprite) && !sprite.get("dead")) {
           // Hero is attacking

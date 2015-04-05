@@ -70,6 +70,18 @@
       yAcceleration: fallAcceleration,
       scaleX: -1,
       scaleY: 1
+    },
+    "squish-left": {
+      sequences: [32, 33, 33, 34],
+      delay: koDelay,
+      scaleX: 1,
+      scaleY: 1
+    },
+    "squish-right": {
+      sequences: [32, 33, 33, 34],
+      delay: koDelay,
+      scaleX: -1,
+      scaleY: 1
     }
   };
 
@@ -110,11 +122,30 @@
       aiDelay: 250
     }),
     animations: animations,
+    squish: function(sprite) {
+      this.whenAnimationEnds = null;
+      var cur = this.getStateInfo();
+      this.set({
+        state: this.buildState("squish", cur.opo),
+        health: 0,
+        velocity: 0,
+        yVelocity: 0,
+        sequenceIndex: 0,
+        dead: true,
+        collision: false
+      });
+      this.cancelUpdate = true;
+      return this;
+    },
     hit: function(sprite, dir, dir2) {
-      if (dir == "top" && sprite.get("type") == "breakable-tile") {
+      if (dir == "top" && sprite.get("hero") || sprite.get("type") == "breakable-tile") {
         if (this._handlingSpriteHit) return this;
         this._handlingSpriteHit = sprite;
+
+        if (sprite.get("hero")) this.squish.apply(this, arguments);
+
         sprite.trigger("hit", this, "bottom");
+
         this._handlingSpriteHit = undefined;
         return this;
       }
