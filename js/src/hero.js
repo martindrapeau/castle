@@ -282,7 +282,7 @@
       potion: null,
       fireAttackClass: null,
       swordColor: null,
-      farts: 0,
+      farts: false,
       houseId: undefined
     }),
     animations: animations,
@@ -293,6 +293,8 @@
       this._glowEasingTime = 2000;
       this._glowEasing = "linear";
       this._fartPool = new Backbone.Collection([
+        new Backbone.Fart(),
+        new Backbone.Fart(),
         new Backbone.Fart(),
         new Backbone.Fart(),
         new Backbone.Fart(),
@@ -391,7 +393,7 @@
             break;
           case "a-green-potion":
             this.cancelUpdate = true;
-            this.set("potion", "green");
+            this.set({potion: "green", farts: true});
             break;
           case "a-blue-sword":
             this.cancelUpdate = true;
@@ -492,22 +494,22 @@
       return true;
     },
     draw: function(context, options) {
-      var farts = this.get("farts");
-      if (this.world && farts) {
+      if (this.world && this.world.get("state") == "play" && this.get("farts")) {
         var now = _.now(),
-            used = 0;
-        this._fartPool.each(function(fart) {
-          if (fart.world) used += 1;
-        });
-        if (now > this._lastFartTime && used == 0) {
-          var fart = this._fartPool.first(),
-              x = this.get("x") + this.get("width")/2 + (this.attributes.state.indexOf("-left") >= 0 ? 10 : -30),
-              y = this.get("y") + 100;
-          fart.set({
-            x: x + Math.round((0.5-Math.random())*10),
-            y: y + Math.round((0.5-Math.random())*10)
-          });
-          this.world.add(fart);
+            time = 500 / (this.attributes.yVelocity ? 6 : 1);
+
+        if (now > this._lastFartTime + time) {
+          var fart = this._fartPool.find(function(fart) {return !fart.world;});
+          if (fart) {
+            var width = this.get("width"),
+                x = this.get("x") + width/2 + (this.attributes.state.indexOf("-left") >= 0 ? 10 : -30),
+                y = this.get("y") + 100;
+            fart.set({
+              x: x + Math.round((0.5-Math.random())*10),
+              y: y + Math.round((0.5-Math.random())*10)
+            });
+            this.world.add(fart);
+          }
           this._lastFartTime = now;
         }
       }
