@@ -91,7 +91,7 @@
   var HeroEventStack = EventStack.extend({
     onAttach: function() {
       this.hero = this.world.sprites.findWhere({hero: true});
-      this.hero.set("x", -80);
+      this.hero.set("x", 0);
     },
     onDetach: function() {
       this.hero = undefined;

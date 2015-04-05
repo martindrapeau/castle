@@ -72,13 +72,13 @@
       scaleY: 1
     },
     "squish-left": {
-      sequences: [32, 33, 33, 34],
+      sequences: [32, 33, 34],
       delay: koDelay,
       scaleX: 1,
       scaleY: 1
     },
     "squish-right": {
-      sequences: [32, 33, 33, 34],
+      sequences: [32, 33, 34],
       delay: koDelay,
       scaleX: -1,
       scaleY: 1

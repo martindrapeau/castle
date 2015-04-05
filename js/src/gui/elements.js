@@ -2,7 +2,7 @@
   
   Backbone.LabelButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
-      x: 400,
+      x: 432,
       y: 400,
       width: 160,
       height: 100,
@@ -25,8 +25,8 @@
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
       x: 0,
       y: 0,
-      width: 960,
-      height: 720,
+      width: 1024,
+      height: 768,
       backgroundColor: "#000",
       opacity: 0,
       text: "",

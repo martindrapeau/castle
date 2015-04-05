@@ -189,7 +189,7 @@
 
   Backbone.PausePanel = Backbone.InGamePanel.extend({
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
-      x: 320, y: 720, width: 320, height: 240,
+      x: 352, y: 768, width: 320, height: 240,
       text: "Pause",
       img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
     }),
@@ -233,7 +233,7 @@
 
   Backbone.DiedPanel = Backbone.InGamePanel.extend({
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
-      x: 320, y: 720, width: 320, height: 240,
+      x: 352, y: 768, width: 320, height: 240,
       text: "R.I.P.",
       img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
     }),
@@ -283,7 +283,7 @@
 
   Backbone.LevelEndPanel = Backbone.InGamePanel.extend({
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
-      x: 320, y: 720, width: 366, height: 305,
+      x: 352, y: 768, width: 366, height: 305,
       text: "Complete!",
       textContextAttributes: {
         fillStyle: "#FFF600",

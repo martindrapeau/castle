@@ -1,8 +1,8 @@
 (function() {
 
-  var SPRITES = [{"name":"f-grass2","state":"idle","x":0,"y":1216},{"name":"f-grass2","state":"idle","x":64,"y":1216},{"name":"f-grass2","state":"idle","x":128,"y":1216},{"name":"f-grass2","state":"idle","x":192,"y":1216},{"name":"f-grass2","state":"idle","x":256,"y":1216},{"name":"h-wall","state":"idle","x":320,"y":1024},{"name":"bc-brick4","state":"idle","x":320,"y":960},{"name":"bc-brick6","state":"idle","x":576,"y":960},{"name":"bc-brick5","state":"idle","x":512,"y":896},{"name":"bc-brick5","state":"idle","x":384,"y":896},{"name":"bc-brick5","state":"idle","x":384,"y":960},{"name":"bc-brick5","state":"idle","x":448,"y":960},{"name":"bc-brick5","state":"idle","x":512,"y":960},{"name":"bc-brick5","state":"idle","x":320,"y":1216},{"name":"bc-brick5","state":"idle","x":384,"y":1216},{"name":"bc-brick5","state":"idle","x":448,"y":1216},{"name":"bc-brick5","state":"idle","x":512,"y":1216},{"name":"bc-brick5","state":"idle","x":576,"y":1216},{"name":"hero1","state":"idle-right","x":192,"y":1092,"nextState":"idle-right","velocity":0,"acceleration":0,"yVelocity":0,"yAcceleration":0},{"name":"f-grass2","state":"idle","x":640,"y":1216},{"name":"f-grass2","state":"idle","x":704,"y":1216},{"name":"f-grass2","state":"idle","x":768,"y":1216},{"name":"f-grass2","state":"idle","x":832,"y":1216},{"name":"f-grass2","state":"idle","x":896,"y":1216},{"name":"f-bush1","state":"idle","x":832,"y":1152},{"name":"f-bush2","state":"idle","x":896,"y":1152},{"name":"bc-brick4","state":"idle","x":256,"y":832},{"name":"bc-brick7","state":"idle","x":256,"y":896},{"name":"bc-brick5","state":"idle","x":320,"y":896},{"name":"bc-brick5","state":"idle","x":320,"y":832},{"name":"bc-brick9","state":"idle","x":640,"y":896},{"name":"bc-brick6","state":"idle","x":640,"y":832},{"name":"bc-brick5","state":"idle","x":576,"y":832},{"name":"bc-brick5","state":"idle","x":576,"y":896},{"name":"bc-brick5","state":"idle","x":320,"y":768},{"name":"bc-brick5","state":"idle","x":384,"y":768},{"name":"bc-brick5","state":"idle","x":448,"y":768},{"name":"bc-brick5","state":"idle","x":512,"y":768},{"name":"bc-brick5","state":"idle","x":576,"y":768},{"name":"bc-brick5","state":"idle","x":320,"y":704},{"name":"bc-brick5","state":"idle","x":384,"y":704},{"name":"bc-brick5","state":"idle","x":448,"y":704},{"name":"bc-brick5","state":"idle","x":512,"y":704},{"name":"bc-brick5","state":"idle","x":576,"y":704},{"name":"bc-brick6","state":"idle","x":640,"y":768},{"name":"bc-brick6","state":"idle","x":640,"y":704},{"name":"bc-brick4","state":"idle","x":256,"y":768},{"name":"bc-brick4","state":"idle","x":256,"y":704},{"name":"bc-brick1","state":"idle","x":256,"y":640},{"name":"bc-brick2","state":"idle","x":384,"y":640},{"name":"bc-brick2","state":"idle","x":512,"y":640},{"name":"bc-brick3","state":"idle","x":640,"y":640},{"name":"bc-block1","state":"idle","x":384,"y":832},{"name":"bc-block2","state":"idle","x":448,"y":832},{"name":"bc-block2","state":"idle","x":448,"y":896},{"name":"bc-block1","state":"idle","x":512,"y":832},{"name":"f-grass2","state":"idle","x":960,"y":1216},{"name":"f-grass2","state":"idle","x":1024,"y":1216},{"name":"f-grass2","state":"idle","x":1088,"y":1216},{"name":"f-grass2","state":"idle","x":1152,"y":1216},{"name":"f-grass2","state":"idle","x":1216,"y":1216}],
-      WORLD = {"tileWidth":64,"tileHeight":64,"width":20,"height":20,"backgroundImage":"#background-town","puzzle":false,"level":99,"name":"TitleScreen","x":0,"y":-400,"backgroundColor":"rgba(2, 10, 23, 1)","sprites":SPRITES,"state":"play","viewportBottom":0,"viewportTop":0,"viewportRight":0,"viewportLeft":0,"time":0}
-  SPRITES.push({name: "barrier1x2", x: 576, y: 1088});
+  var SPRITES = [{"name":"f-grass2","state":"idle","x":64,"y":1216},{"name":"f-grass2","state":"idle","x":128,"y":1216},{"name":"f-grass2","state":"idle","x":192,"y":1216},{"name":"f-grass2","state":"idle","x":256,"y":1216},{"name":"f-grass2","state":"idle","x":320,"y":1216},{"name":"h-wall","state":"idle","x":384,"y":1024},{"name":"bc-brick4","state":"idle","x":384,"y":960},{"name":"bc-brick6","state":"idle","x":640,"y":960},{"name":"bc-brick5","state":"idle","x":576,"y":896},{"name":"bc-brick5","state":"idle","x":448,"y":896},{"name":"bc-brick5","state":"idle","x":448,"y":960},{"name":"bc-brick5","state":"idle","x":512,"y":960},{"name":"bc-brick5","state":"idle","x":576,"y":960},{"name":"bc-brick5","state":"idle","x":384,"y":1216},{"name":"bc-brick5","state":"idle","x":448,"y":1216},{"name":"bc-brick5","state":"idle","x":512,"y":1216},{"name":"bc-brick5","state":"idle","x":576,"y":1216},{"name":"bc-brick5","state":"idle","x":640,"y":1216},{"name":"f-grass2","state":"idle","x":704,"y":1216},{"name":"f-grass2","state":"idle","x":768,"y":1216},{"name":"f-grass2","state":"idle","x":832,"y":1216},{"name":"f-grass2","state":"idle","x":896,"y":1216},{"name":"f-grass2","state":"idle","x":960,"y":1216},{"name":"f-bush1","state":"idle","x":896,"y":1152},{"name":"f-bush2","state":"idle","x":960,"y":1152},{"name":"bc-brick4","state":"idle","x":320,"y":832},{"name":"bc-brick7","state":"idle","x":320,"y":896},{"name":"bc-brick5","state":"idle","x":384,"y":896},{"name":"bc-brick5","state":"idle","x":384,"y":832},{"name":"bc-brick9","state":"idle","x":704,"y":896},{"name":"bc-brick6","state":"idle","x":704,"y":832},{"name":"bc-brick5","state":"idle","x":640,"y":832},{"name":"bc-brick5","state":"idle","x":640,"y":896},{"name":"bc-brick5","state":"idle","x":384,"y":768},{"name":"bc-brick5","state":"idle","x":448,"y":768},{"name":"bc-brick5","state":"idle","x":512,"y":768},{"name":"bc-brick5","state":"idle","x":576,"y":768},{"name":"bc-brick5","state":"idle","x":640,"y":768},{"name":"bc-brick5","state":"idle","x":384,"y":704},{"name":"bc-brick5","state":"idle","x":448,"y":704},{"name":"bc-brick5","state":"idle","x":512,"y":704},{"name":"bc-brick5","state":"idle","x":576,"y":704},{"name":"bc-brick5","state":"idle","x":640,"y":704},{"name":"bc-brick6","state":"idle","x":704,"y":768},{"name":"bc-brick6","state":"idle","x":704,"y":704},{"name":"bc-brick4","state":"idle","x":320,"y":768},{"name":"bc-brick4","state":"idle","x":320,"y":704},{"name":"bc-brick1","state":"idle","x":320,"y":640},{"name":"bc-brick2","state":"idle","x":448,"y":640},{"name":"bc-brick2","state":"idle","x":576,"y":640},{"name":"bc-brick3","state":"idle","x":704,"y":640},{"name":"bc-block1","state":"idle","x":448,"y":832},{"name":"bc-block2","state":"idle","x":512,"y":832},{"name":"bc-block2","state":"idle","x":512,"y":896},{"name":"bc-block1","state":"idle","x":576,"y":832},{"name":"f-grass2","state":"idle","x":1024,"y":1216},{"name":"f-grass2","state":"idle","x":1088,"y":1216},{"name":"f-grass2","state":"idle","x":1152,"y":1216},{"name":"f-grass2","state":"idle","x":1216,"y":1216},{"name":"f-grass2","state":"idle","x":1280,"y":1216},{"name":"spider","state":"walk-left","x":1024,"y":1152},{"name":"f-grass2","state":"idle","x":0,"y":1216},{"name":"hero1","state":"idle-right","x":0,"y":1092,"nextState":"idle-right","velocity":0,"acceleration":0,"yVelocity":0,"yAcceleration":0}],
+      WORLD = {"tileWidth":64,"tileHeight":64,"width":20,"height":20,"backgroundImage":"#background-town","puzzle":false,"level":99,"name":"TitleScreen","x":-32,"y":-400,"backgroundColor":"rgba(2, 10, 23, 1)","sprites":SPRITES,"state":"play","viewportBottom":0,"viewportTop":0,"viewportRight":0,"viewportLeft":0,"time":0}
+  SPRITES.push({name: "barrier1x2", x: 640, y: 1088});
 
   Backbone.PullOutButton = Backbone.Button.extend({
     defaults: _.extend({}, Backbone.Button.prototype.defaults, {
@@ -26,7 +26,7 @@
 
   Backbone.SavedGame = Backbone.Element.extend({
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
-      x: 960,
+      x: 1024,
       y: 280,
       width: 333,
       height: 80,
@@ -132,8 +132,9 @@
       Backbone.Scene.prototype.initialize.apply(this, arguments);
 
       this.banner = new Backbone.Button({
-        x: 0, y: Backbone.HEIGHT/2 - 72,
-        width: 960, height: 145,
+        x: (Backbone.WIDTH - 960)/2,
+        y: Backbone.HEIGHT/2 - 72,
+        width: Backbone.WIDTH, height: 145,
         backgroundColor: "transparent",
         img: "#gui", imgX: 0, imgY: 80, imgWidth: 960, imgHeight: 144, imgMargin: 5,
         easing: "easeInOutQuad",
@@ -238,14 +239,14 @@
       this.stopListening(this.engine);
       this.ready = true;
       this.showButtons();
-      this.world.pan(0, this.engine.canvas.height - this.world.height());
+      this.world.pan(-32, this.engine.canvas.height - this.world.height());
     },
     showButtons: function() {
       this.play.moveTo(-this.play.get("width") + this.play.textMetrics.width + this.play.get("textPadding")*2, this.play.get("y"));
       this.levelButton.moveTo(-this.levelButton.get("width") + this.levelButton.textMetrics.width + this.levelButton.get("textPadding")*2, this.levelButton.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width") + this.showCredits.textMetrics.width + this.showCredits.get("textPadding")*2, this.showCredits.get("y"));
       if (this.saved.size() > 0)
-        this.savedGame.moveTo(720, this.savedGame.get("y"));
+        this.savedGame.moveTo(Backbone.HEIGHT, this.savedGame.get("y"));
 
       var world = this.world;
       setTimeout(function() {
@@ -256,7 +257,7 @@
       this.play.moveTo(-this.play.get("width"), this.play.get("y"));
       this.levelButton.moveTo(-this.levelButton.get("width"), this.levelButton.get("y"));
       this.showCredits.moveTo(-this.showCredits.get("width"), this.showCredits.get("y"));
-      this.savedGame.moveTo(960, this.savedGame.get("y"));
+      this.savedGame.moveTo(Backbone.WIDTH, this.savedGame.get("y"));
     },
     showPanel: function(panel) {
       this.panel = panel;

@@ -5,7 +5,7 @@
       level: 1,
       name: "",
       state: "locked", // locked, unlocked, played, future
-      width: 150, height: 160,
+      width: 166, height: 160,
       backgroundColor: "transparent",
       img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0,
       text: "",
@@ -95,14 +95,14 @@
         x: 0,
         y: 0,
         img: "#background-town",
-        imgWidth: 960,
+        imgWidth: 1024,
         imgHeight: 300
       });
       this.backgroundForest = new Backbone.Element({
         x: 0,
         y: 300,
         img: "#background-forest",
-        imgWidth: 960,
+        imgWidth: 1024,
         imgHeight: 420
       });
 
@@ -122,7 +122,7 @@
           startY = height / 2 - 80,
           view;
       for (var y = startY; y <= startY+height; y += height)
-        for (var x = 117; x < 885; x += 192) {
+        for (var x = 150; x < 900; x += 192) {
           view = this.views.add({
             level: level ? level.id : i,
             name: level ? level.get("name") : "",
