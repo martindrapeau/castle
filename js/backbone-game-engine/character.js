@@ -246,7 +246,7 @@
       if (now > this.animationEndTimeLimit) triggerAnimationEnd = true;
 
       if (triggerAnimationEnd && typeof this.whenAnimationEnds == "function") {
-        this.whenAnimationEnds.call(this);
+        _.defer(this.whenAnimationEnds.bind(this));
         this.whenAnimationEnds = null;
       }
 
