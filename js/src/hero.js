@@ -15,7 +15,8 @@
       fallAcceleration = 1200,
       airTurnaroundDeceleration = 400,
       fallVelocity = 600,
-      flyVelocity = -200,
+      flyBoostVelocity = -400,
+      flyFallVelocity = 100,
       idleDelay = 2500,
       walkDelay = 75,
       koDelay = 100,
@@ -420,6 +421,17 @@
       this._handlingSpriteHit = undefined;
       return this;
     },
+    buttonAToggled: function() {
+      if (this.ignoreInput()) return this;
+
+      if (this.get("potion") == "green" && !this.get("dead") && this.get("yVelocity") > 0 &&
+          this.input && this.input.buttonAPressed()) {
+        this.set("yVelocity", flyBoostVelocity);
+        return this;
+      }
+
+      return Backbone.Hero.prototype.buttonAToggled.apply(this, arguments);
+    },
     startAttack: function() {
       this.attackingSprite = undefined;
       this.set("attackDamage", this.get("maxAttackDamage"));
@@ -478,7 +490,7 @@
     update: function(dt) {
       if (this.get("potion") == "green" && !this.get("dead") && this.input && this.input.buttonAPressed()) {
         var yVelocity = this.get("yVelocity");
-        if (yVelocity > flyVelocity) this.set("yVelocity", flyVelocity);
+        if (yVelocity > flyFallVelocity) this.set("yVelocity", flyFallVelocity);
       }
       return Backbone.Hero.prototype.update.apply(this, arguments);
     },
