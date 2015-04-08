@@ -15,7 +15,7 @@
       fallAcceleration = 1200,
       airTurnaroundDeceleration = 400,
       fallVelocity = 600,
-      flyBoostVelocity = -400,
+      flyBoostVelocity = -500,
       flyFallVelocity = 100,
       idleDelay = 2500,
       walkDelay = 75,

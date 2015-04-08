@@ -116,7 +116,7 @@
       dead: false,
       ignorePhysics: false,
       floor: null,
-      ceiling: null,
+      ceiling: 0,
       aiDelay: 1000
     }),
     animations: animations,
@@ -378,7 +378,7 @@
 
       } else if (yVelocity < 0) {
         // Jumping
-        var topY = -400;
+        var topY = Math.max(-400,  this.get("ceiling"));
         for (i = 0; i < this.collisionMap.top.sprites.length; i++) {
           sprite = this.collisionMap.top.sprites[i];
           if (sprite.get("type") == "tile")

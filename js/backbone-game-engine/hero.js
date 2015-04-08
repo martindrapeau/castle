@@ -672,7 +672,7 @@
 
       } else {
         // Velocity is negative (going up). Stop if obstacle above.
-        var topY = Math.max(-400, this.get("ceiling") || -400);
+        var topY = Math.max(-400,  this.get("ceiling"));
         for (i = 0; i < this.collisionMap.top.sprites.length; i++)
           if (!dead && heroTopY > 0 )
             topY = Math.max(topY, this.collisionMap.top.sprites[i].getBottom(true));
