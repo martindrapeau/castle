@@ -400,6 +400,10 @@
       if (this.timeouts[timerId] != undefined)
         delete this.timeouts[timerId];
     },
+    clearAllTimeouts: function() {
+      for (var i=0; i<this.timeouts.length; i++)
+        delete this.timeouts[i];
+    },
     handleTimeouts: function() {
       var now = Date.now(),
           timerIds = _.keys(this.timeouts),
@@ -760,6 +764,7 @@
       return models;
     },
     remove: function(models, options) {
+      this.clearAllTimeouts();
       models = this.sprites.remove.apply(this.sprites, arguments);
       if (_.isArray(models)) {
         for (var i = 0; i < models.length; i++)

@@ -207,6 +207,10 @@
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "onEnd");
     },
+    onDetach: function() {
+      this.onEnd();
+      Backbone.Sprite.prototype.onDetach.apply(this, arguments);
+    },
     update: function(dt) {
       Backbone.Sprite.prototype.update.apply(this, arguments);
       var animation = this.getAnimation();
@@ -215,8 +219,9 @@
       return true;
     },
     onEnd: function() {
-      this.world.remove(this);
+      this.world.clearTimeout(this.endTimerId);
       this.endTimerId = undefined;
+      this.world.remove(this);
     }
   });
 

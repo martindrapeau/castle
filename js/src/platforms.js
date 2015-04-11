@@ -1,6 +1,6 @@
 (function() {
 
-  var floatVelocity = 60,
+  var floatVelocity = 80,
       floatAcceleration = 100;
 
 	var Platform = Backbone.Character.extend({
