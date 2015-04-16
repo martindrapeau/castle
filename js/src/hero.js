@@ -4,7 +4,7 @@
   var walkVelocity = 160,
       walkMinVelocity = 60,
       walkAcceleration = 300,
-      runVelocity = 220,
+      runVelocity = 260,
       runMinVelocity = 100,
       runAcceleration = 400,
       releaseDeceleration = 200,

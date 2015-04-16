@@ -28,8 +28,9 @@
     y: 0,
     tileWidth: tileWidth,
     tileHeight: tileHeight,
-    tileColumns: 4,
-    tileRows: 31
+    tilePadding: 2,
+    tileColumns: 9,
+    tileRows: 9
   }, {
     id: "houses",
     img: "#houses",
@@ -46,15 +47,6 @@
     y: 1600,
     tileWidth: 315,
     tileHeight: 90,
-    tileColumns: 1,
-    tileRows: 1
-  }, {
-    id: "platforms",
-    img: "#tiles",
-    x: 0,
-    y: 576,
-    tileWidth: 192,
-    tileHeight: 64,
     tileColumns: 1,
     tileRows: 1
   }, {

@@ -188,6 +188,7 @@
       img: undefined, // Element id to find image in DOM
       tileWidth: undefined,
       tileHeight: undefined,
+      tilePadding: 0,
       tileColumns: undefined,
       tileRows: undefined
     },
@@ -205,8 +206,8 @@
       for (var row = 0; row < sheet.tileRows; row++) {
         for (var col = 0; col < sheet.tileColumns; col++)
           this.frames.push({
-            x: sheet.x + col * sheet.tileWidth,
-            y: sheet.y + row * sheet.tileHeight,
+            x: sheet.x + col * (sheet.tileWidth + sheet.tilePadding),
+            y: sheet.y + row * (sheet.tileHeight + sheet.tilePadding),
             width: sheet.tileWidth,
             height: sheet.tileHeight
           });

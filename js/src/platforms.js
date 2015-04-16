@@ -153,8 +153,6 @@
     }
 	});
 
-  extendSprite(Platform, "h-grass-platform");
-
   extendSprite(Platform, "h-barge", _.extend({}, Platform.prototype.defaults, {
     state: "idle-right",
     spriteSheet: "barge",
