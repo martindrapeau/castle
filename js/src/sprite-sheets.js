@@ -38,6 +38,7 @@
     y: 0,
     tileWidth: 432,
     tileHeight: 384,
+    tilePadding: 2,
     tileColumns: 2,
     tileRows: 3
   }, {
@@ -47,6 +48,7 @@
     y: 1600,
     tileWidth: 315,
     tileHeight: 90,
+    tilePadding: 2,
     tileColumns: 1,
     tileRows: 1
   }, {
@@ -56,6 +58,7 @@
     y: 1152,
     tileWidth: 320,
     tileHeight: 192,
+    tilePadding: 2,
     tileColumns: 2,
     tileRows: 1
   }, {
@@ -65,6 +68,7 @@
     y: 1344,
     tileWidth: 384,
     tileHeight: 256,
+    tilePadding: 2,
     tileColumns: 2,
     tileRows: 1
   }, {
