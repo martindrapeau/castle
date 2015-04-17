@@ -11,6 +11,7 @@
 
   var keyboardImg = new Image();
   keyboardImg.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAAAwCAYAAABHTnUeAAACYklEQVR42u3dS5KCQBAEUNx5LJbcYs42t2DJsViOizFCnQH6U9Wd2ZW5JuQVmtAoEd4mRQmcW2+AovSMCqCEjgqghM5hAbZt++qNe808z9852zP7me1s/n8LgDZAyiCj+JntjP4/BUAd4GqQEfzMdla/CgDkZ7az+lUAID+zndWvAgD5me2sfhUAyM9sZ/WrAEB+ZjurXwUA8jPbWf0qAJCf2c7qVwGA/Mx2Vr8KAORntrP6VQAgf6798VpFhsd+zO0W/itX7vYpfvMCPJGlB7lkCEu/d1SAc/+RLWfbHL9pAV6RoxXAqtgqwPUMnz6LD/+R36QAVsDSIWr9uTPWzNb6HsDyvfE69mdGb39VAc7OQCMXoGbGlgWwPjF5Hvuj9X3tuv/KX1SAlEtvhAKUzNqqAB5X5ZYFONmHqT+rAKVrztSkDIdYACu/ld1rSep97K+OsUeBQxag5xzeBfC8H2tx8jl6b7wK7LIEut/v07qu1eDUIaz9tUEqgOVSVAVIxFqBU4co9edkWZZp3/fTbXovgby/jQu/BMqBj1YA9JvgFu9B+JvgnCEiFADla9BWJyB9DZqQ51Jh5AIg/RA2wtWX9oewHulZAIube4RHIX73ZWov8R/NQPcoRMvoYbi31yp2IBRguIfhWkQFeHutYgdiAYZ4HNo7KgCmndWvAgD5me2sfhUAyM9sZ/WrAEB+ZjurXwUA8jPbWf0qAJCf2c7qVwGA/Mx2Vr8KAORntrP6VQAgP7Od1a8CAPmZ7ax+/UkemJ/ZzujX36QC+pntbH79UbYSOiqAEjoqgBI6KoASOj+RrUxeKnOx4gAAAABJRU5ErkJggg==";
+  var opacity = 0.5;
 
   Backbone.InputButton = Backbone.Element.extend({
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
@@ -65,6 +66,7 @@
           pressed = this.get("pressed");
       //drawRect(context, x, y, width, height, "rgba(64, 64, 64, 0.5)");
       context.save();
+      context.globalAlpha = opacity;
       context.beginPath();
       context.moveTo(x+130, y+20);
       context.lineTo(x+40, y+80);
@@ -91,6 +93,7 @@
           pressed = this.get("pressed");
       //drawRect(context, x, y, width, height, "rgba(128, 128, 128, 0.5)");
       context.save();
+      context.globalAlpha = opacity;
       context.beginPath();
       context.moveTo(x+30, y+20);
       context.lineTo(x+120, y+80);
@@ -117,6 +120,7 @@
           pressed = this.get("pressed");
       //drawRect(context, x, y, width, height, "rgba(255, 255, 255, 0.5)");
       context.save();
+      context.globalAlpha = opacity;
       context.beginPath();
       context.arc(x+80, y+80, 60, 0, 2*Math.PI, false);
       context.fillStyle = "#111";
@@ -149,6 +153,7 @@
           pressed = this.get("pressed");
       //drawRect(context, x, y, width, height, "rgba(192, 192, 192, 0.5)");
       context.save();
+      context.globalAlpha = opacity;
       context.beginPath();
       context.arc(x+80, y+80, 60, 0, 2*Math.PI, false);
       context.fillStyle = "#111";
