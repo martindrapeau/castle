@@ -28,8 +28,8 @@
     y: 0,
     tileWidth: tileWidth,
     tileHeight: tileHeight,
-    tileColumns: 9,
-    tileRows: 9
+    tileColumns: 8,
+    tileRows: 16
   }, {
     id: "houses",
     img: "#houses",
