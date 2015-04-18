@@ -42,9 +42,9 @@
   extendSprite(Backbone.Tile, "f-ground5", {collision: true}, {idle: {sequences: [29]}});
   extendSprite(Backbone.Tile, "f-ground6", {collision: true}, {idle: {sequences: [30]}});
 
-  extendSprite(Backbone.Tile, "f-grass4", {collision: true, paddingTop: 18, paddingLeft: 8}, {idle: {sequences: [24]}});
-  extendSprite(Backbone.Tile, "f-grass5", {collision: true, paddingTop: 18}, {idle: {sequences: [25]}});
-  extendSprite(Backbone.Tile, "f-grass6", {collision: true, paddingTop: 18, paddingRight: 8}, {idle: {sequences: [26]}});
+  extendSprite(Backbone.Tile, "f-grass4", {collision: true, paddingLeft: 8}, {idle: {sequences: [24]}});
+  extendSprite(Backbone.Tile, "f-grass5", {collision: true}, {idle: {sequences: [25]}});
+  extendSprite(Backbone.Tile, "f-grass6", {collision: true, paddingRight: 8}, {idle: {sequences: [26]}});
 
   extendSprite(Backbone.Tile, "f-ground7", {collision: true}, {idle: {sequences: [20]}});
   extendSprite(Backbone.Tile, "f-ground8", {collision: true}, {idle: {sequences: [21]}});
@@ -57,11 +57,11 @@
   extendSprite(Backbone.Tile, "f-bush1", {collision: false}, {idle: {sequences: [110]}});
   extendSprite(Backbone.Tile, "f-bush2", {collision: false}, {idle: {sequences: [111]}});
 
-  extendSprite(Backbone.Tile, "f-sign1", {collision: false, zIndex: 1}, {idle: {sequences: [104]}});
-  extendSprite(Backbone.Tile, "f-sign2", {collision: false, zIndex: 1}, {idle: {sequences: [84]}});
+  extendSprite(Backbone.Tile, "f-sign1", {collision: false, zIndex: 1}, {idle: {sequences: [84]}});
+  extendSprite(Backbone.Tile, "f-sign2", {collision: false, zIndex: 1}, {idle: {sequences: [104]}});
 
-  extendSprite(Backbone.Tile, "f-fence1", {collision: false, zIndex: 1}, {idle: {sequences: [52]}});
-  extendSprite(Backbone.Tile, "f-fence2", {collision: false, zIndex: 1}, {idle: {sequences: [53]}});
+  extendSprite(Backbone.Tile, "f-fence1", {collision: false, zIndex: 1}, {idle: {sequences: [44]}});
+  extendSprite(Backbone.Tile, "f-fence2", {collision: false, zIndex: 1}, {idle: {sequences: [45]}});
 
   extendSprite(Backbone.Tile, "g-grass1", {collision: true}, {idle: {sequences: [40]}});
   extendSprite(Backbone.Tile, "g-grass2", {collision: true}, {idle: {sequences: [41]}});
