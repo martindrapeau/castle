@@ -21,7 +21,7 @@
       walkDelay = 75,
       koDelay = 100,
       runDelay = 50,
-      attackDelay = 50,
+      attackDelay = 30,
       attackSequences = [84, 85, 86, 87, 88, 89],
       jumpAttackSequences = [98, 99, 100, 101, 102, 103],
       skidAttackSequences = [112, 113, 114, 115, 116],
@@ -321,6 +321,7 @@
         velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
         sequenceIndex: 0
       });
+      this.hurtStartTime = _.now();
       return this;
     },
     bounce: function(sprite, dir, dir2) {
@@ -346,15 +347,16 @@
       if (type == "barrier") {
 
       } else if (type == "breakable-tile") {
-        if (this.isAttacking(sprite)) {
+        if (this.isAttacking(sprite))
           this.set("attackDamage", Math.min(attackDamage-1, 0));
-        }
       } else if (type == "tile") {
         if (sprite.get("name") == "bc-spikes") {
           this.cancelUpdate = true;
           this.set({health: 0}, {sprite: sprite, dir: dir, dir2: dir2});
         }
       } else if (type == "artifact") {
+        if (this.isAttacking(sprite))
+          this.set("attackDamage", Math.min(attackDamage-1, 0));
         switch (sprite.get("name")) {
           case "a-coin":
             this.cancelUpdate = true;
@@ -491,6 +493,11 @@
       if (this.get("potion") == "green" && !this.get("dead") && this.input && this.input.buttonAPressed()) {
         var yVelocity = this.get("yVelocity");
         if (yVelocity > flyFallVelocity) this.set("yVelocity", flyFallVelocity);
+      }
+      if (this.get("state").indexOf("hurt") != -1 && this.hurtStartTime && _.now() > this.hurtStartTime + 1000) {
+        var cur = this.getStateInfo();
+        this.set({state: this.buildState(cur.mov, cur.dir)}, {silent:true});
+        this.hurtStartTime = undefined;
       }
       return Backbone.Hero.prototype.update.apply(this, arguments);
     },
