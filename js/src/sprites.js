@@ -208,7 +208,7 @@
       _.bindAll(this, "onEnd");
     },
     onDetach: function() {
-      this.onEnd();
+      if (this.world && this.endTimerId) this.onEnd();
       Backbone.Sprite.prototype.onDetach.apply(this, arguments);
     },
     update: function(dt) {

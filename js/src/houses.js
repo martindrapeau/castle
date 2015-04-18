@@ -214,7 +214,7 @@
             house.insideSprites = _.without(house.insideSprites, sprite);
           });
           this.listenTo(world.sprites, "add", function(sprite) {
-            house.insideSprites.push(sprite);
+            if (sprite.get("persist")) house.insideSprites.push(sprite);
           });
           world.requestBackgroundRedraw = true;
           break;

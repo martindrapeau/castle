@@ -116,6 +116,7 @@
         sprite.engine = undefined;
         sprite.trigger("detach");
       });
+      this.clearAllTimeouts();
       this.off("change:viewportLeft change:viewportRight change:viewportTop change:viewportBottom", this.updateViewport);
     },
     onStateChange: function() {
@@ -294,6 +295,8 @@
             input: this.input
           };
 
+      this.clearAllTimeouts();
+      
       var sprites = _.clone(this.sprites.models);
       _.each(sprites, function(sprite) {
         world.remove(sprite);
@@ -764,7 +767,6 @@
       return models;
     },
     remove: function(models, options) {
-      this.clearAllTimeouts();
       models = this.sprites.remove.apply(this.sprites, arguments);
       if (_.isArray(models)) {
         for (var i = 0; i < models.length; i++)
