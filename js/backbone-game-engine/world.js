@@ -112,6 +112,7 @@
     },
     onDetach: function() {
       this.stopListening(this.engine);
+      if (this.camera) this.camera.setOptions({subject: undefined});
       this.sprites.each(function(sprite) {
         sprite.engine = undefined;
         sprite.trigger("detach");
@@ -296,7 +297,7 @@
           };
 
       this.clearAllTimeouts();
-      
+
       var sprites = _.clone(this.sprites.models);
       _.each(sprites, function(sprite) {
         world.remove(sprite);

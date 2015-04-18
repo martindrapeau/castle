@@ -90,10 +90,12 @@
 
   var HeroEventStack = EventStack.extend({
     onAttach: function() {
+      EventStack.prototype.onAttach.apply(this, arguments);
       this.hero = this.world.sprites.findWhere({hero: true});
-      this.hero.set("x", 0);
+      //this.hero.set("x", 0);
     },
     onDetach: function() {
+      EventStack.prototype.onDetach.apply(this, arguments);
       this.hero = undefined;
     },
     stack: [{

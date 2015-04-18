@@ -210,12 +210,11 @@
 
       var camera = this.world.camera;
       this.world.camera = undefined;
-      this.world.set(WORLD);
-      this.world.set("state", "pause");
-      if (!this.ready)
-        this.world.set("y", -400 - (720 - Backbone.HEIGHT) / 2);
-      else
-        this.world.set("y", this.engine.canvas.height - this.world.height());
+      this.world.set(_.extend(WORLD, {
+        x: -32,
+        y: !this.ready ? (-400 - (720 - Backbone.HEIGHT) / 2) : (this.engine.canvas.height - this.world.height()),
+        state: "pause"
+      }));
       this.world.spawnSprites();
       this.world.camera = camera;
 
