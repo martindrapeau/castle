@@ -24,6 +24,7 @@
   extendSprite(Backbone.Tile, "bc-pillar-solid3", {collision: true}, {idle: {sequences: [88]}});
 
   extendSprite(Backbone.Tile, "bc-spikes", {collision: true, paddingTop: 25}, {idle: {sequences: [82]}});
+  extendSprite(Backbone.Tile, "bc-spikes2", {collision: true, paddingBottom: 25}, {idle: {sequences: [87]}});
 
   extendSprite(Backbone.Tile, "bc-table1", {collision: true, zIndex: 1}, {idle: {sequences: [46]}});
   extendSprite(Backbone.Tile, "bc-table2", {collision: true, zIndex: 1}, {idle: {sequences: [47]}});
@@ -93,7 +94,7 @@
   extendSprite(Backbone.Tile, "g-tombstone3", {collision: true, zIndex: 1, paddingTop: 24}, {idle: {sequences: [78]}});
 
   
-  Backbone.BcSpikes.prototype.initialize = function(attributes, options) {
+  Backbone.BcSpikes.prototype.initialize = Backbone.BcSpikes2.prototype.initialize = function(attributes, options) {
     Backbone.Tile.prototype.initialize.apply(this, arguments);
     this.on("hit", this.hit, this);
   };
@@ -103,6 +104,16 @@
 
     if (dir == "top")
       sprite.trigger("hit", this, "bottom");
+
+    this._handlingSpriteHit = undefined;
+    return this;
+  };
+  Backbone.BcSpikes2.prototype.hit = function(sprite, dir, dir2) {
+    if (this._handlingSpriteHit) return this;
+    this._handlingSpriteHit = sprite;
+
+    if (dir == "bottom")
+      sprite.trigger("hit", this, "top");
 
     this._handlingSpriteHit = undefined;
     return this;
