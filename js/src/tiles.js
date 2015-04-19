@@ -8,9 +8,16 @@
   extendSprite(Backbone.Tile, "bc-brick5", {collision: true}, {idle: {sequences: [9]}});
   extendSprite(Backbone.Tile, "bc-brick6", {collision: true}, {idle: {sequences: [10]}});
 
-  extendSprite(Backbone.Tile, "bc-brick7", {collision: true}, {idle: {sequences: [16]}});
-  extendSprite(Backbone.Tile, "bc-brick8", {collision: true}, {idle: {sequences: [17]}});
-  extendSprite(Backbone.Tile, "bc-brick9", {collision: true}, {idle: {sequences: [18]}});
+  extendSprite(Backbone.Tile, "bc-brick7", {collision: true}, {idle: {sequences: [24]}});
+  extendSprite(Backbone.Tile, "bc-brick8", {collision: true}, {idle: {sequences: [25]}});
+  extendSprite(Backbone.Tile, "bc-brick9", {collision: true}, {idle: {sequences: [26]}});
+
+  extendSprite(Backbone.Tile, "bc-brick10", {collision: true}, {idle: {sequences: [16]}});
+  extendSprite(Backbone.Tile, "bc-brick11", {collision: true}, {idle: {sequences: [18]}});
+
+  extendSprite(Backbone.Tile, "bc-brick12", {collision: true}, {idle: {sequences: [120]}});
+  extendSprite(Backbone.Tile, "bc-brick13", {collision: true}, {idle: {sequences: [17]}});
+  extendSprite(Backbone.Tile, "bc-brick14", {collision: true}, {idle: {sequences: [121]}});
   
   extendSprite(Backbone.Tile, "bc-block1", {collision: true}, {idle: {sequences: [98]}});
   extendSprite(Backbone.Tile, "bc-block2", {collision: true}, {idle: {sequences: [99]}});
@@ -43,14 +50,14 @@
   extendSprite(Backbone.Tile, "f-ground5", {collision: true}, {idle: {sequences: [29]}});
   extendSprite(Backbone.Tile, "f-ground6", {collision: true}, {idle: {sequences: [30]}});
 
-  extendSprite(Backbone.Tile, "f-grass4", {collision: true, paddingLeft: 8}, {idle: {sequences: [24]}});
-  extendSprite(Backbone.Tile, "f-grass5", {collision: true}, {idle: {sequences: [25]}});
-  extendSprite(Backbone.Tile, "f-grass6", {collision: true, paddingRight: 8}, {idle: {sequences: [26]}});
+  extendSprite(Backbone.Tile, "f-grass4", {collision: true, paddingLeft: 8}, {idle: {sequences: [125]}});
+  extendSprite(Backbone.Tile, "f-grass5", {collision: true}, {idle: {sequences: [126]}});
+  extendSprite(Backbone.Tile, "f-grass6", {collision: true, paddingRight: 8}, {idle: {sequences: [127]}});
 
   extendSprite(Backbone.Tile, "f-ground7", {collision: true}, {idle: {sequences: [20]}});
   extendSprite(Backbone.Tile, "f-ground8", {collision: true}, {idle: {sequences: [21]}});
-  extendSprite(Backbone.Tile, "f-water", {collision: false}, {idle: {sequences: [114]}});
-  extendSprite(Backbone.Tile, "f-water2", {collision: false}, {idle: {sequences: [122]}});
+  extendSprite(Backbone.Tile, "f-water", {collision: false}, {idle: {sequences: [115]}});
+  extendSprite(Backbone.Tile, "f-water2", {collision: false}, {idle: {sequences: [123]}});
 
   extendSprite(Backbone.Tile, "f-stump1", {collision: true, paddingTop: 20, paddingLeft: 32}, {idle: {sequences: [94]}});
   extendSprite(Backbone.Tile, "f-stump2", {collision: true, paddingTop: 20, paddingRight: 32}, {idle: {sequences: [95]}});
