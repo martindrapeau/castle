@@ -309,16 +309,17 @@
     knockout: function(sprite, dir) {
       Backbone.Hero.prototype.knockout.apply(this, arguments);
       this.set("ignorePhysics", false);
+      if (dir == "top") this.set("yVelocity", 0);
       return this;
     },
     hurt: function(sprite, dir) {
-      dir = dir == "right" ? "right" : "left";
-      var opo = _.opo(dir);
+      var hDir = dir == "right" ? "right" : "left";
+      var opo = _.opo(hDir);
       this.set({
         state: this.buildState("jump", "hurt", opo),
-        nextState: this.buildState("idle", dir),
-        yVelocity: hurtBounceVelocity,
-        velocity: hurtBounceVelocity * (dir == "left" ? -1 : 1) / 2,
+        nextState: this.buildState("idle", hDir),
+        yVelocity: dir != "top" ? hurtBounceVelocity : 0,
+        velocity: hurtBounceVelocity * (hDir == "left" ? -1 : 1) / 2,
         sequenceIndex: 0
       });
       this.hurtStartTime = _.now();
@@ -350,9 +351,9 @@
         if (this.isAttacking(sprite))
           this.set("attackDamage", Math.min(attackDamage-1, 0));
       } else if (type == "tile") {
-        if (sprite.get("name").indexOf("bc-spikes") === 0) {
+        if (sprite.get("name").indexOf("bc-spikes") === 0 && cur.mov2 != "hurt") {
           this.cancelUpdate = true;
-          this.set({health: 0}, {sprite: sprite, dir: dir, dir2: dir2});
+          this.set({health: Math.max(this.get("health") - 4, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
         }
       } else if (type == "artifact") {
         if (this.isAttacking(sprite))
