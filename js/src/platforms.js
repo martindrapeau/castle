@@ -9,7 +9,6 @@
       type: "platform",
       width: 192,
       height: 64,
-      paddingTop: 16,
       state: "float-left",
       collision: true
     }),
@@ -194,6 +193,13 @@
       return this;
     }
   });
+
+  extendSprite(Platform, "h-block-platform", _.extend({}, Platform.prototype.defaults, {
+    state: "float-right",
+    spriteSheet: "block-platform",
+    width: 128,
+    height: 64
+  }));
 
 
 

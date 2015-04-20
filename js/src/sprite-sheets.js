@@ -31,6 +31,15 @@
     tileColumns: 8,
     tileRows: 16
   }, {
+    id: "block-platform",
+    img: "#tiles",
+    x: 128,
+    y: 768,
+    tileWidth: 128,
+    tileHeight: 64,
+    tileColumns: 1,
+    tileRows: 1
+  }, {
     id: "houses",
     img: "#houses",
     x: 0,
