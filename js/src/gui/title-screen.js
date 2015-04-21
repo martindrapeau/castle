@@ -233,7 +233,7 @@
     },
     onTouchStart: function(e) {
       // Animate some stuff
-      this.banner.moveTo(this.banner.get("x"), -this.banner.get("height"));
+      this.banner.moveTo(this.banner.get("x"), -this.banner.get("height")-5);
       this.touchStart.moveTo(this.touchStart.get("x"), Backbone.HEIGHT);
       this.stopListening(this.engine);
       this.ready = true;
