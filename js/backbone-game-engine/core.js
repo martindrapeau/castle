@@ -709,6 +709,7 @@
       switch (context.textBaseline) {
         case "top":
           y += padding + offsetY;
+          break;
         case "bottom":
           y += b.height - padding - (lines.length-1)*b.textLineHeight - offsetY;
           break;

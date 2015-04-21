@@ -5,15 +5,16 @@
       level: 1,
       name: "",
       state: "locked", // locked, unlocked, played, future
-      width: 166, height: 160,
+      width: 150, height: 140,
       backgroundColor: "transparent",
       img: "#gui", imgX: 650, imgY: 700, imgWidth: 150, imgHeight: 140, imgMargin: 0,
       text: "",
       textLineHeight: 20,
+      textPadding:  130,
       textContextAttributes: {
         fillStyle: "#F67D00",
         font: "18px arcade",
-        textBaseline: "bottom",
+        textBaseline: "top",
         fontWeight: "normal",
         textAlign: "center"
       }
@@ -91,6 +92,10 @@
   });
 
   Backbone.LevelScreenGui = Backbone.Scene.extend({
+    defaults: _.extend({}, Backbone.Scene.prototype.defaults, {
+      easingTime: 1000,
+      easing: "easeInOutCubic"
+    }),
     initialize: function(attributes, options) {
       Backbone.Scene.prototype.initialize.apply(this, arguments);
       _.bindAll(this, "_calculateState");
@@ -102,14 +107,36 @@
         imgWidth: 1024,
         imgHeight: 300
       });
+      this.backgroundTown._origY = this.backgroundTown.get("y");
+
       this.backgroundForest = new Backbone.Element({
         x: 0,
         y: 300,
         img: "#backgrounds",
         imgY: 300,
         imgWidth: 1024,
+        imgHeight: 300
+      });
+      this.backgroundForest._origY = this.backgroundForest.get("y");
+
+      this.backgroundGraveyard = new Backbone.Element({
+        x: 0,
+        y: 600,
+        img: "#backgrounds",
+        imgWidth: 1024,
+        imgHeight: 300
+      });
+      this.backgroundGraveyard._origY = this.backgroundGraveyard.get("y");
+
+      this.backgroundCastle = new Backbone.Element({
+        x: 0,
+        y: 900,
+        img: "#backgrounds",
+        imgY: 300,
+        imgWidth: 1024,
         imgHeight: 420
       });
+      this.backgroundCastle._origY = this.backgroundCastle.get("y");
 
       this.backButton = new Backbone.Button({
         x: 20, y: Backbone.HEIGHT - 100,
@@ -119,14 +146,32 @@
       });
       this.backButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
 
+      this.upButton = new Backbone.Button({
+        x: Backbone.WIDTH - 90,
+        y: 30,
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 800, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0
+      });
+      this.upButton.on("tap", _.partial(this.moveTo, 0, 0), this);
+
+      this.downButton = new Backbone.Button({
+        x: Backbone.WIDTH - 90,
+        y: Backbone.HEIGHT - 100,
+        width: 70, height: 70,
+        backgroundColor: "transparent",
+        img: "#gui", imgX: 870, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0
+      });
+      this.downButton.on("tap", _.partial(this.moveTo, 0, -600), this);
+
       this.views = new Backbone.LevelViewCollection();
 
       var level = this.levels.first(),
           i = level ? level.id : 1,
-          height = Backbone.HEIGHT / 2,
-          startY = height / 2 - 80,
+          height = 300,
+          startY = height / 2 - 75,
           view;
-      for (var y = startY; y <= startY+height; y += height)
+      for (var y = startY; y <= startY+height*3; y += height)
         for (var x = 150; x < 900; x += 192) {
           view = this.views.add({
             level: level ? level.id : i,
@@ -141,13 +186,18 @@
           i = level ? level.id : (i + 1);
         }
 
+      for (var i = 0; i < this.views.models.length; i++) {
+        var model = this.views.models[i];
+        model._origY = model.get("y");
+      }
+
     },
     onAttach: function() {
       Backbone.Scene.prototype.onAttach.apply(this, arguments);
       this.stopListening(this.engine);
       this.set("opacity", 0);
 
-      this.engine.add([this.backgroundTown, this.backgroundForest, this.backButton]);
+      this.engine.add([this.backgroundTown, this.backgroundForest, this.backgroundGraveyard, this.backgroundCastle, this.backButton, this.upButton, this.downButton]);
       this.engine.add(this.views.models);
       this.updateLevelStates();
 
@@ -155,7 +205,7 @@
     },
     onDetach: function() {
       Backbone.Scene.prototype.onDetach.apply(this, arguments);
-      this.engine.remove([this.backgroundTown, this.backgroundForest, this.backButton]);
+      this.engine.remove([this.backgroundTown, this.backgroundForest, this.backgroundGraveyard, this.backgroundCastle, this.backButton, this.upButton, this.downButton]);
       this.engine.remove(this.views.models);
     },
     _calculateState: function(level) {
@@ -179,13 +229,30 @@
       if (!Backbone.Scene.prototype.update.apply(this, arguments)) return false;
 
       var attrs = {opacity: this.get("opacity")},
-          options = {silent: true};
+          options = {silent: true},
+          y = this.get("y");
 
       this.backButton.set(attrs, options);
+      this.upButton.set(y != 0 ? attrs : {opacity: 0}, options);
+      this.downButton.set(y != -600 ? attrs : {opacity: 0}, options);
+
+      attrs.y = y + this.backgroundTown._origY;
       this.backgroundTown.set(attrs, options);
+
+      attrs.y = y + this.backgroundForest._origY;
       this.backgroundForest.set(attrs, options);
-      for (var i = 0; i < this.views.models.length; i++)
-        this.views.models[i].set(attrs, options);
+
+      attrs.y = y + this.backgroundGraveyard._origY;
+      this.backgroundGraveyard.set(attrs, options);
+
+      attrs.y = y + this.backgroundCastle._origY;
+      this.backgroundCastle.set(attrs, options);
+
+      for (var i = 0; i < this.views.models.length; i++) {
+        var model = this.views.models[i];
+        attrs.y = y + model._origY;
+        model.set(attrs, options);
+      }
 
       return true;
     },
