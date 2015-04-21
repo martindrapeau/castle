@@ -151,7 +151,7 @@ $(window).on("load", function() {
       this.pauseButton = new Backbone.Button({
         id: "pauseButton",
         x: 16, y: 4, width: 70, height: 70, backgroundColor: "transparent",
-        img: "#gui", imgX: 210, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
+        img: "#gui", imgX: 590, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0
       });
 
       this.pausePanel = new Backbone.PausePanel({

@@ -62,7 +62,7 @@
       width: 640,
       height: 140,
       backgroundColor: "transparent",
-      img: "#gui", imgX: 0, imgY: 473, imgWidth: 640, imgHeight: 480, imgMargin: 0,
+      img: "#gui", imgX: 0, imgY: 560, imgWidth: 640, imgHeight: 460, imgMargin: 0,
       text: "",
       textPadding: 24,
       textContextAttributes: {

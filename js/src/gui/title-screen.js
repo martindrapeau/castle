@@ -31,7 +31,7 @@
       width: 333,
       height: 80,
       backgroundColor: "transparent",
-      img: "#gui", imgX: 0, imgY: 225, imgWidth: 333, imgHeight: 247, imgMargin: 0,
+      img: "#gui", imgX: 0, imgY: 250, imgWidth: 333, imgHeight: 247, imgMargin: 0,
       text: "High Score",
       textPadding: 24,
       textContextAttributes: {
@@ -121,7 +121,7 @@
 
       b.textContextAttributes.fillStyle = "#DDD";
       b.text = "Built with Backbone Game Engine";
-      b.y = y + 340;
+      b.y = y + 330;
       this.drawText(b, context, options);
 
     }
@@ -136,7 +136,7 @@
         y: Backbone.HEIGHT/2 - 72,
         width: Backbone.WIDTH, height: 145,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 0, imgY: 80, imgWidth: 960, imgHeight: 144, imgMargin: 5,
+        img: "#gui", imgX: 0, imgY: 82, imgWidth: 960, imgHeight: 144, imgMargin: 5,
         easing: "easeInOutQuad",
         easingTime: 400
       });

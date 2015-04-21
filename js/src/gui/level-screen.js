@@ -7,7 +7,7 @@
       state: "locked", // locked, unlocked, played, future
       width: 166, height: 160,
       backgroundColor: "transparent",
-      img: "#gui", imgX: 0, imgY: 1696, imgWidth: 150, imgHeight: 140, imgMargin: 0,
+      img: "#gui", imgX: 650, imgY: 700, imgWidth: 150, imgHeight: 140, imgMargin: 0,
       text: "",
       textLineHeight: 20,
       textContextAttributes: {
@@ -48,18 +48,22 @@
 
       switch (this.attributes.state) {
         case "locked":
-          attrs.imgX = 300;
+          attrs.imgX = 650;
+          attrs.imgY = 850;
           break;
         case "unlocked":
-          attrs.imgX = 150;
+          attrs.imgX = 800;
+          attrs.imgY = 700;
           break;
         case "future":
-          attrs.imgX = 450;
+          attrs.imgX = 800;
+          attrs.imgY = 850;
           attrs.textContextAttributes.fillStyle = "#999";
           attrs.text = "Comming\nSoon";
           break;
         case "played":
-          attrs.imgX = 0;
+          attrs.imgX = 650;
+          attrs.imgY = 700;
           this.scoreTextAttributes.text = this.get("coins");
           break;
       }
@@ -110,7 +114,7 @@
         x: 20, y: Backbone.HEIGHT - 100,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 350, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0
+        img: "#gui", imgX: 730, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0
       });
       this.backButton.on("tap", _.partial(this.action, "showTitleScreen"), this);
 

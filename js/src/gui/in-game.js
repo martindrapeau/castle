@@ -103,7 +103,7 @@
         offsetX: 80, offsetY: 180,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 0, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        img: "#gui", imgX: 380, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0,
         click: "home"
       }
     },
@@ -191,7 +191,7 @@
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
       x: 352, y: 768, width: 320, height: 240,
       text: "Pause",
-      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
+      img: "#gui", imgX: 340, imgY: 250, imgWidth: 320, imgHeight: 300, imgMargin: 0
     }),
     buttons: {
       home: _.clone(Backbone.InGamePanel.prototype.buttons.home),
@@ -199,7 +199,7 @@
         offsetX: 170, offsetY: 180,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 140, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        img: "#gui", imgX: 520, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0,
         click: "resume"
       }
     },
@@ -235,7 +235,7 @@
     defaults: _.extend({}, Backbone.InGamePanel.prototype.defaults, {
       x: 352, y: 768, width: 320, height: 240,
       text: "R.I.P.",
-      img: "#gui", imgX: 0, imgY: 952, imgWidth: 320, imgHeight: 300, imgMargin: 0
+      img: "#gui", imgX: 340, imgY: 250, imgWidth: 320, imgHeight: 300, imgMargin: 0
     }),
     buttons: {
       home: _.clone(Backbone.InGamePanel.prototype.buttons.home),
@@ -243,7 +243,7 @@
         offsetX: 170, offsetY: 180,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 70, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        img: "#gui", imgX: 450, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0,
         click: "replay"
       }
     },
@@ -292,7 +292,7 @@
         fontWeight: "normal",
         textAlign: "center"
       },
-      img: "#gui", imgX: 0, imgY: 1322, imgWidth: 366, imgHeight: 375, imgMargin: 0
+      img: "#gui", imgX: 660, imgY: 250, imgWidth: 366, imgHeight: 375, imgMargin: 0
     }),
     buttons: {
       home: _.extend({}, Backbone.InGamePanel.prototype.buttons.home, {
@@ -302,7 +302,7 @@
         offsetX: 209, offsetY: 330,
         width: 70, height: 70,
         backgroundColor: "transparent",
-        img: "#gui", imgX: 280, imgY: 1252, imgWidth: 70, imgHeight: 70, imgMargin: 0,
+        img: "#gui", imgX: 660, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0,
         click: "next"
       }
     },
