@@ -21,6 +21,11 @@
       height: 17,
       viewportTop: 0, viewportRight: 0, viewportBottom: 0, viewportLeft: 0,
       backgroundColor: "rgba(66, 66, 255, 1)",
+      backgroundImage: undefined,
+      backgroundImageX: 0,
+      backgroundImageY: 0,
+      backgroundImageWidth: 0,
+      backgroundImageHeight: 0,
       sprites: [], // Copy for persistence only. Use the direct member sprites which is a collection.
       state: "play", // play or pause
       time: 0 // Time played in ms
@@ -286,6 +291,10 @@
         throw "Invalid img #" + id + " for world backgroundImage. Cannot find element by id.";
 
       this.backgroundImage = img;
+      this.set({
+        backgroundImageWidth: this.get("backgroundImageWidth") || img.width,
+        backgroundImageHeight: this.get("backgroundImageHeight") || img.height
+      });
       return this;
     },
     spawnSprites: function() {
@@ -494,11 +503,14 @@
 
       if (this.backgroundImage) {
         var img = this.backgroundImage,
-            width = context.canvas.width < img.width ? context.canvas.width : img.width,
-            height = context.canvas.height < img.height ? context.canvas.height : img.height;
+            width = this.get("backgroundImageWidth"),
+            height = this.get("backgroundImageHeight");
+        if (context.canvas.width < width) width = context.canvas.width;
+        if (context.canvas.height < height) height = context.canvas.height;
         context.drawImage(
           img,
-          0, 0, width, height,
+          this.get("backgroundImageX"), this.get("backgroundImageY"),
+          width, height,
           0, 0, width, height
         );
       }

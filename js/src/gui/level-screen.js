@@ -98,14 +98,15 @@
       this.backgroundTown = new Backbone.Element({
         x: 0,
         y: 0,
-        img: "#background-town",
+        img: "#backgrounds",
         imgWidth: 1024,
         imgHeight: 300
       });
       this.backgroundForest = new Backbone.Element({
         x: 0,
         y: 300,
-        img: "#background-forest",
+        img: "#backgrounds",
+        imgY: 300,
         imgWidth: 1024,
         imgHeight: 420
       });
