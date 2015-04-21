@@ -483,7 +483,7 @@
   buildBreakableTile("a-block-coin", 98, {artifact: "a-coin"});
   buildBreakableTile("a-block-coin-bag", 98, {artifact: "a-coin-bag"});
   buildBreakableTile("a-block-key", 98, {artifact: "a-key"});
-  buildBreakableTile("a-block-red-potion", 98, {artifact: "a-red-potion"});
+  buildBreakableTile("a-block-green-potion", 98, {artifact: "a-green-potion"});
   buildBreakableTile("a-block-health", 98, {artifact: "a-health"});
   buildBreakableTile("a-block-death", 98, {artifact: "a-death"});
   buildBreakableTile("a-block-spider", 98, {artifact: "spider"});
