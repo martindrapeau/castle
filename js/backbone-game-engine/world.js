@@ -295,7 +295,7 @@
         backgroundImageWidth: this.get("backgroundImageWidth") || img.width,
         backgroundImageHeight: this.get("backgroundImageHeight") || img.height
       });
-      console.log("backgroundImage", img.width, img.height, this.get("backgroundImageWidth"), this.get("backgroundImageHeight"));
+      //console.log("backgroundImage", img.width, img.height, this.get("backgroundImageWidth"), this.get("backgroundImageHeight"));
       return this;
     },
     spawnSprites: function() {
