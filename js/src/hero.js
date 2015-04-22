@@ -21,7 +21,7 @@
       walkDelay = 75,
       koDelay = 100,
       runDelay = 50,
-      attackDelay = 30,
+      attackDelay = 40,
       attackSequences = [84, 85, 86, 87, 88, 89],
       jumpAttackSequences = [98, 99, 100, 101, 102, 103],
       skidAttackSequences = [112, 113, 114, 115, 116],
@@ -467,12 +467,12 @@
       if (this.attributes.state.indexOf("-attack") == -1) return null;
 
       this.attackCollisionPoints || (this.attackCollisionPoints = [
-        {x: 40, y: 0},
-        {x: 70, y: 10},
-        {x: 120, y: 30},
-        {x: 120, y: 70},
-        {x: 120, y: 100},
-        {x: 120, y: 120}
+        {x: 40, y: 0, width: 10, height: 10},
+        {x: 70, y: 10, width: 10, height: 10},
+        {x: 110, y: 30, width: 10, height: 10},
+        {x: 110, y: 60, width: 10, height: 10},
+        {x: 110, y: 90, width: 10, height: 10},
+        {x: 110, y: 110, width: 10, height: 10}
       ]);
 
       var sequenceIndex =  this.get("sequenceIndex"),
@@ -480,7 +480,7 @@
           x = this.get("x") + (this.attributes.state.indexOf("-left") >= 0 ? this.get("width") - point.x : point.x),
           y = this.get("y") + point.y;
 
-      return {x: x, y: y};
+      return {x: x, y: y, width: point.width, height: point.width};
     },
     isAttacking: function(sprite) {
       if (this.attackingSprite != sprite || !this.get("attackDamage")) return false;
@@ -510,7 +510,7 @@
 
       this.attackSpriteTypes || (this.attackSpriteTypes = ["character", "breakable-tile", "artifact"]);
 
-      var sprite = this.world.findAt(attackPoint.x, attackPoint.y, this.attackSpriteTypes, this, undefined);
+      var sprite = this.world.findAt(attackPoint, undefined, this.attackSpriteTypes, this, undefined);
 
       if (sprite) {
         var cur = this.getStateInfo();

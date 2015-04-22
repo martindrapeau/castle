@@ -70,6 +70,10 @@
             worldY = -worldHeight + viewportHeight;
       }
 
+      if (worldHeight + worldY < viewportHeight) {
+        worldY = viewportHeight - worldHeight;
+      }
+
       if (worldX != w.x ||  worldY != w.y)
         this.world.set({x: worldX, y: worldY});
     },

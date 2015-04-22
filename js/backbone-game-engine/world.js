@@ -634,29 +634,32 @@
     },
     _findOrFilter: function(fn, x, y, type, exclude, collision) {
       var id = exclude && exclude.id ? exclude.id : null,
+          o = _.isObject(x) ? x: {x: x, y: y, width: 0, height: 0},
           types = !_.isEmpty(type) && typeof type == "object" && type.length != undefined ? " " + type.join(" ") : type || "",
-          col = this.getWorldCol(x),
-          row = this.getWorldRow(y),
+          col = this.getWorldCol(o.x),
+          row = this.getWorldRow(o.y),
           index, c, r, s,
           result = [];
+      o.w = o.width;
+      o.h = o.height;
 
       function test(sprite) {
         return (sprite && sprite.id && sprite.id != id) &&
           (!id || sprite.get("parentId") != id) &&
           (!type || types.indexOf(" "+sprite.get("type")) >= 0) &&
           (collision === undefined || sprite.attributes.collision === collision) &&
-          sprite.overlaps.call(sprite, x, y);
+          sprite.overlaps.call(sprite, o);
       }
 
       if (type == "tile") {
-        index = this.getWorldIndex({x: x, y: y});
+        index = this.getWorldIndex(o);
         var sprite = index ? this.sprites.get(index) : null;
         if (sprite && test(sprite))
           return fn == "find" ? sprite : [sprite];
         return fn == "find" ? null : result;
       }
 
-      var matches = this.quadTree.get({x: x, y: y, w: 0, h: 0}),
+      var matches = this.quadTree.get(o),
           sprite, i;
       for (i = 0; i < matches.length; i++) {
         sprite = this.sprites.get(matches[i].id);
