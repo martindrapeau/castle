@@ -477,7 +477,7 @@
 
       var sequenceIndex =  this.get("sequenceIndex"),
           point = this.attackCollisionPoints[sequenceIndex],
-          x = this.get("x") + (this.attributes.state.indexOf("-left") >= 0 ? this.get("width") - point.x : point.x),
+          x = this.get("x") + (this.attributes.state.indexOf("-left") >= 0 ? this.get("width") - point.x - point.width : point.x),
           y = this.get("y") + point.y;
 
       return {x: x, y: y, width: point.width, height: point.width};
