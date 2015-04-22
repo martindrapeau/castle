@@ -26,6 +26,7 @@
       backgroundImageY: 0,
       backgroundImageWidth: 0,
       backgroundImageHeight: 0,
+      backgroundImageStretch: false,
       sprites: [], // Copy for persistence only. Use the direct member sprites which is a collection.
       state: "play", // play or pause
       time: 0 // Time played in ms
@@ -505,14 +506,15 @@
       if (this.backgroundImage) {
         var img = this.backgroundImage,
             width = this.get("backgroundImageWidth"),
-            height = this.get("backgroundImageHeight");
+            height = this.get("backgroundImageHeight"),
+            stretch = this.get("backgroundImageStretch");
         if (context.canvas.width < width) width = context.canvas.width;
         if (context.canvas.height < height) height = context.canvas.height;
         context.drawImage(
           img,
           this.get("backgroundImageX"), this.get("backgroundImageY"),
           width, height,
-          0, 0, width, height
+          0, 0, stretch ? context.canvas.width : width, stretch ? context.canvas.height : height
         );
       }
 

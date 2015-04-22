@@ -104,6 +104,7 @@
         x: 0,
         y: 0,
         img: "#backgrounds",
+        imgY: 0,
         imgWidth: 1024,
         imgHeight: 300
       });
@@ -113,7 +114,7 @@
         x: 0,
         y: 300,
         img: "#backgrounds",
-        imgY: 300,
+        imgY: 600,
         imgWidth: 1024,
         imgHeight: 300
       });
@@ -123,6 +124,7 @@
         x: 0,
         y: 600,
         img: "#backgrounds",
+        imgY: 300,
         imgWidth: 1024,
         imgHeight: 300
       });
@@ -132,7 +134,7 @@
         x: 0,
         y: 900,
         img: "#backgrounds",
-        imgY: 300,
+        imgY: 600,
         imgWidth: 1024,
         imgHeight: 420
       });
