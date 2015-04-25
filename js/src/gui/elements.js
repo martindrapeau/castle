@@ -57,7 +57,7 @@
 
   Backbone.Panel = Backbone.Element.extend({
     defaults: _.extend({}, Backbone.Element.prototype.defaults, {
-      x: 160,
+      x: 192,
       y: 720,
       width: 640,
       height: 140,

@@ -497,11 +497,22 @@
       this.spriteOptions.offsetX = this.attributes.x;
       this.spriteOptions.offsetY = this.attributes.y;
 
-      drawRect(
-        context,
-        0, 0, context.canvas.width, context.canvas.height,
-        this.attributes.backgroundColor
-      );
+      if (this.attributes.backgroundColor == "pattern") {
+        this.backgroundPattern || (this.backgroundPattern = context.createPattern(this.backgroundImage, "repeat"));
+        drawRect(
+          context,
+          0, 0, context.canvas.width, context.canvas.height,
+          this.backgroundPattern
+        );
+
+      } else {
+        drawRect(
+          context,
+          0, 0, context.canvas.width, context.canvas.height,
+          this.attributes.backgroundColor
+        );
+
+      }
 
       if (this.backgroundImage) {
         var img = this.backgroundImage,
