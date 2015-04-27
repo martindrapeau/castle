@@ -107,7 +107,7 @@
       b.y = y + 40;
       this.drawText(b, context, options);
 
-      b.text = "simirk, dxc, Saranai";
+      b.text = "simirk, bevoulin";
       b.y = y + 70;
       this.drawText(b, context, options);
 

@@ -512,22 +512,22 @@
           this.attributes.backgroundColor
         );
 
+        if (this.backgroundImage) {
+          var img = this.backgroundImage,
+              width = this.get("backgroundImageWidth"),
+              height = this.get("backgroundImageHeight"),
+              stretch = this.get("backgroundImageStretch");
+          if (context.canvas.width < width) width = context.canvas.width;
+          if (context.canvas.height < height) height = context.canvas.height;
+          context.drawImage(
+            img,
+            this.get("backgroundImageX"), this.get("backgroundImageY"),
+            width, height,
+            0, 0, stretch ? context.canvas.width : width, stretch ? context.canvas.height : height
+          );
+        }
       }
 
-      if (this.backgroundImage) {
-        var img = this.backgroundImage,
-            width = this.get("backgroundImageWidth"),
-            height = this.get("backgroundImageHeight"),
-            stretch = this.get("backgroundImageStretch");
-        if (context.canvas.width < width) width = context.canvas.width;
-        if (context.canvas.height < height) height = context.canvas.height;
-        context.drawImage(
-          img,
-          this.get("backgroundImageX"), this.get("backgroundImageY"),
-          width, height,
-          0, 0, stretch ? context.canvas.width : width, stretch ? context.canvas.height : height
-        );
-      }
 
       var secondPass = [];
       for (var col = tileX1; col <= tileX2; col++)
