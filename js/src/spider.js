@@ -22,21 +22,21 @@
       scaleY: 1
     },
     "walk-left": {
-      sequences: [8, 9, 10, 11, 12, 13, 14, 15],
+      sequences: [6, 7, 8, 9, 10, 11, 12, 13],
       delay: sequenceDelay,
       velocity: -walkVelocity,
       scaleX: -1,
       scaleY: 1
     },
     "walk-right": {
-      sequences: [8, 9, 10, 11, 12, 13, 14, 15],
+      sequences: [6, 7, 8, 9, 10, 11, 12, 13],
       delay: sequenceDelay,
       velocity: walkVelocity,
       scaleX: 1,
       scaleY: 1
     },
     "fall-left": {
-      sequences: [17],
+      sequences: [15],
       delay: sequenceDelay,
       velocity: -walkVelocity,
       yVelocity: fallVelocity,
@@ -45,7 +45,7 @@
       scaleY: 1
     },
     "fall-right": {
-      sequences: [17],
+      sequences: [15],
       delay: sequenceDelay,
       velocity: walkVelocity,
       yVelocity: fallVelocity,
@@ -54,7 +54,7 @@
       scaleY: 1
     },
     "ko-left": {
-      sequences: [25, 26, 27, 28, 29, 30],
+      sequences: [21, 22, 23, 24, 25, 26],
       delay: koDelay,
       velocity: -walkVelocity*0.5,
       yVelocity: fallVelocity*0.75,
@@ -63,7 +63,7 @@
       scaleY: 1
     },
     "ko-right": {
-      sequences: [25, 26, 27, 28, 29, 30],
+      sequences: [21, 22, 23, 24, 25, 26],
       delay: koDelay,
       velocity: walkVelocity*0.5,
       yVelocity: fallVelocity*0.75,
@@ -72,13 +72,13 @@
       scaleY: 1
     },
     "squish-left": {
-      sequences: [32, 33, 34],
+      sequences: [27, 28, 29],
       delay: koDelay,
       scaleX: 1,
       scaleY: 1
     },
     "squish-right": {
-      sequences: [32, 33, 34],
+      sequences: [27, 28, 29],
       delay: koDelay,
       scaleX: -1,
       scaleY: 1
@@ -86,7 +86,7 @@
   };
 
   var hurtAnimation = {
-        sequences: [24, 25],
+        sequences: [20, 21],
         delay: 300,
         yVelocity: fallVelocity,
         yAcceleration: fallAcceleration
@@ -99,7 +99,7 @@
   animations["fall-hurt-right"] = _.extend({}, animations["fall-right"], hurtAnimation);
 
   var attackAnimation = {
-    sequences: [16, 17, 18, 19, 20, 21]
+    sequences: [14, 15, 16, 17, 18, 19]
   };
   animations["idle-attack-left"] = _.extend({}, animations["idle-left"], attackAnimation);
   animations["idle-attack-right"] = _.extend({}, animations["idle-right"], attackAnimation);

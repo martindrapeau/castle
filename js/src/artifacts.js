@@ -34,8 +34,8 @@
       name: "callout",
       spriteSheet: "callout",
       state: "callout",
-      width: 126,
-      height: 116,
+      width: 128,
+      height: 128,
       text: "Short text",
       textPadding: 0,
       textLineHeight: 30,
@@ -116,7 +116,7 @@
       width: 90,
       height: 64,
       backgroundColor: "transparent",
-      img: "#artifacts", imgX: 256, imgY: 256, imgWidth: 64, imgHeight: 64, imgMargin: 0,
+      img: "#artifacts", imgX: 448, imgY: 128, imgWidth: 64, imgHeight: 64, imgMargin: 0,
       text: "+1",
       textContextAttributes: {
         fillStyle: "#FFF",
@@ -213,16 +213,16 @@
   }
 
   buildArtifact(Artifact, "a-coin", [5, 6, 7, 8], {gain: 1});
-  buildArtifact(Artifact, "a-coin-bag", [20], {gain: 5});
-  buildArtifact(Artifact, "a-death", [11]);
-  buildArtifact(Artifact, "a-key", [18]);
-  buildArtifact(Artifact, "a-blue-potion", [14]);
-  buildArtifact(Artifact, "a-red-potion", [15]);
-  buildArtifact(Artifact, "a-green-potion", [16]);
-  buildArtifact(Artifact, "a-health", [12]);
+  buildArtifact(Artifact, "a-coin-bag", [19], {gain: 5});
+  buildArtifact(Artifact, "a-death", [10]);
+  buildArtifact(Artifact, "a-key", [17]);
+  buildArtifact(Artifact, "a-blue-potion", [13]);
+  buildArtifact(Artifact, "a-red-potion", [14]);
+  buildArtifact(Artifact, "a-green-potion", [15]);
+  buildArtifact(Artifact, "a-health", [11]);
 
-  buildArtifact(Artifact, "a-dollar", [24]);
-  buildArtifact(Artifact, "a-clock", [23]);
+  buildArtifact(Artifact, "a-dollar", [23]);
+  buildArtifact(Artifact, "a-clock", [22]);
   Backbone.pagedSprites.a.pop();
   Backbone.pagedSprites.a.pop();
 
@@ -305,7 +305,7 @@
     }
   });
 
-  buildArtifact(Sword, "a-blue-sword", [22], {color: "rgba(0, 125, 249, {0})"});
+  buildArtifact(Sword, "a-blue-sword", [21], {color: "rgba(0, 125, 249, {0})"});
 
   // Breakable tiles
   Backbone.BreakableTile = Backbone.Object.extend({

@@ -86,13 +86,13 @@
     y: 0,
     tileWidth: tileWidth,
     tileHeight: tileHeight,
-    tileColumns: 5,
-    tileRows: 6
+    tileColumns: 8,
+    tileRows: 3
   }, {
     id: "farts",
     img: "#artifacts",
-    x: 0,
-    y: 128,
+    x: 128,
+    y: 64,
     tileWidth: 21,
     tileHeight: 21,
     tileColumns: 3,
@@ -101,25 +101,25 @@
     id: "health-indicator",
     img: "#artifacts",
     x: 0,
-    y: 320,
+    y: 192,
     tileWidth: 200,
     tileHeight: 24,
     tileColumns: 1,
     tileRows: 2
   }, {
     id: "callout",
-    img: "#artifacts",
-    x: 0,
-    y: 368,
-    tileWidth: 126,
-    tileHeight: 116,
+    img: "#hero1",
+    x: 640,
+    y: 768,
+    tileWidth: 128,
+    tileHeight: 128,
     tileColumns: 1,
     tileRows: 1
   }, {
     id: "fireball",
     img: "#artifacts",
-    x: 0,
-    y: 486,
+    x: 200,
+    y: 192,
     tileWidth: 70,
     tileHeight: 41,
     tileColumns: 4,
@@ -140,7 +140,7 @@
     y: 0,
     tileWidth: 130,
     tileHeight: 80,
-    tileColumns: 8,
+    tileColumns: 7,
     tileRows: 5
   }, {
     id: "fly",
