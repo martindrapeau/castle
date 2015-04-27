@@ -51,7 +51,9 @@
       doorX: 168,
       doorY: 240,
       zIndex: 0,
-      static: true
+      static: true,
+      showContent: false,
+      artifact: undefined
     }),
     animations: {
       idle: {sequences: [0], delay: 0},
@@ -66,6 +68,10 @@
       Backbone.Tile.prototype.initialize.apply(this, arguments);
 
       _.bindAll(this, "open", "close", "onStep", "tryOpenClose");
+
+      this.artifacts = [];
+      if (this.attributes.artifact)
+        this.artifacts.push(new Backbone[_.classify(this.attributes.artifact)]());
 
       var house = this,
           world = this.world,
@@ -239,7 +245,10 @@
           this.set("state", "idle");
           break;
       }
-    }
+    },
+    showContent: Backbone.BreakableTile.prototype.showContent,
+    hideContent: Backbone.BreakableTile.prototype.hideContent,
+    onDraw: Backbone.BreakableTile.prototype.onDraw
   });
   
   function createHouse(name, tileIndex, defaults, insideAssets, outsideAssets) {
@@ -260,37 +269,71 @@
   }
 
   createHouse("h-1", 0, null, [
-    {name: "bc-table1", x: 64, y: 320},
-    {name: "bc-table2", x: 128, y: 320},
-    {name: "a-chess-coin-bag", x: 320, y: 320},
     {name: "barrier1x2", x: -20, y: 256},
     {name: "barrier2x1", x: 0, y: 150},
     {name: "barrier2x1", x: 128, y: 150},
     {name: "barrier2x1", x: 256, y: 150},
-    {name: "barrier1x2", x: 390, y: 256}
+    {name: "barrier1x2", x: 390, y: 256},
+    {name: "bc-table1", x: 64, y: 320},
+    {name: "bc-table2", x: 128, y: 320}
+  ]);
+  createHouse("h-1-coin-bag", 0, {
+    artifact: "a-coin-bag"
+  }, [
+    {name: "barrier1x2", x: -20, y: 256},
+    {name: "barrier2x1", x: 0, y: 150},
+    {name: "barrier2x1", x: 128, y: 150},
+    {name: "barrier2x1", x: 256, y: 150},
+    {name: "barrier1x2", x: 390, y: 256},
+    {name: "bc-table1", x: 64, y: 320},
+    {name: "bc-table2", x: 128, y: 320},
+    {name: "a-chess-coin-bag", x: 320, y: 320}
   ]);
   createHouse("h-2", 2, {
     doorX: 264
   }, [
-    {name: "a-chess-coin-bag", x: 192, y: 320},
-    {name: "a-barrel", x: 128, y: 320},
-    {name: "a-barrel", x: 128, y: 256},
     {name: "barrier1x2", x: 20, y: 256},
     {name: "barrier2x1", x: 0, y: 128},
     {name: "barrier2x1", x: 128, y: 128},
     {name: "barrier2x1", x: 256, y: 128},
-    {name: "barrier1x2", x: 410, y: 256}
+    {name: "barrier1x2", x: 410, y: 256},
+    {name: "a-barrel", x: 128, y: 320},
+    {name: "a-barrel", x: 128, y: 256}
+  ]);
+  createHouse("h-2-coin-bag", 2, {
+    doorX: 264,
+    artifact: "a-coin-bag"
+  }, [
+    {name: "barrier1x2", x: 20, y: 256},
+    {name: "barrier2x1", x: 0, y: 128},
+    {name: "barrier2x1", x: 128, y: 128},
+    {name: "barrier2x1", x: 256, y: 128},
+    {name: "barrier1x2", x: 410, y: 256},
+    {name: "a-barrel", x: 128, y: 320},
+    {name: "a-barrel", x: 128, y: 256}
   ]);
   createHouse("h-3", 4, null, [
-    {name: "a-chess-key", x: 64, y: 320},
-    {name: "bc-table1", x: 256, y: 320},
-    {name: "bc-table2", x: 320, y: 320},
     {name: "barrier1x2", x: -20, y: 256},
     {name: "barrier", x: 0, y: 150},
     {name: "barrier2x1", x: 64, y: 120},
     {name: "barrier2x1", x: 192, y: 120},
     {name: "barrier", x: 320, y: 150},
-    {name: "barrier1x2", x: 390, y: 256}
+    {name: "barrier1x2", x: 390, y: 256},
+    {name: "bc-table1", x: 256, y: 320},
+    {name: "bc-table2", x: 320, y: 320}
+  ]);
+  createHouse("h-3-key", 4, {
+    artifact: "a-key"
+  }, [
+    {name: "barrier1x2", x: -20, y: 256},
+    {name: "barrier", x: 0, y: 150},
+    {name: "barrier2x1", x: 64, y: 120},
+    {name: "barrier2x1", x: 192, y: 120},
+    {name: "barrier", x: 320, y: 150},
+    {name: "barrier1x2", x: 390, y: 256},
+    {name: "a-chess-key", x: 64, y: 320},
+    {name: "bc-table1", x: 256, y: 320},
+    {name: "bc-table2", x: 320, y: 320}
   ]);
   createHouse("h-cave", 0, {
     spriteSheet: "cave",
@@ -298,7 +341,8 @@
     width: 384,
     height: 256,
     doorX: 284,
-    doorY: 48
+    doorY: 48,
+    artifact: "a-red-potion"
   }, [
     {name: "a-crate", x: 60, y: 192},
     {name: "a-crate-red-potion", x: 60, y: 128},

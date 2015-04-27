@@ -45,7 +45,7 @@
 
       if (this.world.get("puzzle"))
         this.world.sprites.each(function(sprite) {
-          if (sprite.get("type") == "breakable-tile" && sprite.get("artifact"))
+          if (_.isBoolean(sprite.get("showContent")) && sprite.get("artifact"))
             sprite.showContent();
         });
 

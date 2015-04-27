@@ -308,7 +308,7 @@
   buildArtifact(Sword, "a-blue-sword", [22], {color: "rgba(0, 125, 249, {0})"});
 
   // Breakable tiles
-  var BreakableTile = Backbone.Object.extend({
+  Backbone.BreakableTile = Backbone.Object.extend({
     defaults: _.extend({}, Backbone.Object.prototype.defaults, {
       spriteSheet: "tiles",
       type: "breakable-tile",
@@ -389,7 +389,7 @@
       if (!this._animation && !this.attributes.showContent) return this;
       var x = this.get("x") + (options.offsetX || 0) + (options.tileWidth || this.get("width"))/2,
           y = this.get("y") + (options.offsetY || 0) + (options.tileHeight || this.get("height"))/2,
-          radius = Math.round((options.tileWidth || this.get("width")) * 0.375),
+          radius = Math.round(Math.min(64, (options.tileWidth || this.get("width"))) * 0.375),
           now = _.now(),
           factor = 1;
 
@@ -433,7 +433,7 @@
   });
 
   function buildBreakableTile(name, tileIndex, defaults) {
-    extendSprite(BreakableTile, name, defaults, {
+    extendSprite(Backbone.BreakableTile, name, defaults, {
       idle: _.extend({}, Backbone.Object.prototype.animations.idle, {sequences: [tileIndex]}),
       fall: _.extend({}, Backbone.Object.prototype.animations.fall, {sequences: [tileIndex]}),
       ko: _.extend({}, Backbone.Object.prototype.animations.ko, {sequences: [tileIndex]}),
