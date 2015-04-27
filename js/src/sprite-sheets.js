@@ -10,8 +10,8 @@
     y: 0,
     tileWidth: 128,
     tileHeight: 128,
-    tileColumns: 14,
-    tileRows: 9
+    tileColumns: 8,
+    tileRows: 8
   }, {
     id: "bat",
     img: "#bat",

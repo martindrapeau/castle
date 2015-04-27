@@ -22,14 +22,14 @@
       koDelay = 100,
       runDelay = 50,
       attackDelay = 40,
-      attackSequences = [84, 85, 86, 87, 88, 89],
-      jumpAttackSequences = [98, 99, 100, 101, 102, 103],
-      skidAttackSequences = [112, 113, 114, 115, 116],
-      walkSequences = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25],
-      runSequences = [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41],
+      attackSequences = [36, 37, 38, 39, 40, 41],
+      jumpAttackSequences = [42, 43, 44, 45, 46, 47],
+      skidAttackSequences = [48, 49, 50, 51, 52],
+      walkSequences = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      runSequences = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
       hurtDelay = 300,
       hurtBounceVelocity = -300,
-      hurtSequences = [71, 71];
+      hurtSequences = [32, 32];
 
   var animations = {
     "idle-left": {
@@ -101,21 +101,21 @@
       scaleY: 1
     },
     "skid-left": {
-      sequences: [42],
+      sequences: [48],
       velocity: 0,
       acceleration: skidDeceleration,
       scaleX: 1,
       scaleY: 1
     },
     "skid-right": {
-      sequences: [42],
+      sequences: [48],
       velocity: 0,
       acceleration: skidDeceleration,
       scaleX: -1,
       scaleY: 1
     },
     "jump-left": {
-      sequences: [56, 57],
+      sequences: [29, 30],
       delay: 1000,
       velocity: -walkVelocity,
       acceleration: airTurnaroundDeceleration,
@@ -128,7 +128,7 @@
       scaleY: 1
     },
     "jump-right": {
-      sequences: [56, 57],
+      sequences: [29, 30],
       delay: 1000,
       velocity: walkVelocity,
       acceleration: airTurnaroundDeceleration,
@@ -141,7 +141,7 @@
       scaleY: 1
     },
     "ko-left": {
-      sequences: [70, 71, 72],
+      sequences: [31, 32, 33],
       delay: koDelay,
       velocity: -walkVelocity,
       yVelocity: fallVelocity,
@@ -150,7 +150,7 @@
       scaleY: 1
     },
     "ko-right": {
-      sequences: [70, 71, 72],
+      sequences: [31, 32, 33],
       delay: koDelay,
       velocity: walkVelocity,
       yVelocity: fallVelocity,
@@ -159,13 +159,13 @@
       scaleY: 1
     },
     "dead-left": {
-      sequences: [73],
+      sequences: [34],
       velocity: 0,
       scaleX: -1,
       scaleY: 1
     },
     "dead-right": {
-      sequences: [73],
+      sequences: [34],
       velocity: 0,
       scaleX: 1,
       scaleY: 1
