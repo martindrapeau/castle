@@ -11,7 +11,7 @@
     tileWidth: 128,
     tileHeight: 128,
     tileColumns: 8,
-    tileRows: 8
+    tileRows: 7
   }, {
     id: "bat",
     img: "#bat",
@@ -151,5 +151,14 @@
     tileHeight: 110,
     tileColumns: 8,
     tileRows: 3
+  }, {
+    id: "skeletons",
+    img: "#skeletons",
+    x: 0,
+    y: 0,
+    tileWidth: 160,
+    tileHeight: 128,
+    tileColumns: 6,
+    tileRows: 8
   }];
 }).call(this);
