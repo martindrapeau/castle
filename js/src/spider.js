@@ -99,7 +99,7 @@
   animations["fall-hurt-right"] = _.extend({}, animations["fall-right"], hurtAnimation);
 
   var attackAnimation = {
-    sequences: [14, 15, 16, 17, 18, 19]
+    sequences: [14, 15, 16, 17, 18, 19, 19]
   };
   animations["idle-attack-left"] = _.extend({}, animations["idle-left"], attackAnimation);
   animations["idle-attack-right"] = _.extend({}, animations["idle-right"], attackAnimation);

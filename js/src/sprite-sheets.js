@@ -160,5 +160,23 @@
     tileHeight: 128,
     tileColumns: 6,
     tileRows: 8
+  }, {
+    id: "orc",
+    img: "#orc",
+    x: 0,
+    y: 0,
+    tileWidth: 146,
+    tileHeight: 128,
+    tileColumns: 7,
+    tileRows: 6
+  }, {
+    id: "boss",
+    img: "#boss",
+    x: 0,
+    y: 0,
+    tileWidth: 256,
+    tileHeight: 192,
+    tileColumns: 4,
+    tileRows: 5
   }];
 }).call(this);

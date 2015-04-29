@@ -87,7 +87,7 @@
   animations["fall-hurt-right"] = _.extend({}, animations["fall-right"], hurtAnimation);
 
   var attackAnimation = {
-    sequences: [13, 14, 15, 16, 17, 18, 19]
+    sequences: [13, 14, 15, 16, 17, 18, 19, 19]
   };
   animations["idle-attack-left"] = _.extend({}, animations["idle-left"], attackAnimation);
   animations["idle-attack-right"] = _.extend({}, animations["idle-right"], attackAnimation);
@@ -103,7 +103,7 @@
       state: "idle-left",
       paddingLeft: 32,
       paddingRight: 32,
-      paddingTop: 24,
+      paddingTop: 32,
       paddingBottom: 4,
       health: 2,
       attackDamage: 2,
