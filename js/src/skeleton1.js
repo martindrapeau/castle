@@ -107,7 +107,9 @@
       paddingBottom: 4,
       health: 2,
       attackDamage: 2,
-      aiDelay: 250
+      aiDelay: 250,
+      aiState: null, // patrol, think or charge
+      aiPatrolDelay: 1000
     }),
     animations: animations,
     onBeforeFall: function(condition) {
@@ -148,6 +150,66 @@
       this.world.add(this.ouchSprite);
       return this;
     },
+    hit: function(sprite, dir, dir2) {
+      var cur = this.getStateInfo(),
+          opo = _.opo(dir);
+
+      if (this._handlingSpriteHit || cur.mov == "ko" || cur.mov2 == "hurt") return this;
+      this._handlingSpriteHit = sprite;
+
+      if (sprite.get("hero") && sprite.isAttacking(this) ||
+          sprite.get("type") == "projectile") {
+        this.cancelUpdate = true;
+        var attackDamage = sprite.get("attackDamage") || 0;
+        this.set({health: Math.max(this.get("health") - attackDamage, 0)}, {sprite: sprite, dir: dir, dir2: dir2});
+      } else if (cur.dir == dir) {
+        this.cancelUpdate = true;
+        if (cur.mov2 == null)
+          this.set("state", this.buildState(cur.mov, cur.opo));
+        else
+          this.set("state", this.buildState("idle", cur.mov2, cur.dir));
+      }
+
+      sprite.trigger("hit", this, opo);
+
+      this._handlingSpriteHit = undefined;
+      return this;
+    },
+    changeWalkVelocity: function(velocity, sequenceDelay) {
+      this.animations["walk-left"].velocity =
+        this.animations["walk-hurt-left"].velocity =
+        this.animations["fall-left"].velocity = 
+        this.animations["fall-hurt-left"].velocity = 
+        this.animations["walk-attack-left"].velocity = -velocity;
+      this.animations["walk-right"].velocity =
+        this.animations["walk-hurt-right"].velocity =
+        this.animations["fall-right"].velocity = 
+        this.animations["fall-hurt-right"].velocity = 
+        this.animations["walk-attack-right"].velocity = velocity;
+      this.animations["walk-left"].delay = 
+      this.animations["walk-right"].delay = sequenceDelay;
+    },
+    changeAiState: function(newAiState, newDir) {
+      var cur = this.getStateInfo();
+      switch (newAiState) {
+        case "charge":
+            this.cancelUpdate = true;
+            this.set({
+              aiState: "charge",
+              state: this.buildState(cur.mov, cur.mov2, newDir || cur.dir)
+            });
+            this.changeWalkVelocity(walkVelocity, sequenceDelay);
+          break;
+        case "patrol":
+            this.cancelUpdate = true;
+            this.set({
+              aiState: "patrol",
+              state: this.buildState(cur.mov, cur.mov2, newDir || cur.dir)
+            });
+            this.changeWalkVelocity(walkVelocity*0.5, sequenceDelay*1.5);
+          break;
+      }
+    },
     ai: function(dt) {
       Backbone.Character.prototype.ai.apply(this, arguments);
       if (this.cancelUpdate) return this;
@@ -159,24 +221,51 @@
       if (!hero) return this;
 
       var heroBbox = hero.getBbox(true),
-          bbox = this.getBbox(true);
+          bbox = this.getBbox(true),
+          heroWidth = bbox.x2 - bbox.x1,
+          lineOfSight = heroWidth * 3,
+          heroInDir = hero.getCenterX(true) < this.getCenterX(true) ? "left" : "right";
       if (heroBbox.y2 < bbox.y1 || heroBbox.y1 > bbox.y2) return this;
 
-      if (cur.mov == "idle") {
-        this.cancelUpdate = true;
-        this.set({
-          state: this.buildState("walk", cur.dir),
-          velocity: this.animations["walk-"+cur.dir].velocity
-        });
-        return this;
-      }
+      var aiState = this.get("aiState");
 
-      // Attack hero if in line of sight
-      var heroWidth = heroBbox.x2 - heroBbox.x1;
-      if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth && heroBbox.x1 <= bbox.x2) ||
-          (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth && heroBbox.x2 >= bbox.x1)) {
-        this.cancelUpdate = true;
-        this.startNewAnimation(this.buildState(cur.mov, "attack", cur.dir), null, this.endAttack);
+      switch (aiState) {
+        case "patrol":
+          if (cur.dir == heroInDir && heroBbox.x2 > bbox.x1 - lineOfSight && heroBbox.x1 < bbox.x2 + lineOfSight)
+            this.changeAiState("charge");
+          break;
+
+        case "charge":
+          // Attack if in line of sight
+          if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth && heroBbox.x1 <= bbox.x2) ||
+              (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth && heroBbox.x2 >= bbox.x1)) {
+            this.cancelUpdate = true;
+            this.startNewAnimation(this.buildState("walk", "attack", cur.dir), null, this.endAttack);
+            return this;
+          }
+
+          // Walk in hero's direction
+          if (cur.mov == "idle" || cur.dir != heroInDir) {
+            var newState = this.buildState("walk", heroInDir);
+            this.cancelUpdate = true;
+            this.set({
+              state: newState,
+              velocity: this.animations[newState].velocity
+            });
+            return this;
+          }
+
+          // Fall back in patrol mode if out of sight
+          if (heroBbox.x2 < bbox.x1 - lineOfSight || heroBbox.x1 > bbox.x2 + lineOfSight) {
+            this.changeAiState("patrol", cur.opo);
+          }
+
+        break;
+
+        default:
+          this.changeAiState("patrol");
+          break;
+
       }
 
       return this;
