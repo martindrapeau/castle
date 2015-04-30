@@ -210,6 +210,18 @@
           break;
       }
     },
+    isSpriteInLigneOfSight: function(sprite, lineOfSight) {
+      var spriteBbox = sprite.getBbox(true),
+          bbox = this.getBbox(true),
+          spriteWidth = bbox.x2 - bbox.x1,
+          heroInDir = sprite.getCenterX(true) < this.getCenterX(true) ? "left" : "right";
+      lineOfSight || (lineOfSight = spriteWidth * 3);
+
+      if (spriteBbox.y2 < bbox.y1 || spriteBbox.y1 > bbox.y2) return false;
+      if (spriteBbox.x2 < bbox.x1 - lineOfSight || spriteBbox.x1 > bbox.x2 + lineOfSight) return false;
+
+      return true;
+    },
     ai: function(dt) {
       Backbone.Character.prototype.ai.apply(this, arguments);
       if (this.cancelUpdate) return this;
@@ -223,20 +235,20 @@
       var heroBbox = hero.getBbox(true),
           bbox = this.getBbox(true),
           heroWidth = bbox.x2 - bbox.x1,
-          lineOfSight = heroWidth * 3,
-          heroInDir = hero.getCenterX(true) < this.getCenterX(true) ? "left" : "right";
+          heroInDir = hero.getCenterX(true) < this.getCenterX(true) ? "left" : "right",
+          inLighOfSight = this.isSpriteInLigneOfSight(hero);
       if (heroBbox.y2 < bbox.y1 || heroBbox.y1 > bbox.y2) return this;
 
       var aiState = this.get("aiState");
 
       switch (aiState) {
         case "patrol":
-          if (cur.dir == heroInDir && heroBbox.x2 > bbox.x1 - lineOfSight && heroBbox.x1 < bbox.x2 + lineOfSight)
+          if (cur.dir == heroInDir && inLighOfSight)
             this.changeAiState("charge");
           break;
 
         case "charge":
-          // Attack if in line of sight
+          // Attack if real close
           if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth && heroBbox.x1 <= bbox.x2) ||
               (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth && heroBbox.x2 >= bbox.x1)) {
             this.cancelUpdate = true;
@@ -256,7 +268,7 @@
           }
 
           // Fall back in patrol mode if out of sight
-          if (heroBbox.x2 < bbox.x1 - lineOfSight || heroBbox.x1 > bbox.x2 + lineOfSight) {
+          if (!inLighOfSight) {
             this.changeAiState("patrol", cur.opo);
           }
 
