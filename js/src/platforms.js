@@ -53,18 +53,11 @@
           state = this.get("state"),
           cur = this.getStateInfo(),
           animation = this.getAnimation(),
-          now = _.now(),
           aiDelay = this.get("aiDelay"),
           attrs = {};
 
-      // Handle AI
-      if (!this.lastAIEvent)
-        this.lastAIEvent = now;
-      else if (now > this.lastAIEvent + aiDelay) {
-        this.ai(now - this.lastAIEvent);
-        this.lastAIEvent = now;
-        if (this.cancelUpdate) return true;
-      }
+      this.handleAi();
+      if (this.cancelUpdate) return true;
 
       attrs.sequenceIndex = this.updateSequenceIndex();
 

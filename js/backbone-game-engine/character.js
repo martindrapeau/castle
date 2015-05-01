@@ -124,6 +124,9 @@
       Backbone.Sprite.prototype.initialize.apply(this, arguments);
       options || (options = {});
 
+      this._lastAiEvent = 0;
+      this._forceAiEvent = false;
+
       this.on("attach", this.onAttach, this);
       this.on("detach", this.onDetach, this);
 
@@ -152,7 +155,7 @@
       else if (health < this.previous("health")) 
         return this.hurt(options.sprite || null, dir, options.dir2 || null);
       
-      this.lastAIEvent = _.now();
+      this._lastAiEvent = _.now();
 
       return this;
     },
@@ -255,6 +258,15 @@
     ai: function(dt) {
       return this;
     },
+    handleAi: function() {
+      var now = _.now();
+      if (this._forceAiEvent || now > this._lastAiEvent + this.get("aiDelay")) {
+        if (this.world.get("state") == "play") this.ai(now - this._lastAiEvent);
+        this._lastAiEvent = now;
+        this._forceAiEvent = false;
+      }
+      return this;
+    },
     update: function(dt) {
       // Movements are only possible inside a world
       if (!this.world) return true;
@@ -270,18 +282,11 @@
           state = this.get("state"),
           cur = this.getStateInfo(),
           animation = this.getAnimation(),
-          now = _.now(),
           aiDelay = this.get("aiDelay"),
           attrs = {};
 
-      // Handle AI
-      if (!this.lastAIEvent)
-        this.lastAIEvent = now;
-      else if (now > this.lastAIEvent + aiDelay) {
-        if (this.world.get("state") == "play") this.ai(now - this.lastAIEvent);
-        this.lastAIEvent = now;
-        if (this.cancelUpdate) return true;
-      }
+      this.handleAi();
+      if (this.cancelUpdate) return true;
 
       if ((dead || cur.mov2 == "hurt") &&
           this.get("sequenceIndex") == animation.sequences.length-1) {
@@ -428,6 +433,7 @@
             attrs.velocity = velocity = velocity * (cur.mov != "ko" ? -1 : 0);
             attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
             attrs.x = x = leftX - paddingLeft;
+            this._forceAiEvent = true;
           }
         }
 
@@ -457,6 +463,7 @@
             attrs.velocity = velocity = velocity * (cur.mov != "ko" ? -1 : 0);
             attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
             attrs.x = x = rightX - charWidth - paddingLeft;
+            this._forceAiEvent = true;
           }
         }
       }

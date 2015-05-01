@@ -167,7 +167,7 @@
         state: this.buildState("idle", cur.dir),
         velocity: 0
       });
-      this.lastAIEvent = _.now();
+      this._lastAiEvent = _.now();
       return this;
     },
     knockout: function(sprite, dir) {

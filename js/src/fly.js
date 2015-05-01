@@ -137,7 +137,7 @@
             state: this.buildState("idle", dir),
             velocity: 0
           });
-          fly.lastAIEvent = _.now();
+          fly._lastAiEvent = _.now();
         }
       );
       return this;
@@ -179,7 +179,7 @@
         velocity: 0,
         yVelocity: 0
       });
-      this.lastAIEvent = _.now();
+      this._lastAiEvent = _.now();
       return this;
     },
     endAttack: function() {
@@ -189,7 +189,7 @@
         velocity: 0,
         yVelocity: 0
       });
-      this.lastAIEvent = _.now();
+      this._lastAiEvent = _.now();
       return this;
     },
     ai: function(dt) {
@@ -301,8 +301,7 @@
       if (cur.mov == "ko") return Backbone.Character.prototype.update.apply(this, arguments);
 
       // Velocity and state
-      var now = _.now(),
-          velocity = this.get("velocity") || 0,
+      var velocity = this.get("velocity") || 0,
           yVelocity = this.get("yVelocity") || 0,
           x = this.get("x"),
           y = this.get("y"),
@@ -313,14 +312,8 @@
 
       attrs.sequenceIndex = this.updateSequenceIndex();
 
-      // Handle AI
-      if (!this.lastAIEvent)
-        this.lastAIEvent = now;
-      else if (now > this.lastAIEvent + aiDelay) {
-        this.ai(now - this.lastAIEvent);
-        this.lastAIEvent = now;
-        if (this.cancelUpdate) return true;
-      }
+      this.handleAi();
+      if (this.cancelUpdate) return true;
 
       // Handle acceleration
       if (cur.mov == "fly") {

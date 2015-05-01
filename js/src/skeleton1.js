@@ -120,6 +120,7 @@
         velocity: this.animations["walk-"+cur.opo].velocity
       });
       this.cancelUpdate = true;
+      this._forceAiEvent = true;
       return this;
     },
     endAttack: function() {
@@ -128,7 +129,7 @@
         state: this.buildState("idle", cur.dir),
         velocity: 0
       });
-      this.lastAIEvent = _.now();
+      this._lastAiEvent = _.now();
       return this;
     },
     knockout: function(sprite, dir) {
