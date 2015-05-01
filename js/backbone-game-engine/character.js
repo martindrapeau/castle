@@ -278,7 +278,7 @@
       if (!this.lastAIEvent)
         this.lastAIEvent = now;
       else if (now > this.lastAIEvent + aiDelay) {
-        this.ai(now - this.lastAIEvent);
+        if (this.world.get("state") == "play") this.ai(now - this.lastAIEvent);
         this.lastAIEvent = now;
         if (this.cancelUpdate) return true;
       }

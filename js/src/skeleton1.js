@@ -213,12 +213,28 @@
     isSpriteInLigneOfSight: function(sprite, lineOfSight) {
       var spriteBbox = sprite.getBbox(true),
           bbox = this.getBbox(true),
+          height = bbox.y2 - bbox.y1,
           spriteWidth = bbox.x2 - bbox.x1,
-          heroInDir = sprite.getCenterX(true) < this.getCenterX(true) ? "left" : "right";
+          spriteInDir = sprite.getCenterX(true) < this.getCenterX(true) ? "left" : "right";
       lineOfSight || (lineOfSight = spriteWidth * 3);
 
       if (spriteBbox.y2 < bbox.y1 || spriteBbox.y1 > bbox.y2) return false;
       if (spriteBbox.x2 < bbox.x1 - lineOfSight || spriteBbox.x1 > bbox.x2 + lineOfSight) return false;
+
+      var sightBbox = {
+            x: spriteInDir == "left" ? spriteBbox.x2 : bbox.x2,
+            width: (spriteInDir == "left" ? bbox.x1 - spriteBbox.x2 : spriteBbox.x1 - bbox.x2),
+            y: bbox.y1,
+            height: height - 1
+          },
+          obstacles = this.world.filterAt(sightBbox, undefined, undefined, this, true);
+      if (obstacles.length)
+        for (var i = 0; i < obstacles.length; i ++)
+          if (obstacles[i].id != sprite.id) {
+            console.log(obstacles[i]);
+            console.log(sightBbox);
+            return false;
+          }
 
       return true;
     },
@@ -248,6 +264,13 @@
           break;
 
         case "charge":
+          // Fall back in patrol mode if out of sight
+          if (!inLighOfSight) {
+            this.cancelUpdate = true;
+            this.changeAiState("patrol", cur.opo);
+            return this;
+          }
+
           // Attack if real close
           if ((cur.dir == "left" && heroBbox.x2 >= bbox.x1 - heroWidth && heroBbox.x1 <= bbox.x2) ||
               (cur.dir == "right" && heroBbox.x1 <= bbox.x2 + heroWidth && heroBbox.x2 >= bbox.x1)) {
@@ -265,11 +288,6 @@
               velocity: this.animations[newState].velocity
             });
             return this;
-          }
-
-          // Fall back in patrol mode if out of sight
-          if (!inLighOfSight) {
-            this.changeAiState("patrol", cur.opo);
           }
 
         break;
