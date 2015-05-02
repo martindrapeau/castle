@@ -1,7 +1,7 @@
 (function() {
 
   var sequenceDelay = 50,
-      walkVelocity = 150,
+      walkVelocity = 200,
       fallAcceleration = 1200,
       fallVelocity = 600,
       koDelay = 100;

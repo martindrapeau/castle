@@ -364,7 +364,7 @@
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = bottomY - tileHeight + paddingBottom;
-          if (cur.mov == "fall"){
+          if (cur.mov == "fall") {
             attrs.state = this.buildState("walk", cur.dir);
           } else if (cur.mov == "ko") {
             attrs.velocity = velocity = 0;

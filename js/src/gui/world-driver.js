@@ -58,7 +58,10 @@
       this.input = options.input;
 
       this.stacks = new EventStackCollection();
-      this.stacks.add(new HeroEventStack(null, _.extend({driver: this}, options)));
+      this.stacks.add([
+        new HeroEventStack(null, _.extend({driver: this}, options)),
+        new RandomEnemyStack(null, _.extend({driver: this}, options))
+      ]);
     },
     onAttach: function() {
       Backbone.Clock.prototype.onAttach.apply(this, arguments);
@@ -92,7 +95,6 @@
     onAttach: function() {
       EventStack.prototype.onAttach.apply(this, arguments);
       this.hero = this.world.sprites.findWhere({hero: true});
-      //this.hero.set("x", 0);
     },
     onDetach: function() {
       EventStack.prototype.onDetach.apply(this, arguments);
@@ -112,6 +114,23 @@
       delay: 300,
       fn: function() {
         this.input.set({buttonB: false});
+      }
+    }]
+  });
+
+  var enemyNames = ["spider", "orc", "skeleton1", "skeleton2", "boss"];
+  var RandomEnemyStack = EventStack.extend({
+    stack: [{
+      delay: 500,
+      fn: function() {
+        var index = Math.max(0, Math.floor(Math.random()*enemyNames.length-1)),
+            name = enemyNames[index], 
+            Cls = Backbone[_.classify(name)];
+        this.world.add(new Cls({
+          x: 1024,
+          y: 1216 - Cls.prototype.defaults.height,
+          state: "fall-left"
+        }));
       }
     }]
   });
