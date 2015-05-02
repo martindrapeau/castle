@@ -259,11 +259,7 @@
           obstacles = this.world.filterAt(sightBbox, undefined, undefined, this, true);
       if (obstacles.length)
         for (var i = 0; i < obstacles.length; i ++)
-          if (obstacles[i].id != sprite.id) {
-            console.log(obstacles[i]);
-            console.log(sightBbox);
-            return false;
-          }
+          if (obstacles[i].id != sprite.id) return false;
 
       return true;
     },
