@@ -4,8 +4,8 @@
     defaults: _.extend({}, Backbone.Skeleton1.prototype.defaults, {
       name: "orc",
       spriteSheet: "orc",
-      paddingLeft: 32,
-      paddingRight: 32,
+      paddingLeft: 48,
+      paddingRight: 48,
       paddingTop: 24,
       paddingBottom: 12,
       health: 3

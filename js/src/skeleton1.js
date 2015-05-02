@@ -93,6 +93,8 @@
   animations["idle-attack-right"] = _.extend({}, animations["idle-right"], attackAnimation);
   animations["walk-attack-left"] = _.extend({}, animations["walk-left"], attackAnimation);
   animations["walk-attack-right"] = _.extend({}, animations["walk-right"], attackAnimation);
+  animations["fall-attack-left"] = _.extend({}, animations["fall-left"], attackAnimation);
+  animations["fall-attack-right"] = _.extend({}, animations["fall-right"], attackAnimation);
 
 	Backbone.Skeleton1 = Backbone.Character.extend({
     defaults: _.extend({}, Backbone.Character.prototype.defaults, {
@@ -112,15 +114,40 @@
       aiPatrolDelay: 1000
     }),
     animations: animations,
+    initialize: function() {
+      Backbone.Character.prototype.initialize.apply(this, arguments);
+      this.on("beforeTurn", this.onBeforeTurn, this);
+    },
     onBeforeFall: function(condition) {
       var cur = this.getStateInfo();
       if (cur.mov2 == "hurt") return this;
+
+      // When charging, do fall from a ledge to follow the hero
+      if (this.get("aiState") == "charge") {
+        var hero = this.world.sprites.findWhere({hero: true}),
+            heroInDir = hero.getCenterX(true) < this.getCenterX(true) ? "left" : "right";
+        if (cur.dir == heroInDir) return this;
+      }
+
       this.set({
         state: this.buildState("walk", cur.opo),
         velocity: this.animations["walk-"+cur.opo].velocity
       });
       this.cancelUpdate = true;
       this._forceAiEvent = true;
+      return this;
+    },
+    onBeforeTurn: function(obstacleX, newX) {
+      if (this.get("aiState") == "charge") {
+        var cur = this.getStateInfo();
+        this.set({
+          state: this.buildState("idle", cur.mov2, cur.dir),
+          x: newX,
+          velocity: 0
+        });
+        this.cancelUpdate = true;
+        this._forceAiEvent = true;
+      }
       return this;
     },
     endAttack: function() {
@@ -140,6 +167,7 @@
     },
     hurt: function(sprite, dir) {
       this.ouch(dir);
+      this.handleHurtInNextAi = true;
       return Backbone.Character.prototype.hurt.apply(this, arguments);
     },
     ouch: function(dir) {
@@ -225,8 +253,8 @@
       var sightBbox = {
             x: spriteInDir == "left" ? spriteBbox.x2 : bbox.x2,
             width: (spriteInDir == "left" ? bbox.x1 - spriteBbox.x2 : spriteBbox.x1 - bbox.x2),
-            y: bbox.y1,
-            height: height - 1
+            y: Math.max(bbox.y1, spriteBbox.y1),
+            height: Math.min(bbox.y2, spriteBbox.y2) - Math.max(bbox.y1, spriteBbox.y1) - 1
           },
           obstacles = this.world.filterAt(sightBbox, undefined, undefined, this, true);
       if (obstacles.length)
@@ -258,6 +286,13 @@
 
       var aiState = this.get("aiState");
 
+      if (this.handleHurtInNextAi) {
+        this.handleHurtInNextAi = false;
+        if (cur.dir != heroInDir)
+          this.set("state", this.buildState(cur.mov, cur.mov2, cur.opo));
+        cur = this.getStateInfo();
+      }
+
       switch (aiState) {
         case "patrol":
           if (cur.dir == heroInDir && inLighOfSight)
@@ -281,7 +316,8 @@
           }
 
           // Walk in hero's direction
-          if (cur.mov == "idle" || cur.dir != heroInDir) {
+          if ((cur.mov == "idle" && !this.collisionMap[cur.dir].sprites.length) ||
+              cur.dir != heroInDir) {
             var newState = this.buildState("walk", heroInDir);
             this.cancelUpdate = true;
             this.set({

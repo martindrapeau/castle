@@ -364,9 +364,9 @@
           // Stop falling because obstacle below
           attrs.yVelocity = yVelocity = 0;
           attrs.y = y = bottomY - tileHeight + paddingBottom;
-          if (cur.mov == "fall")
+          if (cur.mov == "fall"){
             attrs.state = this.buildState("walk", cur.dir);
-          else if (cur.mov == "ko") {
+          } else if (cur.mov == "ko") {
             attrs.velocity = velocity = 0;
           }
           updateTopBottom();
@@ -422,6 +422,7 @@
             }
 
           if (charLeftX <= leftX) {
+            var newX = leftX - paddingLeft;
             if (charLeftX <= worldLeft) {
               this.world.remove(this);
               return false;
@@ -430,9 +431,11 @@
               leftCharacter.trigger("hit", this, "right", cur.mov2);
               if (this.cancelUpdate) return true;
             }
+            this.trigger("beforeTurn", leftX, newX);
+            if (this.cancelUpdate) return true;
             attrs.velocity = velocity = velocity * (cur.mov != "ko" ? -1 : 0);
             attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
-            attrs.x = x = leftX - paddingLeft;
+            attrs.x = x = newX;
             this._forceAiEvent = true;
           }
         }
@@ -452,6 +455,7 @@
             }
 
           if (charRightX >= rightX) {
+            var newX = rightX - charWidth - paddingLeft;
             if (charRightX >= worldRight) {
               this.world.remove(this);
               return false;
@@ -460,9 +464,11 @@
               rightCharacter.trigger("hit", this, "left", cur.mov2);
               if (this.cancelUpdate) return true;
             }
+            this.trigger("beforeTurn", rightX, newX);
+            if (this.cancelUpdate) return true;
             attrs.velocity = velocity = velocity * (cur.mov != "ko" ? -1 : 0);
             attrs.state = this.buildState(cur.mov, cur.mov2, cur.opo);
-            attrs.x = x = rightX - charWidth - paddingLeft;
+            attrs.x = x = newX;
             this._forceAiEvent = true;
           }
         }
