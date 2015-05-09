@@ -103,6 +103,9 @@
       this.backgroundTown = new Backbone.Element({
         x: 0,
         y: 0,
+        width: 1024,
+        height: 300,
+        backgroundColor: "#4BACC6",
         img: "#backgrounds",
         imgY: 0,
         imgWidth: 1024,
@@ -113,6 +116,8 @@
       this.backgroundForest = new Backbone.Element({
         x: 0,
         y: 300,
+        width: 1024,
+        height: 300,
         img: "#backgrounds",
         imgY: 600,
         imgWidth: 1024,
@@ -123,6 +128,9 @@
       this.backgroundGraveyard = new Backbone.Element({
         x: 0,
         y: 600,
+        width: 1024,
+        height: 300,
+        backgroundColor: "#0C1B2E",
         img: "#backgrounds",
         imgY: 300,
         imgWidth: 1024,
@@ -133,6 +141,8 @@
       this.backgroundCastle = new Backbone.Element({
         x: 0,
         y: 900,
+        width: 1024,
+        height: 420,
         img: "#backgrounds",
         imgY: 600,
         imgWidth: 1024,
@@ -141,7 +151,7 @@
       this.backgroundCastle._origY = this.backgroundCastle.get("y");
 
       this.backButton = new Backbone.Button({
-        x: 20, y: Backbone.HEIGHT - 100,
+        x: 20, y: 30,
         width: 70, height: 70,
         backgroundColor: "transparent",
         img: "#gui", imgX: 730, imgY: 0, imgWidth: 70, imgHeight: 70, imgMargin: 0
